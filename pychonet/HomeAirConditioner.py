@@ -231,7 +231,7 @@ class HomeAirConditioner(EchonetInstance):
                       0xBE] # outdoor temperature
         opc = []
         returned_json_data = {}
-        self.last_transaction_id += 1
+        self.incrementTID()
         for value in attributes:
           if value in self.propertyMaps[0x9F].values():
             opc.append({'EPC': value})

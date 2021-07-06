@@ -99,7 +99,7 @@ class EchonetInstance:
     """
     def __init__(self, eojgc, eojcc, instance = 0x1, netif="", polling = 10 ):
         self.netif = netif
-        self.last_transaction_id = 0x1
+        self.last_transaction_id = 0x01
         self.eojgc = eojgc
         self.eojcc = eojcc
         self.instance = instance
@@ -116,7 +116,7 @@ class EchonetInstance:
 
     """
     def getMessage(self, epc, pdc = 0x00):
-        self.last_transaction_id += 1
+        self.incrementTID()
         opc = [{'EPC': epc, 'PDC': pdc}]
         edt = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, opc, self.last_transaction_id )
         return edt
@@ -131,7 +131,7 @@ class EchonetInstance:
     :return: True if sucessful, false if request message failed
     """
     def setMessage(self, tx_epc, tx_edt):
-        self.last_transaction_id += 1
+        self.incrementTID()
         tx_payload = {
         'TID' : self.last_transaction_id,
         'DEOJGC': self.eojgc ,
@@ -200,6 +200,10 @@ class EchonetInstance:
         else:
             return {}
 
+    def incrementTID (self):
+        self.last_transaction_id += 0x01
+        if self.last_transaction_id > 0xFFFF:
+            self.last_transaction_id = 0x01
     """
     getIdentificationNumber returns a number used to identify an object uniquely
 
