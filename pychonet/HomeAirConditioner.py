@@ -73,17 +73,9 @@ SWING_MODE = {
 }
 
 
-# Check status of Configured Temperature
-def _30B3(edt):
-    return {'set_temperature': int.from_bytes(edt, 'big')}
-
-# Check status of Room Temperature
-def _30BB(edt):
-    return {'room_temperature': int.from_bytes(edt, 'big')}
-
-# Check status of Outdoor Temperature
-def _30BE(edt):
-    return {'outdoor_temperature': int.from_bytes(edt, 'big')}
+# Convert bytes to temperatures
+def _30BX(edt):
+    return int.from_bytes(edt, 'big') if edt is not None else None
 
 # Check status of Fan speed
 def _30A0(edt):
@@ -259,9 +251,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured temperature.
     """
     def getOperationalTemperature(self):
-        raw_data = self.getMessage(0xB3)[0]
-        if raw_data['rx_epc'] == 0xB3:
-            return _30B3(raw_data['rx_edt'])
+        return _30BX(self.getSingleMessageResponse(0xB3))
 
 
     """
@@ -318,9 +308,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the room temperature.
     """
     def getRoomTemperature(self):
-        raw_data = self.getMessage(0xBB)[0]
-        if raw_data['rx_epc'] == 0xBB:
-            return _30BB(raw_data['rx_edt'])
+       return _30BX(self.getSingleMessageResponse(0xBB))
 
     """
     getOutdoorTemperature get the outdoor temperature that has been set in the HVAC
@@ -328,9 +316,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured outdoor temperature.
     """
     def getOutdoorTemperature(self):
-        raw_data= self.getMessage(0xBE)[0]
-        if raw_data['rx_epc'] == 0xBE:
-           return _30BE(raw_data['rx_edt'])
+       return _30BX(self.getSingleMessageResponse(0xBE))
 
     """
     setSwingMode sets the automatic swing mode function

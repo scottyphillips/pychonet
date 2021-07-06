@@ -121,7 +121,14 @@ class EchonetInstance:
         edt = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, opc, self.last_transaction_id )
         return edt
 
+    def getSingleMessageResponse(self, epc):
+        result = self.getMessage(epc)
 
+        # safety check that we got a result for the correct code
+        if len(result) > 0 and 'rx_epc' in result[0] and result[0]['rx_epc'] == epc:
+            return result[0]['rx_edt']
+        return None
+    
     """
     setMessage is used to fire ECHONET request messages to set Node information
     Assumes one OPC is sent per message.
