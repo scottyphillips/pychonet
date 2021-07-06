@@ -2,6 +2,6 @@
 *.tar.gz
 build/*
 dist/*
-mitsubishi_echonet.egg-info/*
+pychonet.egg-info/*
 .DS_Store
 __pycache__
