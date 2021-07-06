@@ -208,6 +208,7 @@ class HomeAirConditioner(EchonetInstance):
         self.eojgc = 0x01 #	Air conditioner-related device group
         self.eojcc = 0x30 # Home air conditioner class
         EchonetInstance.__init__(self, self.eojgc, self.eojcc, instance, netif)
+        self.update_data = {}
 
         # self.available_functions = EPC_CODE[self.eojgc][self.eojcc]['functions']
 
@@ -249,8 +250,8 @@ class HomeAirConditioner(EchonetInstance):
                     returned_json_data.update(_30B0(data['rx_edt']))
                 elif data['rx_epc'] == 0xBE: #mode
                     returned_json_data.update(_30BE(data['rx_edt']))
-
-        return returned_json_data
+        self.update_data = returned_json_data
+        return self.update_data
 
     """
     GetOperationaTemperature get the temperature that has been set in the HVAC
