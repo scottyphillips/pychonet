@@ -8,10 +8,10 @@ with open(path.join(this_directory, 'README.md')) as f:
 
 setup(
     name='pychonet',
-    version='1.0',
+    version='1.0.1',
     author='Scott Phillips',
     author_email='jrh@example.com',
-    packages=['pychonet'],
+    packages=['pychonet', 'pychonet.lib'],
     url='http://pypi.python.org/pypi/pychonet/',
     license='LICENSE.txt',
     description='A library for interfacing via the ECHONETlite protocol.',

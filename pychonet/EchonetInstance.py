@@ -1,6 +1,6 @@
 # from ..eojx import *
-from ..epc  import EPC_CODE, EPC_SUPER
-from ..functions import buildEchonetMsg, sendMessage, decodeEchonetMsg, getOpCode
+from pychonet.lib.epc  import EPC_CODE, EPC_SUPER
+from pychonet.lib.functions import buildEchonetMsg, sendMessage, decodeEchonetMsg, getOpCode
 
 """
 Superclass for Echonet instance objects.

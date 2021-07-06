@@ -1,5 +1,5 @@
-from .EchonetInstance import _FF80, EchonetInstance
-from ..functions import getOpCode
+from pychonet.EchonetInstance import _FF80, EchonetInstance
+from pychonet.lib.functions import getOpCode
 
 MODES = {
 	'auto':  	0x41,

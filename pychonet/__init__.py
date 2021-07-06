@@ -10,10 +10,10 @@ stage it will control the AC and thats it!
 
 import socket
 import struct
-from .eojx import EOJX_GROUP, EOJX_CLASS
-from .functions  import buildEchonetMsg, sendMessage, decodeEchonetMsg
-from .classes.EchonetInstance import EchonetInstance
-from .classes.HomeAirConditioner import HomeAirConditioner
+from pychonet.lib.eojx import EOJX_CLASS,EOJX_GROUP
+from pychonet.lib.functions import buildEchonetMsg, sendMessage, decodeEchonetMsg
+from pychonet.EchonetInstance import EchonetInstance
+from pychonet.HomeAirConditioner import HomeAirConditioner
 
 """
 discover is used to identify ECHONET instances.

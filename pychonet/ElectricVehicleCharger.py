@@ -1,4 +1,4 @@
-from .EchonetInstance import EchonetInstance
+from EchonetInstance import EchonetInstance
 from ..functions import getOpCode
 
 """Class for Electric Vehicle Charger Objects"""
