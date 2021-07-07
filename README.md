@@ -86,16 +86,21 @@ NOTE: For Home Assistant users there is now a dedicated repo for the related Hom
 
 'example_hvac.py' gives you an idea how to drive a HVAC directly from Python using this library.
 
-## Thanks
+## Hall of Fame
+Thanks to khcnz (Karl Chaffey) and gvs for helping refector the old code
+and contributing to testing.
+
+Thanks to Dick Swart, Masaki Tagawa, Paul, khcnz,  Kolodnerd, and Alfie Gerner
+for each contributing code updates to to the original 'mitsubishi_echonet'
+and therefore this library
 
 Thanks to Jeffro Carr who inspired me to write my own native Python ECHONET
-library for Home Assistant. I could not get his Node JS Docker container
-to work properly on Hass.io :-)
+library for Home Assistant. 
 Some ideas in his own repo got implemented in my own code.
 (https://github.com/jethrocarr/echonetlite-hvac-mqtt-service.git)
 
-Also big thanks to Futomi Hatano for open sourcing a high quality and
-extremely well documented ECHONET Lite library in Node JS that formed
+Also big thanks to Futomi Hatano for open sourcing a well-documented ECHONET Lite
+library in Node JS that formed
 the basis of my reverse engineering efforts.
 (https://github.com/futomi/node-echonet-lite)
 
