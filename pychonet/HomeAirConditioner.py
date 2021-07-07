@@ -180,7 +180,7 @@ def _30B0(edt):
     }
     return values.get(op_mode, "invalid_setting")
 
-# Check status of temperature
+# Check status of Temperature
 def _30BX(edt):
     return int.from_bytes(edt, 'big')
 
