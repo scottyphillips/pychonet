@@ -46,7 +46,7 @@ Superclass for Echonet instance objects.
 # Check status of Echonnet Instance
 def _FF80(edt):
     ops_value = int.from_bytes(edt, 'big')
-    return {'status': ('On' if ops_value == 0x30 else 'Off')}
+    return ('On' if ops_value == 0x30 else 'Off')
 
 def _009X(edt):
     payload = []

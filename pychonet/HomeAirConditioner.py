@@ -72,19 +72,6 @@ SWING_MODE = {
     'vert-horiz':   0x43
 }
 
-
-# Check status of Configured Temperature
-def _30B3(edt):
-    return {'set_temperature': int.from_bytes(edt, 'big')}
-
-# Check status of Room Temperature
-def _30BB(edt):
-    return {'room_temperature': int.from_bytes(edt, 'big')}
-
-# Check status of Outdoor Temperature
-def _30BE(edt):
-    return {'outdoor_temperature': int.from_bytes(edt, 'big')}
-
 # Check status of Fan speed
 def _30A0(edt):
     op_mode = int.from_bytes(edt, 'big')
@@ -99,8 +86,18 @@ def _30A0(edt):
        0x37: 'very-high',
        0x38: 'max'
     }
-    return {'fan_speed': values.get(op_mode, "Invalid setting")}
+    return values.get(op_mode, "Invalid setting")
 
+# Automatic control of air flow direction setting
+def _30A1(edt):
+    op_mode = int.from_bytes(edt, 'big')
+    values = {
+       0x41: 'auto',
+       0x42: 'non-auto',
+       0x43: 'auto-vert',
+       0x44: 'auto-horiz'
+    }
+    return values.get(op_mode, "Invalid setting")
 
 def _30AA(edt):
     op_mode = int.from_bytes(edt, 'big')
@@ -112,31 +109,7 @@ def _30AA(edt):
       0x43: 'Heat removal'
       }
     # return({'special':hex(op_mode)})
-    return {'special_setting': values.get(op_mode, "Invalid setting")}
-
-# Operation mode
-def _30B0(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x41: 'auto',
-       0x42: 'cool',
-       0x43: 'heat',
-       0x44: 'dry',
-       0x45: 'fan_only',
-       0x40: 'other'
-    }
-    return {'mode': values.get(op_mode, "Invalid setting" )}
-
-# Automatic control of air flow direction setting
-def _30A1(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x41: 'auto',
-       0x42: 'non-auto',
-       0x43: 'auto-vert',
-       0x44: 'auto-horiz'
-    }
-    return {'auto_direction': values.get(op_mode, "Invalid setting")}
+    return values.get(op_mode, "invalid_setting")
 
 # Automatic swing of air flow direction setting
 def _30A3(edt):
@@ -147,7 +120,7 @@ def _30A3(edt):
        0x42: 'horiz',
        0x43: 'vert-horiz'
     }
-    return {'swing_mode': values.get(op_mode, "Invalid setting")}
+    return values.get(op_mode, "invalid_setting")
 
 # Air flow direction (vertical) setting
 def _30A4(edt):
@@ -160,7 +133,7 @@ def _30A4(edt):
       0x42: 'lower'
       }
     # return({'special':hex(op_mode)})
-    return {'airflow_vert': values.get(op_mode, "Invalid setting")}
+    return values.get(op_mode, "invalid_setting")
 
 # Air flow direction (horiziontal) setting
 def _30A5(edt):
@@ -192,7 +165,25 @@ def _30A5(edt):
       0x6A: 'left-lc-rc'
       }
     # return({'special':hex(op_mode)})
-    return {'airflow_horiz': values.get(op_mode, "Invalid setting")}
+    return values.get(op_mode, "invalid_setting")
+
+# Operation mode
+def _30B0(edt):
+    op_mode = int.from_bytes(edt, 'big')
+    values = {
+       0x41: 'auto',
+       0x42: 'cool',
+       0x43: 'heat',
+       0x44: 'dry',
+       0x45: 'fan_only',
+       0x40: 'other'
+    }
+    return values.get(op_mode, "invalid_setting")
+
+# Check status of temperature
+def _30BX(edt):
+    return int.from_bytes(edt, 'big')
+
 
 """Class for Home AirConditioner Objects"""
 class HomeAirConditioner(EchonetInstance):
@@ -208,7 +199,6 @@ class HomeAirConditioner(EchonetInstance):
         self.eojgc = 0x01 #	Air conditioner-related device group
         self.eojcc = 0x30 # Home air conditioner class
         EchonetInstance.__init__(self, self.eojgc, self.eojcc, instance, netif)
-        self.update_data = {}
 
         # self.available_functions = EPC_CODE[self.eojgc][self.eojcc]['functions']
 
@@ -239,19 +229,18 @@ class HomeAirConditioner(EchonetInstance):
         if raw_data is not False:
              for data in raw_data:
                 if data['rx_epc'] == 0x80: #Op status
-                    returned_json_data.update(_FF80(data['rx_edt']))
+                    returned_json_data.update({"status":_FF80(data['rx_edt'])})
                 elif data['rx_epc'] == 0xB3: #Set Temperature
-                    returned_json_data.update(_30B3(data['rx_edt']))
+                    returned_json_data.update({"set_temperature":_30BX(data['rx_edt'])})
                 elif data['rx_epc'] == 0xA0: #fan speed
-                    returned_json_data.update(_30A0(data['rx_edt']))
+                    returned_json_data.update({"fan_speed":_30A0(data['rx_edt'])})
                 elif data['rx_epc'] == 0xBB: #room temperature
-                    returned_json_data.update(_30BB(data['rx_edt']))
+                    returned_json_data.update({"room_temperature":_30BX(data['rx_edt'])})
                 elif data['rx_epc'] == 0xB0: #mode
-                    returned_json_data.update(_30B0(data['rx_edt']))
-                elif data['rx_epc'] == 0xBE: #mode
-                    returned_json_data.update(_30BE(data['rx_edt']))
-        self.update_data = returned_json_data
-        return self.update_data
+                    returned_json_data.update({"mode":_30B0(data['rx_edt'])})
+                elif data['rx_epc'] == 0xBE: #outdoor_temperature
+                    returned_json_data.update({"outdoor_temperature":_30BX(data['rx_edt'])})
+        return returned_json_data
 
     """
     GetOperationaTemperature get the temperature that has been set in the HVAC
@@ -261,8 +250,27 @@ class HomeAirConditioner(EchonetInstance):
     def getOperationalTemperature(self):
         raw_data = self.getMessage(0xB3)[0]
         if raw_data['rx_epc'] == 0xB3:
-            return _30B3(raw_data['rx_edt'])
+            return _30BX(raw_data['rx_edt'])
 
+    """
+    getRoomTemperature get the HVAC's room temperature.
+
+    return: A integer representing the room temperature.
+    """
+    def getRoomTemperature(self):
+        raw_data = self.getMessage(0xBB)[0]
+        if raw_data['rx_epc'] == 0xBB:
+            return _30BX(raw_data['rx_edt'])
+
+    """
+    getOutdoorTemperature get the outdoor temperature that has been set in the HVAC
+
+    return: An integer representing the configured outdoor temperature.
+    """
+    def getOutdoorTemperature(self):
+        raw_data= self.getMessage(0xBE)[0]
+        if raw_data['rx_epc'] == 0xBE:
+           return _30BX(raw_data['rx_edt'])
 
     """
     setOperationalTemperature get the temperature that has been set in the HVAC
@@ -301,7 +309,6 @@ class HomeAirConditioner(EchonetInstance):
         raw_data = self.getMessage(0xA0)[0]
         if raw_data['rx_epc'] == 0xA0:
             return _30A0(raw_data['rx_edt'])
-        # return self.fan_speed
 
 
     """
@@ -311,26 +318,6 @@ class HomeAirConditioner(EchonetInstance):
     """
     def setFanSpeed(self, fan_speed):
         return self.setMessage(0xA0, FAN_SPEED[fan_speed])
-
-    """
-    getRoomTemperature get the HVAC's room temperature.
-
-    return: A string representing the room temperature.
-    """
-    def getRoomTemperature(self):
-        raw_data = self.getMessage(0xBB)[0]
-        if raw_data['rx_epc'] == 0xBB:
-            return _30BB(raw_data['rx_edt'])
-
-    """
-    getOutdoorTemperature get the outdoor temperature that has been set in the HVAC
-
-    return: A string representing the configured outdoor temperature.
-    """
-    def getOutdoorTemperature(self):
-        raw_data= self.getMessage(0xBE)[0]
-        if raw_data['rx_epc'] == 0xBE:
-           return _30BE(raw_data['rx_edt'])
 
     """
     setSwingMode sets the automatic swing mode function
