@@ -8,15 +8,15 @@
 
 A library for interfacing with the ECHONETlite protocol as commonly used in Japan.
 Useful for interfacing to many interesting devices such as HVACs,
-electric car chargers and solar systems that support ECHONETLite.
+electric car chargers, rice cookers (not joking), and solar systems
+that support ECHONETLite.
 
-It is specifically designed for use with Home Assistant, and its functionality
-is currently limited to HVAC systems, but it can easily be extended to other
-ECHONETlite applications and be used as a general purpose library.
+The current functionality is limited to a few ECHONETLite classes, notably HVAC
+but it can easily be extended to any ECHONETlite classes required.
 
-The basic boilerplate EchoNetInstance can be used to provide raw connectivity to
-any compatible device but it is up to the developer to create useful classes.
-Any additions to the library are welcome.
+The basic boilerplate EchoNetInstance class can be used to provide
+raw connectivity to any compatible device but it is up to the developer
+to create useful classes. Any ECHONETlite class additions to the library are welcome.
 
 It is designed to work with Python 3.9.5+
 
@@ -95,7 +95,7 @@ for each contributing code updates to to the original 'mitsubishi_echonet'
 and therefore this library
 
 Thanks to Jeffro Carr who inspired me to write my own native Python ECHONET
-library for Home Assistant. 
+library for Home Assistant.
 Some ideas in his own repo got implemented in my own code.
 (https://github.com/jethrocarr/echonetlite-hvac-mqtt-service.git)
 
