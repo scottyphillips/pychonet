@@ -8,9 +8,9 @@ with open(path.join(this_directory, 'README.md')) as f:
 
 setup(
     name='pychonet',
-    version='1.0.5',
+    version='1.0.6',
     author='Scott Phillips',
-    author_email='jrh@example.com',
+    author_email='scotty.phillips@hotmail.com',
     packages=['pychonet', 'pychonet.lib'],
     url='http://pypi.python.org/pypi/pychonet/',
     license='LICENSE.txt',
