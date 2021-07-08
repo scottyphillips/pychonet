@@ -48,7 +48,6 @@ def discover(IP_ADDRESS = "224.0.23.0"):
     # Decipher received message for each node discovered:
 
     for node in data:
-        enl_instance = {}
         rx = decodeEchonetMsg(node['payload'])
         if (tx_payload['DEOJGC'] == rx['SEOJGC'] and
         rx['TID'] == tx_payload['TID'] and
@@ -61,11 +60,18 @@ def discover(IP_ADDRESS = "224.0.23.0"):
             #2nd to 253rd bytes: ECHONET object codes (EOJ3 bytes) enumerated
             edtnum = bytearray(edt)[0]
             for x in range(edtnum):
+                enl_instance = {}
                 enl_instance['netaddr'] = node['server'][0]
                 enl_instance['eojgc'] = bytearray(edt)[1 + (3 * x)]
                 enl_instance['eojcc'] = bytearray(edt)[2 + (3 * x)]
                 enl_instance['eojci'] = bytearray(edt)[3 + (3 * x)]
-                enl_instance['group'] = EOJX_GROUP[enl_instance['eojgc']]
-                enl_instance['code'] = EOJX_CLASS[enl_instance['eojgc']][enl_instance['eojcc'] ]
+
+                try:
+                    enl_instance['group'] = EOJX_GROUP[enl_instance['eojgc']]
+                    enl_instance['code'] = EOJX_CLASS[enl_instance['eojgc']][enl_instance['eojcc'] ]
+                except KeyError as e:
+                    pass
+
                 eoa.append(enl_instance)
+
     return eoa
