@@ -13,7 +13,11 @@ import struct
 from pychonet.lib.eojx import EOJX_CLASS,EOJX_GROUP
 from pychonet.lib.functions import buildEchonetMsg, sendMessage, decodeEchonetMsg
 from pychonet.EchonetInstance import EchonetInstance
+
+# Available classes.
 from pychonet.HomeAirConditioner import HomeAirConditioner
+from pychonet.HomeAirConditioner import HomeSolarPower
+from pychonet.HomeAirConditioner import StorageBattery
 
 """
 discover is used to identify ECHONET instances.

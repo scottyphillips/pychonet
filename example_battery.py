@@ -7,7 +7,7 @@ instances = pychonet.discover()
 print(instances)
 
 # create a battery instance
-battery = pychonet.StorageBattery.StorageBattery("10.0.0.1")
+battery = pychonet.StorageBattery("10.0.0.1")
 
 # return all the property maps
 print(battery.getAllPropertyMaps())
