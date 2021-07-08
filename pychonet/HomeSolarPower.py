@@ -13,11 +13,7 @@ class HomeSolarPower(EchoNetNode):
         EchonetInstance.__init__(self, self.eojgc, self.eojcc, instance, netif)
 
     def getMeasuredInstantPower(self):
-        raw_data = self.getMessage(0xE0)[0]
-        if raw_data['rx_epc'] == 0xE0:
-            return _0279e0(raw_data['rx_edt'])
+        return _0279e0(self.getSingleMessageResponse(0xE0))
 
     def getMeasuredCumulPower(self):
-        raw_data = self.getMessage(0xE1)[0]
-        if raw_data['rx_epc'] == 0xE1:
-            return _0279e1(raw_data['rx_edt'])
+        return _0279e1(self.getSingleMessageResponse(0xE1))

@@ -248,9 +248,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured temperature.
     """
     def getOperationalTemperature(self):
-        raw_data = self.getMessage(0xB3)[0]
-        if raw_data['rx_epc'] == 0xB3:
-            return _30BX(raw_data['rx_edt'])
+        return _30BX(self.getSingleMessageResponse(0xB3))
+
 
     """
     getRoomTemperature get the HVAC's room temperature.
@@ -258,9 +257,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A integer representing the room temperature.
     """
     def getRoomTemperature(self):
-        raw_data = self.getMessage(0xBB)[0]
-        if raw_data['rx_epc'] == 0xBB:
-            return _30BX(raw_data['rx_edt'])
+        return _30BX(self.getSingleMessageResponse(0xBB))
+
 
     """
     getOutdoorTemperature get the outdoor temperature that has been set in the HVAC
@@ -268,9 +266,7 @@ class HomeAirConditioner(EchonetInstance):
     return: An integer representing the configured outdoor temperature.
     """
     def getOutdoorTemperature(self):
-        raw_data= self.getMessage(0xBE)[0]
-        if raw_data['rx_epc'] == 0xBE:
-           return _30BX(raw_data['rx_edt'])
+         return _30BX(self.getSingleMessageResponse(0xBE))
 
     """
     setOperationalTemperature get the temperature that has been set in the HVAC
@@ -285,10 +281,8 @@ class HomeAirConditioner(EchonetInstance):
 
     return: A string representing the configured mode.
     """
-    def getMode(self):
-        raw_data = self.getMessage(0xB0)[0]
-        if raw_data['rx_epc'] == 0xB0:
-            return _30B0(raw_data['rx_edt'])
+    def getMode(self): #0xB0
+        return _30B0(self.getSingleMessageResponse(0xB0))
 
     """
     setMode set the desired mode (e.g Heating, Cooling, Fan etc)
@@ -304,11 +298,8 @@ class HomeAirConditioner(EchonetInstance):
 
     return: A string representing the fan speed
     """
-    def getFanSpeed(self):
-        #self.fan_speed = self.getMessage(0xA0)
-        raw_data = self.getMessage(0xA0)[0]
-        if raw_data['rx_epc'] == 0xA0:
-            return _30A0(raw_data['rx_edt'])
+    def getFanSpeed(self): #0xA0
+        return _30A0(self.getSingleMessageResponse(0xA0))
 
 
     """
@@ -333,11 +324,8 @@ class HomeAirConditioner(EchonetInstance):
 
     return: A string representing the configured swing mode.
     """
-    def getSwingMode(self):
-        raw_data = self.getMessage(0xA3)[0]
-        if raw_data['rx_epc'] == 0xA3:
-            return _30A3(raw_data['rx_edt'])
-
+    def getSwingMode(self): #0xA3
+        return _30A3(self.getSingleMessageResponse(0xA3))
 
     """
     setAutoDirection sets the automatic direction mode function
@@ -353,11 +341,8 @@ class HomeAirConditioner(EchonetInstance):
 
     return: A string representing the configured temperature.
     """
-    def getAutoDirection(self):
-        raw_data = self.getMessage(0xA1)[0]
-        if raw_data['rx_epc'] == 0xA1:
-            return _30A1(raw_data['rx_edt'])
-
+    def getAutoDirection(self): #0xA1
+        return _30A1(self.getSingleMessageResponse(0xA1))
 
     """
     setAirflowVert sets the vertical vane setting
@@ -374,10 +359,9 @@ class HomeAirConditioner(EchonetInstance):
 
     return: A string representing vertical airflow setting
     """
-    def getAirflowVert(self):
-        raw_data = self.getMessage(0xA4)[0]
-        if raw_data['rx_epc'] == 0xA4:
-            return _30A4(raw_data['rx_edt'])
+    def getAirflowVert(self): #0xA4
+        return _30A4(self.getSingleMessageResponse(0xA4))
+
 
     """
     setAirflowHoriz sets the horizontal vane setting
@@ -393,7 +377,5 @@ class HomeAirConditioner(EchonetInstance):
 
     return: A string representing vertical airflow setting e.g: 'left', 'lc', 'center', 'rc', 'right'
     """
-    def getAirflowHoriz(self):
-        raw_data = self.getMessage(0xA5)[0]
-        if raw_data['rx_epc'] == 0xA5:
-            return _30A5(raw_data['rx_edt'])
+    def getAirflowHoriz(self): #0xA5
+        return _30A5(self.getSingleMessageResponse(0xA5))

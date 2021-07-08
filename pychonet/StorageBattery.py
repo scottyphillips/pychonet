@@ -24,11 +24,7 @@ class StorageBattery(EchonetInstance):
         EchonetInstance.__init__(self, self.eojgc, self.eojcc, instance, netif)
 
     def getRemainingStoredElectricity3(self):
-        raw_data = self.getMessage(0xE4)[0]
-        if raw_data['rx_epc'] == 0xE4:
-            return _027de4(raw_data['rx_edt'])
+        return _027de4(self.getSingleMessageResponse(0xE4))
 
     def getWorkingOperationStatus(self):
-        raw_data = self.getMessage(0xCF)[0]
-        if raw_data['rx_epc'] == 0xCF:
-            return _027dcf(raw_data['rx_edt'])
+        return _027dcf(self.getSingleMessageResponse(0xCF))

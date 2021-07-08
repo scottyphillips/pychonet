@@ -123,6 +123,24 @@ class EchonetInstance:
 
 
     """
+    getSingleMessageResponse is used to fire ECHONET request messages to get Node information
+    Assumes one EPC is sent per message.
+
+    :param tx_epc: EPC byte code for the request.
+    :return: the deconstructed payload for the response
+
+    """
+    def getSingleMessageResponse(self, epc):
+         result = self.getMessage(epc)
+
+         # safety check that we got a result for the correct code
+         if len(result) > 0 and 'rx_epc' in result[0] and result[0]['rx_epc'] == epc:
+             return result[0]['rx_edt']
+         return None
+
+
+
+    """
     setMessage is used to fire ECHONET request messages to set Node information
     Assumes one OPC is sent per message.
 
@@ -161,10 +179,7 @@ class EchonetInstance:
     :return: status as a string.
     """
     def getOperationalStatus(self): # EPC 0x80
-        raw_data = self.getMessage(0x80)[0]
-        if raw_data['rx_epc'] == 0x80:
-            return _FF80(raw_data['rx_edt'])
-
+        return _FF80(self.getSingleMessageResponse(0x80))
 
     """
     setOperationalStatus sets the ON/OFF state of the node
@@ -210,9 +225,7 @@ class EchonetInstance:
     :return: Identification number as a string.
     """
     def getIdentificationNumber(self): # EPC 0x83
-        raw_data = self.getMessage(0x83)[0]
-        if raw_data['rx_epc'] == 0x83:
-            return _0083(raw_data['rx_edt'])
+        return _0083(self.getSingleMessageResponse(0x83))
 
     def getAllPropertyMaps(self):
         propertyMaps = {}
