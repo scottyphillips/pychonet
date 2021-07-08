@@ -17,7 +17,7 @@ def _027dcf(edt):
 
     return {"working_operation_status": STATES[int.from_bytes(edt, 'big')]}
 
-class StorageBattery(EchoNetNode):
+class StorageBattery(EchonetInstance):
     def __init__(self, netif, instance = 0x1):
         self.eojgc = 0x02
         self.eojcc = 0x7d
