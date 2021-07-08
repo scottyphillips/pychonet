@@ -224,6 +224,4 @@ class EchonetInstance:
                     propertyMaps[property['rx_epc']][EPC_CODE[self.eojgc][self.eojcc][value]] = value
                 elif value in EPC_SUPER:
                     propertyMaps[property['rx_epc']][EPC_SUPER[value]] = value
-                else:
-                    print("code not found: " + hex(value) )
         return propertyMaps
