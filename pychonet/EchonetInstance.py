@@ -151,12 +151,12 @@ class EchonetInstance:
     def setMessage(self, tx_epc, tx_edt):
         self.incrementTID()
         tx_payload = {
-        'TID' : self.last_transaction_id,
-        'DEOJGC': self.eojgc ,
-        'DEOJCC': self.eojcc ,
-        'DEOJIC': self.instance,
-        'ESV' : SETC,
-        'OPC' : [{'EPC': tx_epc, 'PDC': 0x01, 'EDT': tx_edt}]
+            'TID' : self.last_transaction_id,
+            'DEOJGC': self.eojgc ,
+            'DEOJCC': self.eojcc ,
+            'DEOJIC': self.instance,
+            'ESV' : SETC,
+            'OPC' : [{'EPC': tx_epc, 'PDC': 0x01, 'EDT': tx_edt}]
         }
         message = buildEchonetMsg(tx_payload)
         data = sendMessage(message, self.netif);
