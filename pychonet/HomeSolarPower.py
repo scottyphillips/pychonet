@@ -6,7 +6,7 @@ def _0279e0(edt):
 def _0279e1(edt):
         return {'cumul_power': int.from_bytes(edt, 'big')}
 
-class HomeSolarPower(EchoNetNode):
+class HomeSolarPower(EchonetInstance):
     def __init__(self, netif, instance = 0x1):
         self.eojgc = 0x02
         self.eojcc = 0x79
