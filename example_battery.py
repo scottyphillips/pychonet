@@ -13,3 +13,4 @@ battery = pychonet.StorageBattery("10.0.0.1")
 print(battery.getAllPropertyMaps())
 
 print(battery.getRemainingStoredElectricity3())
+print(battery.WORKING_OPERATION_STATES[battery.getWorkingOperationStatus()])
