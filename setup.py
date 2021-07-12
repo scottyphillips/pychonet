@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md')) as f:
 
 setup(
     name='pychonet',
-    version='1.0.6',
+    version='1.0.7',
     author='Scott Phillips',
     author_email='scotty.phillips@hotmail.com',
     packages=['pychonet', 'pychonet.lib'],
