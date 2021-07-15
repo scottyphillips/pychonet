@@ -11,7 +11,7 @@ stage it will control the AC and thats it!
 import socket
 import struct
 from pychonet.lib.eojx import EOJX_CLASS,EOJX_GROUP
-from pychonet.lib.functions import buildEchonetMsg, sendMessage, decodeEchonetMsg
+from pychonet.lib.functions import buildEchonetMsg, sendMessage, decodeEchonetMsg, VERSION
 from pychonet.EchonetInstance import EchonetInstance
 
 # Available classes.

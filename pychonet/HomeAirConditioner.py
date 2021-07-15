@@ -210,15 +210,18 @@ class HomeAirConditioner(EchonetInstance):
     {'status': '###', 'set_temperature': ##, 'fan_speed': '###', 'room_temperature': ##, 'mode': '###'}
 
     """
-    def update(self):
+    def update(self, attributes=None):
         # at this stage we only care about a subset of gettable attributes that are relevant
         # down the track i might try to pull all of them..
-        attributes = [0x80, # Op status
-                      0xB3, # Set temperature
-                      0xA0, # fan speed
-                      0xBB, # room temperature
-                      0xB0, # mode
-                      0xBE] # outdoor temperature
+        if attributes == None:
+            attributes = [0x80, # Op status
+                          0xB3, # Set temperature
+                          0xA0, # Fan speed
+                          0xBB, # Room temperature
+                          0xB0, # Mode
+                          0xBE, # Outdoor temperature
+                          0xA5, # Horizontal Airflow
+                          0xA4] # Vertical Airflow 
         opc = []
         returned_json_data = {}
         self.incrementTID()
@@ -238,8 +241,12 @@ class HomeAirConditioner(EchonetInstance):
                     returned_json_data.update({"room_temperature":_30BX(data['rx_edt'])})
                 elif data['rx_epc'] == 0xB0: #mode
                     returned_json_data.update({"mode":_30B0(data['rx_edt'])})
-                elif data['rx_epc'] == 0xBE: #outdoor_temperature
+                elif data['rx_epc'] == 0xBE: #Outdoor temperature
                     returned_json_data.update({"outdoor_temperature":_30BX(data['rx_edt'])})
+                elif data['rx_epc'] == 0xA5: #Horizontal Airflow
+                    returned_json_data.update({"airflow_horizt":_30A5(data['rx_edt'])})
+                elif data['rx_epc'] == 0xA4: #Vertical Airflow
+                    returned_json_data.update({"airflow_vert":_30A4(data['rx_edt'])})
         return returned_json_data
 
     """
