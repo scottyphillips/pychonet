@@ -148,7 +148,7 @@ class EchonetInstance:
     :param tx_edt: EDT data relevant to the request.
     :return: True if sucessful, false if request message failed
     """
-    def setMessage(self, tx_epc, tx_edt):
+    def setMessage(self, opc):
         self.incrementTID()
         tx_payload = {
             'TID' : self.last_transaction_id,
@@ -156,7 +156,7 @@ class EchonetInstance:
             'DEOJCC': self.eojcc ,
             'DEOJIC': self.instance,
             'ESV' : SETC,
-            'OPC' : [{'EPC': tx_epc, 'PDC': 0x01, 'EDT': tx_edt}]
+            'OPC' : opc
         }
         message = buildEchonetMsg(tx_payload)
         data = sendMessage(message, self.netif);
@@ -166,12 +166,7 @@ class EchonetInstance:
         # if no data is returned ignore the IndexError and return false
         except IndexError:
            return False
-        rx_epc = rx['OPC'][0]['EPC']
-        rx_pdc = rx['OPC'][0]['PDC']
-        if rx_epc == tx_epc and rx_pdc == 0x00:
-            return True
-        else:
-            return False
+        return True
 
     """
     getOperationalStatus returns the ON/OFF state of the node
@@ -187,21 +182,21 @@ class EchonetInstance:
     :param status: True if On, False if Off.
     """
     def setOperationalStatus(self, status): # EPC 0x80
-        return self.setMessage(0x80, 0x30 if status else 0x31)
+        return self.setMessage([{'EPC': 0x80, 'PDC': 0x01, 'EDT': 0x30 if status else 0x31}])
 
     """
     On sets the node to ON.
 
     """
     def on (self): # EPC 0x80
-        return self.setMessage(0x80, 0x30)
+        return self.setMessage([{'EPC': 0x80, 'PDC': 0x01, 'EDT': 0x30}])
 
     """
     Off sets the node to OFF.
 
     """
     def off (self): # EPC 0x80
-        return self.setMessage(0x80, 0x31)
+        return self.setMessage([{'EPC': 0x80, 'PDC': 0x01, 'EDT': 0x31}])
 
     def fetchSetProperties (self): # EPC 0x9E
         if 0x9E in self.propertyMaps:
