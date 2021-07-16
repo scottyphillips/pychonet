@@ -38,6 +38,10 @@ ESV_CODES = {
     0x5E: {'name': 'SetGet_SNA', 'description': 'Property value write & read (response not possible)'}
 }
 
+ENL_STATUS = 0x80
+ENL_UID = 0x83
+ENL_SETMAP = 0x9E
+ENL_GETMAP = 0x9F
 
 """
 Superclass for Echonet instance objects.
@@ -128,8 +132,8 @@ class EchonetInstance:
 
     """
     getSingleMessageResponse is used to fire ECHONET request messages to get Node information
-    Assumes one EPC is sent per message.
-
+    Assumes one EPC is sent per message. This is obsolete as 'update' can now peform the same function
+    
     :param tx_epc: EPC byte code for the request.
     :return: the deconstructed payload for the response
 
@@ -173,12 +177,60 @@ class EchonetInstance:
         return True
 
     """
+    update is used as a way of producing a dict useful for API polling etc
+    Data can be formatted or returned as a hex string value by default.
+
+    :param attributes: optional list of EPC codes. eg [0x80, 0xBF], or a single code eg 0x80
+
+    :return dict: A dict with the following attributes:
+    {128: 'On', 160: 'medium-high', 176: 'heat', 129: '00', 130: '00004300',
+    131: '0000060104a0c9a0fffe069719013001', 179: 19, 134: '06000006000000020000', 136: '42', 137: '0000'}
+
+    :return string: if attribute is a single code then return value directly:
+    eg:
+    update(0x80)
+    'on'
+
+    """
+    def update(self, attributes=None):
+        # at this stage we only care about a subset of gettable attributes that are relevant
+        # down the track i might try to pull all of them..
+        opc = []
+        if attributes == None:
+            attributes = self.propertyMaps[ENL_GETMAP].values()
+        if isinstance(attributes, int):
+            list_attributes = [attributes]
+            attributes = list_attributes
+        returned_json_data = {}
+        self.incrementTID()
+        for value in attributes:
+          if value in self.propertyMaps[ENL_GETMAP].values():
+            opc.append({'EPC': value})
+        raw_data = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, opc, self.last_transaction_id )
+        if raw_data is not False:
+             for data in raw_data:
+                if data['rx_epc'] in self.EPC_SUPER_FUNCTIONS:
+                    returned_json_data.update({data['rx_epc']: self.EPC_SUPER_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
+                elif data['rx_epc'] in self.EPC_FUNCTIONS:
+                    returned_json_data.update({data['rx_epc']: self.EPC_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
+                elif data['rx_epc'] in EPC_CODE[self.eojgc][self.eojcc]:
+                    returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
+                elif data['rx_epc'] in EPC_SUPER:
+                    returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
+        if(len(returned_json_data)) == 1:
+            return returned_json_data[attributes[0]]
+        elif(len(returned_json_data)) == 0:
+            return False
+        return returned_json_data
+
+
+    """
     getOperationalStatus returns the ON/OFF state of the node
 
     :return: status as a string.
     """
     def getOperationalStatus(self): # EPC 0x80
-        return self.EPC_SUPER_FUNCTIONS[0x80](self.getSingleMessageResponse(0x80))
+        return self.update(ENL_STATUS)
 
     """
     setOperationalStatus sets the ON/OFF state of the node
@@ -186,31 +238,31 @@ class EchonetInstance:
     :param status: True if On, False if Off.
     """
     def setOperationalStatus(self, status): # EPC 0x80
-        return self.setMessage([{'EPC': 0x80, 'PDC': 0x01, 'EDT': 0x30 if status else 0x31}])
+        return self.setMessage([{'EPC': ENL_STATUS, 'PDC': 0x01, 'EDT': 0x30 if status else 0x31}])
 
     """
     On sets the node to ON.
 
     """
     def on (self): # EPC 0x80
-        return self.setMessage([{'EPC': 0x80, 'PDC': 0x01, 'EDT': 0x30}])
+        return self.setMessage([{'EPC': ENL_STATUS, 'PDC': 0x01, 'EDT': 0x30}])
 
     """
     Off sets the node to OFF.
 
     """
     def off (self): # EPC 0x80
-        return self.setMessage([{'EPC': 0x80, 'PDC': 0x01, 'EDT': 0x31}])
+        return self.setMessage([{'EPC': ENL_STATUS, 'PDC': 0x01, 'EDT': 0x31}])
 
     def fetchSetProperties (self): # EPC 0x9E
         if 0x9E in self.propertyMaps:
-            return self.propertyMaps[0x9E]
+            return self.propertyMaps[ENL_SETMAP]
         else:
             return {}
 
     def fetchGetProperties (self): # EPC 0x9F
         if 0x9F in self.propertyMaps:
-            return self.propertyMaps[0x9F]
+            return self.propertyMaps[ENL_GETMAP]
         else:
             return {}
 
@@ -224,11 +276,11 @@ class EchonetInstance:
     :return: Identification number as a string.
     """
     def getIdentificationNumber(self): # EPC 0x83
-        return self.EPC_SUPER_FUNCTIONS[0x83](self.getSingleMessageResponse(0x83))
+        return self.update(ENL_UID)
 
     def getAllPropertyMaps(self):
         propertyMaps = {}
-        property_map = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, [{'EPC':0x9F},{'EPC':0x9E}])
+        property_map = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, [{'EPC':ENL_GETMAP},{'EPC':ENL_SETMAP}])
         for property in property_map:
             propertyMaps[property['rx_epc']] = {}
             for value in EchonetInstance._009X(property['rx_edt']):
@@ -237,40 +289,3 @@ class EchonetInstance:
                 elif value in EPC_SUPER:
                     propertyMaps[property['rx_epc']][EPC_SUPER[value]] = value
         return propertyMaps
-
-    """
-    update is used as a way of producing a dict useful for API polling etc
-    Data can be formatted or returned as a hex string value by default.
-
-    :param attributes: optional list of EPC codes. eg [0x80, 0xBF]
-
-    :return: A string with the following attributes:
-    {'Operation status': 'On', 'Air flow rate setting': '35', 'Operation mode setting': '43',
-    'Installation location': '00', 'Standard version information': '00004300',
-    'Identification number': '0000060104a0c9a0fffe069719013001', 'Set temperature value': '14',
-    'Manufacturers fault code': '06000006000000020000', 'Fault status': '42', 'Fault description': '0000'}
-
-    """
-    def update(self, attributes=None):
-        # at this stage we only care about a subset of gettable attributes that are relevant
-        # down the track i might try to pull all of them..
-        if attributes == None:
-            attributes = self.propertyMaps[0x9F].values()
-        opc = []
-        returned_json_data = {}
-        self.incrementTID()
-        for value in attributes:
-          if value in self.propertyMaps[0x9F].values():
-            opc.append({'EPC': value})
-        raw_data = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, opc, self.last_transaction_id )
-        if raw_data is not False:
-             for data in raw_data:
-                if data['rx_epc'] in self.EPC_SUPER_FUNCTIONS:
-                    returned_json_data.update({EPC_SUPER[data['rx_epc']]: self.EPC_SUPER_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
-                elif data['rx_epc'] in self.EPC_FUNCTIONS:
-                    returned_json_data.update({EPC_CODE[self.eojgc][self.eojcc][data['rx_epc']]: self.EPC_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
-                elif data['rx_epc'] in EPC_CODE[self.eojgc][self.eojcc]:
-                    returned_json_data.update({EPC_CODE[self.eojgc][self.eojcc][data['rx_epc']]: data['rx_edt'].hex()})
-                elif data['rx_epc'] in EPC_SUPER:
-                    returned_json_data.update({EPC_SUPER[data['rx_epc']]: data['rx_edt'].hex()})
-        return returned_json_data

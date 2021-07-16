@@ -72,7 +72,16 @@ SWING_MODE = {
     'vert-horiz':   0x43
 }
 
-# Check status of Fan speed
+ENL_STATUS = 0x80
+ENL_FANSPEED = 0xA0
+ENL_AUTO_DIRECTION = 0xA1
+ENL_SWING_MODE = 0xA3
+ENL_AIR_VERT = 0xA4
+ENL_AIR_HORZ = 0xA5
+ENL_HVAC_MODE = 0xB0
+ENL_HVAC_SET_TEMP = 0xB3
+ENL_HVAC_ROOM_TEMP = 0xBB
+ENL_HVAC_OUT_TEMP = 0xBE
 
 
 """Class for Home AirConditioner Objects"""
@@ -221,7 +230,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured temperature.
     """
     def getOperationalTemperature(self):
-        return self.EPC_FUNCTIONS[0xB3](self.getSingleMessageResponse(0xB3))
+        return self.update(ENL_HVAC_SET_TEMP)
 
 
     """
@@ -230,7 +239,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A integer representing the room temperature.
     """
     def getRoomTemperature(self):
-        return self.EPC_FUNCTIONS[0xBB](self.getSingleMessageResponse(0xBB))
+        return self.update(ENL_HVAC_ROOM_TEMP)
 
 
     """
@@ -239,7 +248,7 @@ class HomeAirConditioner(EchonetInstance):
     return: An integer representing the configured outdoor temperature.
     """
     def getOutdoorTemperature(self):
-         return self.EPC_FUNCTIONS[0xBE](self.getSingleMessageResponse(0xBE))
+         return self.update(ENL_HVAC_OUT_TEMP)
 
     """
     setOperationalTemperature get the temperature that has been set in the HVAC
@@ -247,7 +256,7 @@ class HomeAirConditioner(EchonetInstance):
     param temperature: A string representing the desired temperature.
     """
     def setOperationalTemperature(self, temperature):
-        return self.setMessage([{'EPC': 0xB3, 'PDC': 0x01, 'EDT': int(temperature)}])
+        return self.setMessage([{'EPC': ENL_HVAC_SET_TEMP, 'PDC': 0x01, 'EDT': int(temperature)}])
 
     """
     GetMode returns the current configured mode (e.g Heating, Cooling, Fan etc)
@@ -255,7 +264,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured mode.
     """
     def getMode(self):
-        return self.EPC_FUNCTIONS[0xB0](self.getSingleMessageResponse(0xB0))
+        return self.update(ENL_HVAC_MODE)
 
     """
     setMode set the desired mode (e.g Heating, Cooling, Fan etc)
@@ -266,9 +275,9 @@ class HomeAirConditioner(EchonetInstance):
     """
     def setMode(self, mode):
         if mode == 'off':
-            return self.setMessage([{'EPC': 0x80, 'PDC': 0x01, 'EDT': 0x31}])
+            return self.setMessage([{'EPC': ENL_STATUS, 'PDC': 0x01, 'EDT': 0x31}])
         #
-        return self.setMessage([{'EPC': 0x80, 'PDC': 0x01, 'EDT': 0x30},{'EPC': 0xB0, 'PDC': 0x01, 'EDT': MODES[mode]}])
+        return self.setMessage([{'EPC': ENL_STATUS, 'PDC': 0x01, 'EDT': 0x30},{'EPC': ENL_HVAC_MODE, 'PDC': 0x01, 'EDT': MODES[mode]}])
 
     """
     GetFanSpeed gets the current fan speed (e.g Low, Medium, High etc)
@@ -277,7 +286,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the fan speed
     """
     def getFanSpeed(self): #0xA0
-        return self.EPC_FUNCTIONS[0xA0](self.getSingleMessageResponse(0xA0))
+        return self.update(ENL_FANSPEED)
 
 
     """
@@ -286,7 +295,7 @@ class HomeAirConditioner(EchonetInstance):
     param fans_speed: A string representing the fan speed
     """
     def setFanSpeed(self, fan_speed):
-        return self.setMessage([{'EPC': 0xA0, 'PDC': 0x01, 'EDT': FAN_SPEED[fan_speed]}])
+        return self.setMessage([{'EPC': ENL_FANSPEED, 'PDC': 0x01, 'EDT': FAN_SPEED[fan_speed]}])
 
     """
     setSwingMode sets the automatic swing mode function
@@ -295,7 +304,7 @@ class HomeAirConditioner(EchonetInstance):
                        e.g: 'not-used', 'vert', 'horiz', 'vert-horiz'
     """
     def setSwingMode(self, swing_mode):
-        return self.setMessage([{'EPC': 0xA3, 'PDC': 0x01, 'EDT': SWING_MODE[swing_mode]}])
+        return self.setMessage([{'EPC': ENL_SWING_MODE, 'PDC': 0x01, 'EDT': SWING_MODE[swing_mode]}])
 
     """
     getSwingMode gets the swing mode that has been set in the HVAC
@@ -303,7 +312,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured swing mode.
     """
     def getSwingMode(self): #0xA3
-        return self.EPC_FUNCTIONS[0xA3](self.getSingleMessageResponse(0xA3))
+        return self.update(ENL_SWING_MODE)
 
     """
     setAutoDirection sets the automatic direction mode function
@@ -312,7 +321,7 @@ class HomeAirConditioner(EchonetInstance):
                            e.g: 'auto', 'non-auto', 'auto-horiz', 'auto-vert'
     """
     def setAutoDirection (self, auto_direction):
-        return self.setMessage([{'EPC': 0xA1, 'PDC': 0x01, 'EDT': AUTO_DIRECTION[auto_direction]}])
+        return self.setMessage([{'EPC': ENL_AUTO_DIRECTION, 'PDC': 0x01, 'EDT': AUTO_DIRECTION[auto_direction]}])
 
     """
     getAutoDirection get the direction mode that has been set in the HVAC
@@ -320,7 +329,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured temperature.
     """
     def getAutoDirection(self): #0xA1
-        return self.EPC_FUNCTIONS[0xA1](self.getSingleMessageResponse(0xA1))
+        return self.update(ENL_AUTO_DIRECTION)
 
     """
     setAirflowVert sets the vertical vane setting
@@ -330,7 +339,7 @@ class HomeAirConditioner(EchonetInstance):
                          'lower-central', 'lower'
     """
     def setAirflowVert (self, airflow_vert):
-        return self.setMessage([{'EPC': 0xA4, 'PDC': 0x01, 'EDT': AIRFLOW_VERT[airflow_vert]}])
+        return self.setMessage([{'EPC': ENL_AIR_VERT, 'PDC': 0x01, 'EDT': AIRFLOW_VERT[airflow_vert]}])
 
     """
     getAirflowVert get the vertical vane setting that has been set in the HVAC
@@ -338,7 +347,7 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing vertical airflow setting
     """
     def getAirflowVert(self): #0xA4
-        return self.EPC_FUNCTIONS[0xA4](self.getSingleMessageResponse(0xA4))
+        return self.update(ENL_AIR_VERT)
 
 
     """
@@ -348,7 +357,7 @@ class HomeAirConditioner(EchonetInstance):
                          e.g: 'left', 'lc', 'center', 'rc', 'right'
     """
     def setAirflowHoriz (self, airflow_horiz):
-        return self.setMessage([{'EPC': 0xA5, 'PDC': 0x01, 'EDT': AIRFLOW_HORIZ[airflow_horiz]}])
+        return self.setMessage([{'EPC': ENL_AIR_HORZ, 'PDC': 0x01, 'EDT': AIRFLOW_HORIZ[airflow_horiz]}])
 
     """
     getAirflowHoriz get the horizontal vane setting that has been set in the HVAC
@@ -356,4 +365,4 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing vertical airflow setting e.g: 'left', 'lc', 'center', 'rc', 'right'
     """
     def getAirflowHoriz(self): #0xA5
-        return self.EPC_FUNCTIONS[0xA5](self.getSingleMessageResponse(0xA5))
+        return self.update(ENL_AIR_HORZ)
