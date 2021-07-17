@@ -163,10 +163,12 @@ class EchonetInstance:
              for data in raw_data:
                 if data['rx_epc'] in EPC_SUPER_FUNCTIONS: # check if function is defined in the superset
                     returned_json_data.update({data['rx_epc']: EPC_SUPER_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
-                elif data['rx_epc'] in EPC_FUNCTIONS[self.eojgc][self.eojcc]: # check if function is defined for the specific class
-                    returned_json_data.update({data['rx_epc']: EPC_FUNCTIONS[self.eojgc][self.eojcc][data['rx_epc']](data['rx_edt'])})
-                elif data['rx_epc'] in EPC_CODE[self.eojgc][self.eojcc]: # return hex value if EPC code exists in class but no function found
-                    returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
+                if self.eojgc in EPC_FUNCTIONS:
+                    if self.eojcc in EPC_FUNCTIONS[self.eojgc]:
+                        if data['rx_epc'] in EPC_FUNCTIONS[self.eojgc][self.eojcc]: # check if function is defined for the specific class
+                            returned_json_data.update({data['rx_epc']: EPC_FUNCTIONS[self.eojgc][self.eojcc][data['rx_epc']](data['rx_edt'])})
+                        elif data['rx_epc'] in EPC_CODE[self.eojgc][self.eojcc]: # return hex value if EPC code exists in class but no function found
+                            returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
                 elif data['rx_epc'] in EPC_SUPER: # return hex value if code exists in superset but no function found
                     returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
         if(len(returned_json_data)) == 1:

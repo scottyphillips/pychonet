@@ -4,7 +4,7 @@ import sys
 import time
 from .eojx import EOJX_GROUP, EOJX_CLASS
 
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 # Echonetlite message format:
 #
 # - EDT0     |Property value data             |01 ..|01 01 30 01
