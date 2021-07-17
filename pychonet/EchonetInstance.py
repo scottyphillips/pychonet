@@ -1,6 +1,7 @@
 # from ..eojx import *
 from pychonet.lib.epc  import EPC_CODE, EPC_SUPER
 from pychonet.lib.functions import buildEchonetMsg, sendMessage, decodeEchonetMsg, getOpCode
+from pychonet.lib.epc_functions import EPC_FUNCTIONS, EPC_SUPER_FUNCTIONS
 
 GETC = 			0x60
 SETC = 			0x61
@@ -66,55 +67,6 @@ class EchonetInstance:
         self.status = False
         self.propertyMaps = self.getAllPropertyMaps()
 
-    # Check status of Echonnet Instance
-    def _0080(edt):
-        ops_value = int.from_bytes(edt, 'big')
-        return ('On' if ops_value == 0x30 else 'Off')
-
-    def _009X(edt):
-        payload = []
-        if len(edt) < 17:
-            for i in range (1, len(edt)):
-                payload.append(edt[i])
-            return payload
-
-        for i in range (1, len(edt)):
-            code = i-1
-            binary = '{0:08b}'.format(edt[i])[::-1]
-            for j in range (0, 8):
-                if binary[j] == "1":
-                    EPC = (j+8) * 0x10 + code
-                    payload.append(EPC)
-        return payload
-
-    # Check install location
-    def _0081(edt):
-        # ops_value = int.from_bytes(edt, 'little')
-        return {'install_location': None}
-    # Check standard version information
-    def _0082(edt):
-        # ops_value = int.from_bytes(edt, 'little')
-        return {'version_info': None}
-
-    # Check standard version information
-    def _008A(edt):
-        return int.from_bytes(edt, 'big')
-
-    def _0083(edt):
-        if edt[0] == 0xFE:
-            ops_value = edt[1:].hex()
-        else:
-            ops_value = None
-        return ops_value
-
-    EPC_SUPER_FUNCTIONS = {
-        0x80: _0080,
-        0x83: _0083,
-        0x9E: _009X,
-        0x9F: _009X
-    }
-
-    EPC_FUNCTIONS = {}
     """
     getMessage is used to fire ECHONET request messages to get Node information
     Assumes one EPC is sent per message.
@@ -133,7 +85,7 @@ class EchonetInstance:
     """
     getSingleMessageResponse is used to fire ECHONET request messages to get Node information
     Assumes one EPC is sent per message. This is obsolete as 'update' can now peform the same function
-    
+
     :param tx_epc: EPC byte code for the request.
     :return: the deconstructed payload for the response
 
@@ -209,13 +161,13 @@ class EchonetInstance:
         raw_data = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, opc, self.last_transaction_id )
         if raw_data is not False:
              for data in raw_data:
-                if data['rx_epc'] in self.EPC_SUPER_FUNCTIONS:
-                    returned_json_data.update({data['rx_epc']: self.EPC_SUPER_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
-                elif data['rx_epc'] in self.EPC_FUNCTIONS:
-                    returned_json_data.update({data['rx_epc']: self.EPC_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
-                elif data['rx_epc'] in EPC_CODE[self.eojgc][self.eojcc]:
+                if data['rx_epc'] in EPC_SUPER_FUNCTIONS: # check if function is defined in the superset
+                    returned_json_data.update({data['rx_epc']: EPC_SUPER_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
+                elif data['rx_epc'] in EPC_FUNCTIONS[self.eojgc][self.eojcc]: # check if function is defined for the specific class
+                    returned_json_data.update({data['rx_epc']: EPC_FUNCTIONS[self.eojgc][self.eojcc][data['rx_epc']](data['rx_edt'])})
+                elif data['rx_epc'] in EPC_CODE[self.eojgc][self.eojcc]: # return hex value if EPC code exists in class but no function found
                     returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
-                elif data['rx_epc'] in EPC_SUPER:
+                elif data['rx_epc'] in EPC_SUPER: # return hex value if code exists in superset but no function found
                     returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
         if(len(returned_json_data)) == 1:
             return returned_json_data[attributes[0]]
@@ -283,7 +235,7 @@ class EchonetInstance:
         property_map = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, [{'EPC':ENL_GETMAP},{'EPC':ENL_SETMAP}])
         for property in property_map:
             propertyMaps[property['rx_epc']] = {}
-            for value in EchonetInstance._009X(property['rx_edt']):
+            for value in EPC_SUPER_FUNCTIONS[0x9F](property['rx_edt']):
                 if value in EPC_CODE[self.eojgc][self.eojcc]:
                     propertyMaps[property['rx_epc']][EPC_CODE[self.eojgc][self.eojcc][value]] = value
                 elif value in EPC_SUPER:

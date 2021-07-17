@@ -6,14 +6,6 @@ class HomeSolarPower(EchonetInstance):
         self.eojcc = 0x79
         EchonetInstance.__init__(self, self.eojgc, self.eojcc, instance, netif)
 
-    def _0279ex(edt):
-            return int.from_bytes(edt, 'big')
-
-    EPC_FUNCTIONS = {
-    	0xE0: _0279ex,
-        0xE1: _0279ex
-    }
-
     def getMeasuredInstantPower(self):
         return int.from_bytes(self.getSingleMessageResponse(0xE0), 'big')
 

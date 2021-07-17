@@ -18,6 +18,7 @@ from pychonet.EchonetInstance import EchonetInstance
 from pychonet.HomeAirConditioner import HomeAirConditioner
 from pychonet.HomeSolarPower import HomeSolarPower
 from pychonet.StorageBattery import StorageBattery
+from pychonet.TemperatureSensor import TemperatureSensor
 
 """
 discover is used to identify ECHONET instances.
