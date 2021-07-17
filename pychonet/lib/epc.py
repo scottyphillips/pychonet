@@ -250,12 +250,12 @@ EPC_CODE = {
 	},
 	0x01: { # Air conditioner-related device class group
 		0x30: { # Home air conditioner class
-			0x80: 'Operation status',
+			0x80: 'Operation status', #done
 			0x8F: 'Operation power-saving',
-			0xB0: 'Operation mode setting',
+			0xB0: 'Operation mode setting',  #done
 			0xB1: 'Automatic temperature control setting',
 			0xB2: 'Normal/high-speed/silent operation setting',
-			0xB3: 'Set temperature value',
+			0xB3: 'Set temperature value',  #done
 			0xB4: 'Set value of relative humidity in dehumidifying mode',
 			0xB5: 'Set temperature value in cooling mode',
 			0xB6: 'Set temperature value in heating mode',
@@ -263,16 +263,16 @@ EPC_CODE = {
 			0xB8: 'Rated power consumption',
 			0xB9: 'Measured value of current consumption',
 			0xBA: 'Measured value of room relative humidity',
-			0xBB: 'Measured value of room temperature',
+			0xBB: 'Measured value of room temperature',  #done
 			0xBC: 'Set temperature value of user remote control',
 			0xBD: 'Measured cooled air temperature',
-			0xBE: 'Measured outdoor air temperature',
+			0xBE: 'Measured outdoor air temperature',  #done
 			0xBF: 'Relative temperature setting',
-			0xA0: 'Air flow rate setting',
-			0xA1: 'Automatic control of air flow direction setting',
-			0xA3: 'Automatic swing of air flow setting',
-			0xA4: 'Air flow direction (vertical) setting',
-			0xA5: 'Air flow direction (horizontal) setting',
+			0xA0: 'Air flow rate setting',  #done
+			0xA1: 'Automatic control of air flow direction setting',  #done
+			0xA3: 'Automatic swing of air flow setting',  #done
+			0xA4: 'Air flow direction (vertical) setting',  #done
+			0xA5: 'Air flow direction (horizontal) setting',  #done 
 			0xAA: 'Special state',
 			0xAB: 'Non-priority state',
 			0xC0: 'Ventilation function setting',
