@@ -161,19 +161,25 @@ class EchonetInstance:
         raw_data = getOpCode(self.netif, self.eojgc, self.eojcc, self.instance, opc, self.last_transaction_id )
         if raw_data is not False:
              for data in raw_data:
-                if data['rx_epc'] in EPC_SUPER_FUNCTIONS: # check if function is defined in the superset
+                flag = 0
+                if data['rx_epc'] in list(EPC_SUPER_FUNCTIONS.keys()): # check if function is defined in the superset
+                    flag = 1
                     returned_json_data.update({data['rx_epc']: EPC_SUPER_FUNCTIONS[data['rx_epc']](data['rx_edt'])})
-                elif self.eojgc in EPC_FUNCTIONS:
-                    if self.eojcc in EPC_FUNCTIONS[self.eojgc]:
-                        if data['rx_epc'] in EPC_FUNCTIONS[self.eojgc][self.eojcc]: # check if function is defined for the specific class
-                            returned_json_data.update({data['rx_epc']: EPC_FUNCTIONS[self.eojgc][self.eojcc][data['rx_epc']](data['rx_edt'])})
-                elif data['rx_epc'] in EPC_CODE[self.eojgc][self.eojcc]: # return hex value if EPC code exists in class but no function found
-                        returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
-                elif data['rx_epc'] in EPC_SUPER: # return hex value if code exists in superset but no function found
+                elif data['rx_epc'] in list(EPC_SUPER.keys()): # return hex value if code exists in superset but no function found
+                    flag = 1
                     returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
+                elif self.eojgc in list(EPC_FUNCTIONS.keys()):
+                    if self.eojcc in list(EPC_FUNCTIONS[self.eojgc].keys()):
+                        if data['rx_epc'] in list(EPC_FUNCTIONS[self.eojgc][self.eojcc].keys()): # check if function is defined for the specific class
+                            flag = 1
+                            returned_json_data.update({data['rx_epc']: EPC_FUNCTIONS[self.eojgc][self.eojcc][data['rx_epc']](data['rx_edt'])})
+                if data['rx_epc'] in list(EPC_CODE[self.eojgc][self.eojcc].keys()) and flag == 0: # return hex value if EPC code exists in class but no function found
+                        returned_json_data.update({data['rx_epc']: data['rx_edt'].hex()})
+        for key in attributes:
+            if key not in list(returned_json_data.keys()):
+                returned_json_data.update({key: False})
         if(len(returned_json_data)) == 1 and len(attributes) == 1:
-            print(returned_json_data)
-            return returned_json_data
+            return returned_json_data[attributes[0]]
         elif(len(returned_json_data)) == 0:
             return False
         return returned_json_data
