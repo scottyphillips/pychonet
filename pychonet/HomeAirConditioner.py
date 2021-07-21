@@ -1,5 +1,5 @@
-from asynchonet.EchonetInstance import EchonetInstance
-from asynchonet.lib.epc_functions import _int
+from pychonet.EchonetInstance import EchonetInstance
+from pychonet.lib.epc_functions import _int
 
 MODES = {
 	'auto':  	0x41,

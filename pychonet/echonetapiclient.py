@@ -6,12 +6,12 @@ from aioudp import UDPServer
 import struct
 import sys
 import time
-from asynchonet.lib.const import GET
-from asynchonet.lib.functions import decodeEchonetMsg, buildEchonetMsg, preparePayload
-from asynchonet.lib.eojx import EOJX_GROUP, EOJX_CLASS
-from asynchonet.lib.const import ENL_STATUS, ENL_UID, ENL_SETMAP, ENL_GETMAP, ENL_PORT
-from asynchonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
-from asynchonet.lib.epc import EPC_CODE, EPC_SUPER
+from pychonet.lib.const import GET
+from pychonet.lib.functions import decodeEchonetMsg, buildEchonetMsg, preparePayload
+from pychonet.lib.eojx import EOJX_GROUP, EOJX_CLASS
+from pychonet.lib.const import ENL_STATUS, ENL_UID, ENL_SETMAP, ENL_GETMAP, ENL_PORT
+from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
+from pychonet.lib.epc import EPC_CODE, EPC_SUPER
 
 
 class ECHONETAPIClient:
