@@ -38,15 +38,9 @@ class ECHONETAPIClient:
             else:
                 if epc == ENL_SETMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
-                    # for item in map:
-                    #     if item not in list(self._state[host][seojgc][seojcc][seojci].keys()):
-                    #         self._state[host][seojgc][seojcc][seojci][item] = None
                     self._state[host][seojgc][seojcc][seojci][epc] = map
                 elif epc == ENL_GETMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
-                    # for item in map:
-                    #     if item not in list(self._state[host][seojgc][seojcc][seojci].keys()):
-                    #         self._state[host][seojgc][seojcc][seojci][item] = None
                     self._state[host][seojgc][seojcc][seojci][epc] = map
                 elif epc == ENL_UID:
                     self._state[host][seojgc][seojcc][seojci][epc] = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
@@ -79,14 +73,14 @@ class ECHONETAPIClient:
        return False
 
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
-        return await self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_GETMAP},{'EPC':ENL_SETMAP}])
+        self._state[host][eojgc][eojcc][eojci]['propertyMaps'] = await self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_GETMAP},{'EPC':ENL_SETMAP}])
+        return self._state[host][eojgc][eojcc][eojci]['propertyMaps']
 
     async def getIdentificationNumber(self, host, eojgc, eojcc, eojci):
         return await self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_UID}])
 
     async def process_discovery_data(self, host, opc_data):
             if 'discovered' not in self._state[host]:
-                default_map = list(EPC_SUPER.keys())
                 edt = bytearray(opc_data['EDT'])
                 #1st byte: Total number of instances
                 #2nd to 253rd bytes: ECHONET object codes (EOJ3 bytes) enumerated
@@ -95,9 +89,7 @@ class ECHONETAPIClient:
                     eojgc = bytearray(edt)[1 + (3 * x)]
                     eojcc = bytearray(edt)[2 + (3 * x)]
                     eojci = bytearray(edt)[3 + (3 * x)]
-                    # prepare set list
-                    for epc in list(EPC_CODE[eojgc][eojcc].keys()):
-                        default_map.append(epc)
+
                     # populate state table
                     if eojgc not in list(self._state[host].keys()):
                         self._state[host].update({eojgc:{}})
@@ -105,9 +97,9 @@ class ECHONETAPIClient:
                         self._state[host][eojgc].update({eojcc:{}})
                     if eojci not in list(self._state[host][eojgc][eojcc].keys()):
                         self._state[host][eojgc][eojcc][eojci] = {}
-                        self._state[host][eojgc][eojcc][eojci].update({ENL_SETMAP:default_map})
-                        self._state[host][eojgc][eojcc][eojci].update({ENL_GETMAP:default_map})
-                    await self.getIdentificationNumber(host, eojgc, eojcc, eojci)
-                    if await self.getAllPropertyMaps(host, eojgc, eojcc, eojci) == True:
-                        self._state[host][eojgc][eojcc][eojci]["discovered"] = True
+                        self._state[host][eojgc][eojcc][eojci].update({ENL_SETMAP:[]})
+                        self._state[host][eojgc][eojcc][eojci].update({ENL_GETMAP:[]})
+                    # await self.getIdentificationNumber(host, eojgc, eojcc, eojci)
+                    # if await self.getAllPropertyMaps(host, eojgc, eojcc, eojci) == True:
+                        # self._state[host][eojgc][eojcc][eojci]["discovered"] = True
                 self._state[host]["discovered"] = True
