@@ -1,0 +1,13 @@
+from aioudp import UDPServer
+from asynchonet import Factory
+from asynchonet import ECHONETAPIClient as api
+from asynchonet import HomeAirConditioner
+from asynchonet import EchonetInstance
+
+udp = UDPServer()
+loop = asyncio.get_event_loop()
+udp.run("0.0.0.0",3610, loop=loop)
+server = api(server=udp,loop=loop)
+await server.discover('192.168.1.230')
+device = HomeAirConditioner("192.168.1.230", server)
+await device.update([0x80])

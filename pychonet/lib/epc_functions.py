@@ -27,11 +27,13 @@ def _009X(edt):
     return payload
 
 def _0083(edt):
-    if edt[0] == 0xFE:
-        ops_value = edt[1:].hex()
-    else:
-        ops_value = None
-    return ops_value
+    if edt is not None:
+        if len(edt) > 1:
+            ops_value = edt[1:].hex()
+        else:
+            ops_value = None
+        return ops_value
+    return None
 
 EPC_SUPER_FUNCTIONS = {
     0x80: _0080,

@@ -1,7 +1,6 @@
 # ------------------------------------------------------------------
 # EPC set
 # ---------------------------------------------------------------- */
-
 EPC_CODE = {
 	0x00: { # Sensor-related device class group
 		0x01: { # Gas leak sensor class
@@ -272,7 +271,7 @@ EPC_CODE = {
 			0xA1: 'Automatic control of air flow direction setting',  #done
 			0xA3: 'Automatic swing of air flow setting',  #done
 			0xA4: 'Air flow direction (vertical) setting',  #done
-			0xA5: 'Air flow direction (horizontal) setting',  #done 
+			0xA5: 'Air flow direction (horizontal) setting',  #done
 			0xAA: 'Special state',
 			0xAB: 'Non-priority state',
 			0xC0: 'Ventilation function setting',
@@ -1296,8 +1295,6 @@ EPC_CODE = {
 		}
 	}
 }
-
-
 
 EPC_SUPER = {
 	0x80: 'Operation status',
