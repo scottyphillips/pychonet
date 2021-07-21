@@ -105,23 +105,18 @@ class EchonetInstance:
         if response is not False:
              for epc in attributes:
                  if epc not in list(self._api._state[self._host][self._eojgc][self._eojcc][self._eojci].keys()):
-                     print("test 1")
                      returned_json_data.update({epc: False})
                      continue
                  elif epc in list(EPC_SUPER_FUNCTIONS.keys()): # check if function is defined in the superset
-                     print("test 2")
                      returned_json_data.update({epc: EPC_SUPER_FUNCTIONS[epc](self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc])})
                      continue
                  elif epc in list(EPC_SUPER.keys()): # return hex value if code exists in superset but no function found
-                     print("test 3")
                      returned_json_data.update({epc: self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc].hex()})
                      continue
                  elif epc in list(self.EPC_FUNCTIONS.keys()):
-                     print("test 4")
                      returned_json_data.update({epc: self.EPC_FUNCTIONS[epc](self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc])})
                      continue
                  elif epc in list(EPC_CODE[self._eojgc][self._eojcc].keys()): # return hex value if EPC code exists in class but no function found
-                     print("test 5")
                      returned_json_data.update({epc: self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc].hex()})
         for epc in attributes:
              if epc not in list(returned_json_data.keys()):
