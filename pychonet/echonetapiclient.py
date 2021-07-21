@@ -73,8 +73,7 @@ class ECHONETAPIClient:
        return False
 
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
-        self._state[host][eojgc][eojcc][eojci]['propertyMaps'] = await self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_GETMAP},{'EPC':ENL_SETMAP}])
-        return self._state[host][eojgc][eojcc][eojci]['propertyMaps']
+        return self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_GETMAP},{'EPC':ENL_SETMAP}])
 
     async def getIdentificationNumber(self, host, eojgc, eojcc, eojci):
         return await self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_UID}])
