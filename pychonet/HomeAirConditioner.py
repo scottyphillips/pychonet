@@ -250,7 +250,7 @@ class HomeAirConditioner(EchonetInstance):
     param temperature: A string representing the desired temperature.
     """
     def setOperationalTemperature(self, temperature):
-        return self.setMessage([{'EPC': ENL_HVAC_SET_TEMP, 'PDC': 0x01, 'EDT': int(temperature)}])
+        return self.setMessage(ENL_HVAC_SET_TEMP, int(temperature))
 
     """
     GetMode returns the current configured mode (e.g Heating, Cooling, Fan etc)
