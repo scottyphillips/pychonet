@@ -21,12 +21,12 @@ class ECHONETAPIClient:
         self._server.subscribe(self.echonetMessageReceived)
         self._state = {}
         self._next_tx_tid = 0x01
-        self._received_tids = []
+        self._message_list = []
 
     async def echonetMessageReceived(self, raw_data, addr):
         host = addr[0]
         processed_data = decodeEchonetMsg(raw_data)
-        self._received_tids.append(processed_data["TID"])
+        self._message_list.remove(processed_data["TID"])
         # handle discovery message response
         for opc in processed_data['OPC']:
             seojgc = processed_data['SEOJGC']
@@ -63,12 +63,13 @@ class ECHONETAPIClient:
            'ESV' : esv,
            'OPC' : opc
        })
+       self._message_list.append(tx_tid)
        self._server.send(payload, (host, ENL_PORT))
        for x in range(0,100):
             await asyncio.sleep(0.01)
-            if tx_tid in self._received_tids:
+            # if tx_tid is not in message list then the message listener has received the message
+            if tx_tid not in self._message_list:
                 # transaction sucessful remove from list
-                self._received_tids.remove(tx_tid)
                 return True
        return False
 
@@ -98,7 +99,4 @@ class ECHONETAPIClient:
                         self._state[host][eojgc][eojcc][eojci] = {}
                         self._state[host][eojgc][eojcc][eojci].update({ENL_SETMAP:[]})
                         self._state[host][eojgc][eojcc][eojci].update({ENL_GETMAP:[]})
-                    # await self.getIdentificationNumber(host, eojgc, eojcc, eojci)
-                    # if await self.getAllPropertyMaps(host, eojgc, eojcc, eojci) == True:
-                        # self._state[host][eojgc][eojcc][eojci]["discovered"] = True
                 self._state[host]["discovered"] = True

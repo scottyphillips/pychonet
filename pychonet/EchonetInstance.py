@@ -54,7 +54,6 @@ class EchonetInstance:
     :return: True if sucessful, false if request message failed
     """
     async def setMessage(self, epc, edt, pdc = 0x01):
-        print(f" values are {epc} {edt}")
         opc = [{'EPC': epc, 'PDC': pdc, 'EDT': edt}]
         response = await self._api.echonetMessage(self._host, self._eojgc, self._eojcc, self._eojci, SETC, opc)
         if not response:
