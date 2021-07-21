@@ -38,12 +38,15 @@ class ECHONETAPIClient:
             else:
                 if epc == ENL_SETMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
-                    for item in map:
-                        if item not in list(self._state[host][seojgc][seojcc][seojci].keys()):
-                            self._state[host][seojgc][seojcc][seojci][item] = None
+                    # for item in map:
+                    #     if item not in list(self._state[host][seojgc][seojcc][seojci].keys()):
+                    #         self._state[host][seojgc][seojcc][seojci][item] = None
                     self._state[host][seojgc][seojcc][seojci][epc] = map
                 elif epc == ENL_GETMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
+                    # for item in map:
+                    #     if item not in list(self._state[host][seojgc][seojcc][seojci].keys()):
+                    #         self._state[host][seojgc][seojcc][seojci][item] = None
                     self._state[host][seojgc][seojcc][seojci][epc] = map
                 elif epc == ENL_UID:
                     self._state[host][seojgc][seojcc][seojci][epc] = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
@@ -51,7 +54,7 @@ class ECHONETAPIClient:
                     self._state[host][seojgc][seojcc][seojci][epc] = opc['EDT']
 
     async def discover(self, host = "224.0.23.0"):
-        await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{'EPC': 0xD6}])
+        return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{'EPC': 0xD6}])
 
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
        if host not in list(self._state.keys()):
@@ -101,7 +104,7 @@ class ECHONETAPIClient:
                     if eojcc not in list(self._state[host][eojgc].keys()):
                         self._state[host][eojgc].update({eojcc:{}})
                     if eojci not in list(self._state[host][eojgc][eojcc].keys()):
-                        self._state[host][eojgc][eojcc][eojci] = { epc : None for epc in default_map }
+                        self._state[host][eojgc][eojcc][eojci] = {}
                         self._state[host][eojgc][eojcc][eojci].update({ENL_SETMAP:default_map})
                         self._state[host][eojgc][eojcc][eojci].update({ENL_GETMAP:default_map})
                     await self.getIdentificationNumber(host, eojgc, eojcc, eojci)
