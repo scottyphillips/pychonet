@@ -38,21 +38,22 @@ class ECHONETAPIClient:
             else:
                 if epc == ENL_SETMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
-                    self._state[host][seojgc][seojcc][seojci][epc] = map
+                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
                 elif epc == ENL_GETMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
-                    self._state[host][seojgc][seojcc][seojci][epc] = map
+                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
                 elif epc == ENL_UID:
-                    self._state[host][seojgc][seojcc][seojci][epc] = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
+                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
                 else:
-                    self._state[host][seojgc][seojcc][seojci][epc] = opc['EDT']
+                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc['EDT']
 
     async def discover(self, host = "224.0.23.0"):
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{'EPC': 0xD6}])
 
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
        if host not in list(self._state.keys()):
-          self._state.update({host:{}})
+          self._state[host] = {"instances":{}}
+
        tx_tid = self._next_tx_tid
        self._next_tx_tid+=1 if self._next_tx_tid < 0xFF else 1
        payload = buildEchonetMsg({
@@ -91,12 +92,12 @@ class ECHONETAPIClient:
                     eojci = bytearray(edt)[3 + (3 * x)]
 
                     # populate state table
-                    if eojgc not in list(self._state[host].keys()):
-                        self._state[host].update({eojgc:{}})
-                    if eojcc not in list(self._state[host][eojgc].keys()):
-                        self._state[host][eojgc].update({eojcc:{}})
-                    if eojci not in list(self._state[host][eojgc][eojcc].keys()):
-                        self._state[host][eojgc][eojcc][eojci] = {}
-                        self._state[host][eojgc][eojcc][eojci].update({ENL_SETMAP:[]})
-                        self._state[host][eojgc][eojcc][eojci].update({ENL_GETMAP:[]})
+                    if eojgc not in list(self._state[host]["instances"].keys()):
+                        self._state[host]["instances"].update({eojgc:{}})
+                    if eojcc not in list(self._state[host]["instances"][eojgc].keys()):
+                        self._state[host]["instances"][eojgc].update({eojcc:{}})
+                    if eojci not in list(self._state[host]["instances"][eojgc][eojcc].keys()):
+                        self._state[host]["instances"][eojgc][eojcc][eojci] = {}
+                        self._state[host]["instances"][eojgc][eojcc][eojci].update({ENL_SETMAP:[]})
+                        self._state[host]["instances"][eojgc][eojcc][eojci].update({ENL_GETMAP:[]})
                 self._state[host]["discovered"] = True

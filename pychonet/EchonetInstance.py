@@ -40,7 +40,7 @@ class EchonetInstance:
         response = await self._api.echonetMessage(self._host, self._eojgc, self._eojcc, self._eojci, GET, opc)
         if not response:
             return False
-        edt = self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc]
+        edt = self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][epc]
         if epc in list(EPC_SUPER_FUNCTIONS.keys()):
             return EPC_SUPER_FUNCTIONS[epc](edt)
         return edt
@@ -104,20 +104,20 @@ class EchonetInstance:
         response = await self._api.echonetMessage(self._host, self._eojgc, self._eojcc, self._eojci, GET, opc)
         if response is not False:
              for epc in attributes:
-                 if epc not in list(self._api._state[self._host][self._eojgc][self._eojcc][self._eojci].keys()):
+                 if epc not in list(self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci].keys()):
                      returned_json_data.update({epc: False})
                      continue
                  elif epc in list(EPC_SUPER_FUNCTIONS.keys()): # check if function is defined in the superset
-                     returned_json_data.update({epc: EPC_SUPER_FUNCTIONS[epc](self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc])})
+                     returned_json_data.update({epc: EPC_SUPER_FUNCTIONS[epc](self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][epc])})
                      continue
                  elif epc in list(EPC_SUPER.keys()): # return hex value if code exists in superset but no function found
-                     returned_json_data.update({epc: self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc].hex()})
+                     returned_json_data.update({epc: self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][epc].hex()})
                      continue
                  elif epc in list(self.EPC_FUNCTIONS.keys()):
-                     returned_json_data.update({epc: self.EPC_FUNCTIONS[epc](self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc])})
+                     returned_json_data.update({epc: self.EPC_FUNCTIONS[epc](self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][epc])})
                      continue
                  elif epc in list(EPC_CODE[self._eojgc][self._eojcc].keys()): # return hex value if EPC code exists in class but no function found
-                     returned_json_data.update({epc: self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][epc].hex()})
+                     returned_json_data.update({epc: self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][epc].hex()})
         for epc in attributes:
              if epc not in list(returned_json_data.keys()):
                  returned_json_data.update({epc: False})
@@ -134,7 +134,7 @@ class EchonetInstance:
     """
     async def getIdentificationNumber(self): # EPC 0x83
         await self._api.getIdentificationNumber(self._host, self._eojgc, self._eojcc, self._eojci)
-        return self._api._status[self._host][self._eojgc][self._eojcc][self._eojci][ENL_UID]
+        return self._api._status[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][ENL_UID]
 
     """
     getOperationalStatus returns the ON/OFF state of the node
@@ -170,10 +170,10 @@ class EchonetInstance:
         return await self.setMessage(ENL_STATUS, ENL_OFF)
 
     def getSetProperties (self): # EPC 0x9E
-        return self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][ENL_SETMAP]
+        return self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][ENL_SETMAP]
 
     def getGetProperties (self): # EPC 0x9F
-        return self._api._state[self._host][self._eojgc][self._eojcc][self._eojci][ENL_GETMAP]
+        return self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][ENL_GETMAP]
 
     async def getAllPropertyMaps(self):
-        return {ENL_SETMAP: self.getSetProperties(), ENL_GETMAP: self.getGetProperties()}
+        return await self._api.getAllPropertyMaps(self._host, self._eojgc, self._eojcc, self._eojci)
