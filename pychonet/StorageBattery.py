@@ -14,13 +14,13 @@ class StorageBattery(EchonetInstance):
         0x49: "Effective capacity recalculation processing"
     }
 
-    def __init__(self, netif, instance = 0x1):
+    def __init__(self, host, api_connector = None, instance = 0x1):
         self.eojgc = 0x02
         self.eojcc = 0x7d
-        EchonetInstance.__init__(self, self.eojgc, self.eojcc, instance, netif)
+        EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
 
     def getRemainingStoredElectricity3(self):
-        return int.from_bytes(self.getSingleMessageResponse(0xE4), 'big')
+        return int.from_bytes(self.getMessage(0xE4), 'big')
 
     def getWorkingOperationStatus(self):
-        return int.from_bytes(self.getSingleMessageResponse(0xCF), 'big')
+        return int.from_bytes(self.getMessage(0xCF), 'big')
