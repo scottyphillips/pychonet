@@ -1,8 +1,7 @@
-from EchonetInstance import EchonetInstance
-from ..functions import getOpCode
+from pychonet.EchonetInstance import EchonetInstance
 
 """Class for Electric Vehicle Charger Objects"""
-class ElectricVehicleCharger(EchoNetNode):
+class ElectricVehicleCharger(EchonetInstance):
 
     def __init__(self, host, api_connector = None, instance = 0x1):
         self.eojgc = 0x02 # Housing/facility-related device group
