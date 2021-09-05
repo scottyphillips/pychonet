@@ -33,10 +33,14 @@ def _0083(edt):
         ops_value = None
     return ops_value
 
+def _0085(edt):
+    return int.from_bytes(edt, 'big')
+
 EPC_SUPER_FUNCTIONS = {
     0x80: _0080,
     0x8A: _int,
     0x83: _0083,
+    0x85: _0085,
     0x9E: _009X,
     0x9F: _009X
 }

@@ -41,6 +41,7 @@ ESV_CODES = {
 
 ENL_STATUS = 0x80
 ENL_UID = 0x83
+ENL_CUMULATIVE_POWER = 0x85
 ENL_SETMAP = 0x9E
 ENL_GETMAP = 0x9F
 
@@ -238,6 +239,15 @@ class EchonetInstance:
     """
     def getIdentificationNumber(self): # EPC 0x83
         return self.update(ENL_UID)
+    
+    """
+    getCumulativePower returns the total number of Wh the device has used.
+    Value should always increment up to 999,999,999 Wh after which resets to 0
+
+    :return: Cumulative Wh as an integer.
+    """
+    def getCumulativePower(self): # EPC 0x85
+        return self.update(ENL_CUMULATIVE_POWER)
 
     def getAllPropertyMaps(self):
         propertyMaps = {}
