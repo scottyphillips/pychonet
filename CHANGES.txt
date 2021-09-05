@@ -12,3 +12,4 @@ v0.2, 07 June 2019 -- Fixed bug when setting fan modes 'medium-low' and 'medium-
 v0.2.1, 18 August 2019 -- Changed mode 'dehumidify' to 'dry' for HA compatibility
 v0.2.2, 24 Feb 2020 -- Minor update to stop HA crashing if no response is received.
 v0.3, 2 March 2020 -- Added in function to measure outdoor temperature
+v2.0.9, 5 Sep 2021 -- fixed up factory method and pushed updates
