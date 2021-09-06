@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pychonet.lib.const import MANUFACTURERS
 
 #------------ EPC GENERIC FUNCTIONS -------
 def _int(edt):
@@ -35,10 +36,34 @@ def _0083(edt):
         return ops_value
     return None
 
+def _008A(edt): #manufacturer
+    id = int.from_bytes(edt, 'big')
+    if id in MANUFACTURERS.keys():
+        return MANUFACTURERS[id]
+    return None
+
+def _009A(edt): #cumulative runtime
+    if len(edt) > 1:
+        value = int.from_bytes(edt[1:], 'big')
+        time_period_multiplier = 0
+        if edt[0] == 0x41:
+            time_period_multiplier = 1 #measurement is in seconds
+        elif edt[0] == 0x42:
+            time_period_multiplier = 60 #measurement is in minutes
+        elif edt[0] == 0x43:
+            time_period_multiplier = 3600 #measurement is in hours
+        elif edt[0] == 0x44:
+            time_period_multiplier = 3600*24 #measurement is in days
+        return value * time_period_multiplier
+    return None
+
 EPC_SUPER_FUNCTIONS = {
     0x80: _0080,
     0x8A: _int,
     0x83: _0083,
+    0x85: _int,
+    0x8A: _008A,
+    0x9A: _009A,
     0x9E: _009X,
     0x9F: _009X
 }
