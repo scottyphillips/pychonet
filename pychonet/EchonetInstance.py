@@ -143,9 +143,9 @@ class EchonetInstance:
     """
     getManufacturer returns the manufacturer name if mapped, or Id otherwise
 
-    :return: Manufacturer name as a string or Identification number as an int.
+    :return: Manufacturer name as a string or echonet identification number as an int.
     """
-    async def getManufacturerId(self): # EPC 0x8A
+    async def getManufacturer(self): # EPC 0x8A
         return await self.update(ENL_MANUFACTURER)
     
     """
