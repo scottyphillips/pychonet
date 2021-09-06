@@ -40,7 +40,7 @@ def _008A(edt): #manufacturer
     id = int.from_bytes(edt, 'big')
     if id in MANUFACTURERS.keys():
         return MANUFACTURERS[id]
-    return None
+    return id
 
 def _009A(edt): #cumulative runtime
     if len(edt) > 1:
