@@ -9,7 +9,7 @@ import time
 from pychonet.lib.const import GET
 from pychonet.lib.functions import decodeEchonetMsg, buildEchonetMsg, preparePayload
 from pychonet.lib.eojx import EOJX_GROUP, EOJX_CLASS
-from pychonet.lib.const import ENL_STATUS, ENL_UID, ENL_SETMAP, ENL_GETMAP, ENL_PORT
+from pychonet.lib.const import ENL_STATUS, ENL_UID, ENL_SETMAP, ENL_GETMAP, ENL_PORT, ENL_MANUFACTURER
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.epc import EPC_CODE, EPC_SUPER
 
@@ -42,7 +42,7 @@ class ECHONETAPIClient:
                 elif epc == ENL_GETMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
-                elif epc == ENL_UID:
+                elif epc in (ENL_UID, ENL_MANUFACTURER):
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = EPC_SUPER_FUNCTIONS[epc](opc['EDT'])
                 else:
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc['EDT']
@@ -77,8 +77,8 @@ class ECHONETAPIClient:
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
         return await self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_GETMAP},{'EPC':ENL_SETMAP}])
 
-    async def getIdentificationNumber(self, host, eojgc, eojcc, eojci):
-        return await self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_UID}])
+    async def getIdentificationInformation(self, host, eojgc, eojcc, eojci):
+        return await self.echonetMessage(host, eojgc, eojcc, eojci, GET, [{'EPC':ENL_UID},{'EPC':ENL_MANUFACTURER}])
 
     async def process_discovery_data(self, host, opc_data):
             if 'discovered' not in self._state[host]:

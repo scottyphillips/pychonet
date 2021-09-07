@@ -1,10 +1,14 @@
 import asyncio
 from pychonet.echonetapiclient import ECHONETAPIClient
-from pychonet.lib.const import GET, SETC, ENL_SETMAP, ENL_GETMAP, ENL_OFF, ENL_ON, ENL_STATUS, ENL_UID
+from pychonet.lib.const import (
+    GET, SETC, 
+    ENL_GETMAP, ENL_SETMAP,
+    ENL_STATUS, ENL_OFF, ENL_ON,  
+    ENL_UID, ENL_MANUFACTURER,
+    ENL_CUMULATIVE_POWER, ENL_CUMULATIVE_RUNTIME
+)
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.epc import EPC_CODE, EPC_SUPER
-
-
 
 """
 Superclass for Echonet instance objects.
@@ -137,6 +141,29 @@ class EchonetInstance:
         return self._api._status[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][ENL_UID]
 
     """
+    getManufacturer returns the manufacturer name if mapped, or Id otherwise
+
+    :return: Manufacturer name as a string or echonet identification number as an int.
+    """
+    async def getManufacturer(self): # EPC 0x8A
+        return await self.update(ENL_MANUFACTURER)
+    
+    """
+    getCumulativePower returns the total number of Wh the node has used.
+    Value should always increment up to 999,999,999 Wh after which resets to 0.
+    :return: Cumulative Wh as an integer.
+    """
+    async def getCumulativePower(self): # EPC 0x85
+        return self.update(ENL_CUMULATIVE_POWER)
+
+    """
+    getCumulativeRuntime returns the total number of seconds the node has been running.
+    :return: Runtime in seconds as an integer.
+    """
+    async def getCumulativeRuntime(self): # EPC 0x9A
+        return await self.update(ENL_CUMULATIVE_RUNTIME)
+    
+    """
     getOperationalStatus returns the ON/OFF state of the node
 
     :return: status as a string.
@@ -159,20 +186,20 @@ class EchonetInstance:
     On sets the node to ON.
 
     """
-    async def on (self): # EPC 0x80
+    async def on(self): # EPC 0x80
         return await self.setMessage(ENL_STATUS, ENL_ON)
 
     """
     Off sets the node to OFF.
 
     """
-    async def off (self): # EPC 0x80
+    async def off(self): # EPC 0x80
         return await self.setMessage(ENL_STATUS, ENL_OFF)
 
-    def getSetProperties (self): # EPC 0x9E
+    def getSetProperties(self): # EPC 0x9E
         return self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][ENL_SETMAP]
 
-    def getGetProperties (self): # EPC 0x9F
+    def getGetProperties(self): # EPC 0x9F
         return self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][ENL_GETMAP]
 
     async def getAllPropertyMaps(self):

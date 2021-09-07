@@ -67,9 +67,16 @@ ESV_CODES = {
     0x5E: {'name': 'SetGet_SNA', 'description': 'Property value write & read (response not possible)'}
 }
 
+MANUFACTURERS = {
+	6: "Mitsubishi"
+}
+
 ENL_ON = 0x30
 ENL_OFF = 0x31
 ENL_STATUS = 0x80
 ENL_UID = 0x83
+ENL_CUMULATIVE_POWER = 0x85
+ENL_MANUFACTURER = 0x8A
+ENL_CUMULATIVE_RUNTIME = 0x9A
 ENL_SETMAP = 0x9E
 ENL_GETMAP = 0x9F
