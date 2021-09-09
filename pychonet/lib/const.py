@@ -250,9 +250,9 @@ MANUFACTURERS = {
     0x0000F9: 'Toho Electronics',
     0x0000FA: 'Plat Home',
     0x0000FB: 'CICO',
-    0x0000FC: 'Fuji Industrial'
-    0xFFFFFE: 'Undefined'
-    0xFFFFFF: 'Experimental',
+    0x0000FC: 'Fuji Industrial',
+    0xFFFFFE: 'Undefined',
+    0xFFFFFF: 'Experimental'
 }
 
 ENL_ON = 0x30
