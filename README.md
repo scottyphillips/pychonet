@@ -18,6 +18,9 @@ The basic boilerplate EchoNetInstance class can be used to provide
 raw connectivity to any compatible device but it is up to the developer
 to create useful classes. Any ECHONETlite class additions to the library are welcome.
 
+Version 2.0.0 of this libray was rebuilt to use asyncio for better compatability with home assistant.
+
+
 It is designed to work with Python 3.9.5+
 
 ## Instructions
@@ -29,30 +32,53 @@ pip install pychonet
 ```
 
 ## Basic usage
-### Discover a list of ECHONETlite instances using:
+
+## create the ECHONETLite listener service on port 3610
 ```python
-import pychonet as echonet
-echonet_instances = echonet.discover()
-print(echonet_instances)
-[{'netaddr': '192.168.1.6', 'eojgc': 1, 'eojcc': 48, 'eojci': 1, 'group': 'Air conditioner-related device group', 'code': 'Home air conditioner'}]
+from aioudp import UDPServer
+from pychonet import Factory
+from pychonet import ECHONETAPIClient as api
+from pychonet import HomeAirConditioner
+from pychonet import EchonetInstance
+udp = UDPServer()
+loop = asyncio.get_event_loop()
+udp.run("0.0.0.0",3610, loop=loop)
+server = api(server=udp,loop=loop)
 ```
 
-### Create a HVAC ECHONETlite instance
+### Discover a list of ECHONETlite instances on a particular server using:
 ```python
-aircon = echonet.HomeAirConditioner("192.168.1.6")
+await server.discover('192.168.1.6')
+```
+
+
+### Popualte the propertymap for a particular ECHONETLite instance
+```python
+await server.getAllPropertyMaps('192.168.1.6',1,48,1)
+```
+# create a ECHONETLite device using the Factory.
+# paramaters include the port listener, and EOJGC, EOJCC, and EOJCI codes
+```python
+aircon = Factory("192.168.1.6",server, 1,48,1)
+```
+
+# OR, create a specific ECHONETLite instance using built in objects.
+```python
+aircon = HomeAirConditioner("192.168.1.6", server )
+```
 
 ### Turn HVAC on or off:
 ```python
-aircon.on()
-aircon.off()
-aircon.getOperationalStatus()
+await aircon.on()
+await aircon.off()
+await aircon.getOperationalStatus()
 {'status': 'off'}
 ```
 
 ### Set or Get a HVACs target temperature
 ```python
-aircon.setOperationalTemperature(25)
-aircon.getOperationalTemperature()
+await aircon.setOperationalTemperature(25)
+await aircon.getOperationalTemperature()
 {'set_temperature': 25}
 ```
 
@@ -60,8 +86,8 @@ aircon.getOperationalTemperature()
 ```python
 supported modes =  'auto', 'cool', 'heat', 'dry', 'fan_only', 'other'
 
-aircon.setMode('cool')
-aircon.getMode()
+await aircon.setMode('cool')
+await aircon.getMode()
 {'mode': 'cool'}
 ```
 ### Set or Get a HVACs fan speed:
@@ -70,15 +96,21 @@ Note - your HVAC may not support all fan speeds.
 ```python
 supported modes = 'auto', 'minimum', 'low', 'medium-Low', 'medium', 'medium-high', 'high', 'very high', 'max'
 
-aircon.setFanSpeed('medium-high')
-aircon.getFanSpeed()
+await aircon.setFanSpeed('medium-high')
+await aircon.getFanSpeed()
 {'fan_speed': 'medium-high'}
 ```
-### Get HVAC attributes at once:
+### Get HVAC attributes at once (Note, the property map must be populated):
 ```python
-aircon.update()
+await aircon.update()
 {'status': 'On', 'set_temperature': 25, 'fan_speed': 'medium-high', 'room_temperature': 25, 'mode': 'cooling'}
 ```
+
+### OR grab a specific attribute at once (Note, the property map must be populated):
+```python
+await aircon.update(0x80)
+```
+
 ## Using this library with Home Assistant
 
 NOTE: For Home Assistant users there is now a dedicated repo for the related Home Assistant 'Mitsubishi' custom component that makes use of this Python library:

@@ -1,9 +1,9 @@
 import asyncio
 from pychonet.echonetapiclient import ECHONETAPIClient
 from pychonet.lib.const import (
-    GET, SETC, 
+    GET, SETC,
     ENL_GETMAP, ENL_SETMAP,
-    ENL_STATUS, ENL_OFF, ENL_ON,  
+    ENL_STATUS, ENL_OFF, ENL_ON,
     ENL_UID, ENL_MANUFACTURER,
     ENL_CUMULATIVE_POWER, ENL_CUMULATIVE_RUNTIME
 )
@@ -30,6 +30,8 @@ class EchonetInstance:
         self._eojcc = eojcc
         self._eojci = instance
         self._api = api_connector
+
+        #TODO self instntiate the API connector for backwards compatability with the older libary 
 
     """
     getMessage is used to fire a single ECHONET get messages to get Node information
@@ -147,7 +149,7 @@ class EchonetInstance:
     """
     async def getManufacturer(self): # EPC 0x8A
         return await self.update(ENL_MANUFACTURER)
-    
+
     """
     getCumulativePower returns the total number of Wh the node has used.
     Value should always increment up to 999,999,999 Wh after which resets to 0.
@@ -162,7 +164,7 @@ class EchonetInstance:
     """
     async def getCumulativeRuntime(self): # EPC 0x9A
         return await self.update(ENL_CUMULATIVE_RUNTIME)
-    
+
     """
     getOperationalStatus returns the ON/OFF state of the node
 
