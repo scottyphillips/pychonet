@@ -68,7 +68,36 @@ ESV_CODES = {
 }
 
 MANUFACTURERS = {
-	6: "Mitsubishi"
+    0x000005: 'Sharp Corporation',
+    0x000006: 'Mitsubishi Electric Corp.',
+    0x000008: 'DAIKIN INDUSTRIES, LTD.',
+    0x000009: 'NEC Corporation',
+    0x00000B: 'Panasonic Corporation',
+    0x000017: 'Toshiba Carrier Corporation',
+    0x00001B: 'TOSHIBA LIGHTING & TECHNOLOGY CORPORATION',
+    0x000022: 'Hitachi Global Life Solutions, Inc.',
+    0x00002F: 'AIPHONE CO., LTD.',
+    0x00004E: 'FUJITSU LIMITED',
+    0x000053: 'Ubiquitous Corporation',
+    0x000059: 'Rinnai Corporation',
+    0x00005E: 'GWSOLAR Corporation',
+    0x000063: 'Kawamura Electric Inc.',
+    0x000064: 'OMRON Corporation',
+    0x000069: 'Toshiba Lifestyle Products & Services Corporation',
+    0x00006F: 'BUFFALO INC.',
+    0x000072: 'Eneres Co., Ltd.',
+    0x000077: 'Kanagawa Institute of Technology',
+    0x000078: 'Hitachi Maxell, Ltd.',
+    0x00007D: 'POWERTECH INDUSTRIAL CO., LTD.',
+    0x000081: 'IWATSU ELECTRIC CO., LTD.',
+    0x000086: 'NIPPON TELEGRAPH AND TELEPHONE WEST CORPORATION',
+    0x00008A: 'FUJITSU GENERAL LIMITED',
+    0x00008C: 'Kyuden Technosystems Corporation',
+    0x000097: 'Future Technology Laboratories',
+    0x0000AA: 'TEN FEET WRIGHT INC.',
+    0x0000B6: 'Bunka Shutter Co., Ltd.',
+    0xFFFFFF: 'Experimental',
+    0xFFFFFE: 'Undefined'
 }
 
 ENL_ON = 0x30
