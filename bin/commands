@@ -1,0 +1,14 @@
+from aioudp import UDPServer
+from pychonet import Factory
+from pychonet import ECHONETAPIClient as api
+from pychonet import HomeAirConditioner
+from pychonet import EchonetInstance
+
+udp = UDPServer()
+loop = asyncio.get_event_loop()
+udp.run("0.0.0.0",3610, loop=loop)
+server = api(server=udp,loop=loop)
+await server.discover('192.168.1.6')
+await server.getAllPropertyMaps('192.168.1.6',1,48,1)
+device = Factory("192.168.1.6",server, 1,48,1)
+await device.update([0x80])
