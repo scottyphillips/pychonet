@@ -33,7 +33,7 @@ pip install pychonet
 
 ## Basic usage
 
-## create the ECHONETLite listener service on port 3610
+### Create the ECHONETLite listener service on port 3610:
 ```python
 from aioudp import UDPServer
 from pychonet import Factory
@@ -42,29 +42,30 @@ from pychonet import HomeAirConditioner
 from pychonet import EchonetInstance
 udp = UDPServer()
 loop = asyncio.get_event_loop()
-udp.run("0.0.0.0",3610, loop=loop)
-server = api(server=udp,loop=loop)
+udp.run("0.0.0.0", 3610, loop=loop)
+server = api(server=udp, loop=loop)
 ```
 
-### Discover a list of ECHONETlite instances on a particular server using:
+### Discover a list of ECHONETlite instances on a particular server:
 ```python
 await server.discover('192.168.1.6')
 ```
 
 
-### Popualte the propertymap for a particular ECHONETLite instance
+### Populate the propertymap for a particular ECHONETLite instance:
 ```python
-await server.getAllPropertyMaps('192.168.1.6',1,48,1)
+await server.getAllPropertyMaps('192.168.1.6', 1, 48, 1)
 ```
-# create a ECHONETLite device using the Factory.
-# paramaters include the port listener, and EOJGC, EOJCC, and EOJCI codes
+### Create a ECHONETLite device using the Factory:
+
+Paramaters include the port listener, and EOJGC, EOJCC, and EOJCI codes.
 ```python
-aircon = Factory("192.168.1.6",server, 1,48,1)
+aircon = Factory("192.168.1.6",server, 1, 48, 1)
 ```
 
-# OR, create a specific ECHONETLite instance using built in objects.
+### OR, create a specific ECHONETLite instance using built in objects:
 ```python
-aircon = HomeAirConditioner("192.168.1.6", server )
+aircon = HomeAirConditioner("192.168.1.6", server)
 ```
 
 ### Turn HVAC on or off:
@@ -75,7 +76,7 @@ await aircon.getOperationalStatus()
 {'status': 'off'}
 ```
 
-### Set or Get a HVACs target temperature
+### Set or Get a HVACs target temperature:
 ```python
 await aircon.setOperationalTemperature(25)
 await aircon.getOperationalTemperature()
