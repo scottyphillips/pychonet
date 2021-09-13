@@ -164,15 +164,3 @@ def _0288EA(edt):
     culmative = int.from_bytes(edt[7:], 'big')
     time = datetime(year, month, day, hour,minute,second)
     return {'time': datetime(year, month, day, hour,minute,second).isoformat(), 'culmative_value': culmative}
-
-# ----- General lighting class -------
-def _0290B1(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x40: 'other',
-       0x41: 'incandescent_lamp_color',
-       0x42: 'white',
-       0x43: 'daylight_white',
-       0x43: 'daylight_color',
-    }
-    return values.get(op_mode, "invalid_setting")
