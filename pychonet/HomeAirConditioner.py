@@ -2,25 +2,25 @@ from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import _int
 
 MODES = {
-	'auto':  	0x41,
-	'cool':  	0x42,
-	'heat':  	0x43,
-	'dry':  	0x44,
+	'auto':		0x41,
+	'cool':		0x42,
+	'heat':		0x43,
+	'dry':		0x44,
 	'fan_only':	0x45,
-	'other': 	0x40,
-    'off'   :   0xFF
+	'other':	0x40,
+	'off':		0xFF
 }
 
 FAN_SPEED = {
-	'auto':	        0x41,
-	'minimum':  	0x31,
-	'low':  		0x32,
-	'medium-low': 	0x33,
-	'medium':		0x34,
-	'medium-high': 	0x35,
-	'high':			0x36,
+	'auto':         0x41,
+	'minimum':      0x31,
+	'low':          0x32,
+	'medium-low':   0x33,
+	'medium':       0x34,
+	'medium-high':  0x35,
+	'high':         0x36,
 	'very-high':    0x37,
-	'max':			0x38
+	'max':          0x38
 }
 
 AIRFLOW_HORIZ = {
@@ -63,8 +63,6 @@ AUTO_DIRECTION = {
     'auto-vert':    0x43,
     'auto-horiz':   0x44
 }
-
-    # Automatic swing of air flow direction setting
 
 SWING_MODE = {
     'not-used':     0x31,
@@ -119,7 +117,7 @@ def _0130AA(edt):
       0x41: 'Defrosting',
       0x42: 'Preheating',
       0x43: 'Heat removal'
-      }
+    }
     # return({'special':hex(op_mode)})
     return values.get(op_mode, "invalid_setting")
 
@@ -143,7 +141,7 @@ def _0130A4(edt):
       0x43: 'central',
       0x45: 'lower-central',
       0x42: 'lower'
-      }
+    }
     # return({'special':hex(op_mode)})
     return values.get(op_mode, "invalid_setting")
 
@@ -175,7 +173,7 @@ def _0130A5(edt):
       0x67: 'left-center-rc-right',
       0x69: 'left-lc-right',
       0x6A: 'left-lc-rc'
-      }
+    }
     return values.get(op_mode, "invalid_setting")
 
 # Operation mode
@@ -214,18 +212,17 @@ class HomeAirConditioner(EchonetInstance):
     :param netif: IP address of node
     """
     def __init__(self, host, api_connector = None, instance = 0x1):
-        self._eojgc = 0x01 #	Air conditioner-related device group
+        self._eojgc = 0x01 # Air conditioner-related device group
         self._eojcc = 0x30 # Home air conditioner class
         EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
 
     """
-    GetOperationaTemperature get the temperature that has been set in the HVAC
+    getOperationalTemperature get the temperature that has been set in the HVAC
 
     return: A string representing the configured temperature.
     """
     def getOperationalTemperature(self):
         return self.getMessage(ENL_HVAC_SET_TEMP)
-
 
     """
     getRoomTemperature get the HVAC's room temperature.
@@ -234,7 +231,6 @@ class HomeAirConditioner(EchonetInstance):
     """
     def getRoomTemperature(self):
         return self.getMessage(ENL_HVAC_ROOM_TEMP)
-
 
     """
     getOutdoorTemperature get the outdoor temperature that has been set in the HVAC
@@ -270,7 +266,7 @@ class HomeAirConditioner(EchonetInstance):
     def setMode(self, mode):
         if mode == 'off':
             return self.setMessage(ENL_STATUS, 0x31)
-        #
+
         return self.setMessages([{'EPC': ENL_STATUS, 'PDC': 0x01, 'EDT': 0x30},{'EPC': ENL_HVAC_MODE, 'PDC': 0x01, 'EDT': MODES[mode]}])
 
     """
@@ -281,7 +277,6 @@ class HomeAirConditioner(EchonetInstance):
     """
     def getFanSpeed(self): #0xA0
         return self.getMessage(ENL_FANSPEED)
-
 
     """
     setFanSpeed set the desired fan speed (e.g Low, Medium, High etc)
@@ -343,12 +338,11 @@ class HomeAirConditioner(EchonetInstance):
     def getAirflowVert(self): #0xA4
         return self.getMessage(ENL_AIR_VERT)
 
-
     """
     setAirflowHoriz sets the horizontal vane setting
 
     params airflow_horiz: A string representing horizontal airflow setting
-                         e.g: 'left', 'lc', 'center', 'rc', 'right'
+                          e.g: 'left', 'lc', 'center', 'rc', 'right'
     """
     def setAirflowHoriz (self, airflow_horiz):
         return self.setMessage(ENL_AIR_HORZ, AIRFLOW_HORIZ[airflow_horiz])
