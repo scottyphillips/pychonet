@@ -120,6 +120,8 @@ NOTE: For Home Assistant users there is a dedicated repo that can be installed v
 'example_hvac.py' gives you an idea how to drive a HVAC directly from Python using this library.
 
 ## Hall of Fame
+Thanks to Jason Nader for all the quality of life updates to the codebase and doco. 
+
 Thanks to khcnz (Karl Chaffey) and gvs for helping refector the old code
 and contributing to testing.
 
