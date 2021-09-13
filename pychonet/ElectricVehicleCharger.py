@@ -4,6 +4,6 @@ from pychonet.EchonetInstance import EchonetInstance
 class ElectricVehicleCharger(EchonetInstance):
 
     def __init__(self, host, api_connector = None, instance = 0x1):
-        self.eojgc = 0x02 # Housing/facility-related device group
-        self.eojcc = 0x7e # Electric vehicle charger/discharger’
+        self._eojgc = 0x02 # Housing/facility-related device group
+        self._eojcc = 0x7e # Electric vehicle charger/discharger’
         EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
