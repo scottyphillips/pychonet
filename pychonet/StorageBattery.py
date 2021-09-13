@@ -15,8 +15,8 @@ class StorageBattery(EchonetInstance):
     }
 
     def __init__(self, host, api_connector = None, instance = 0x1):
-        self.eojgc = 0x02
-        self.eojcc = 0x7d
+        self._eojgc = 0x02
+        self._eojcc = 0x7d
         EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
 
     def getRemainingStoredElectricity3(self):
