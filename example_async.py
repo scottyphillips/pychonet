@@ -2,6 +2,7 @@ import asyncio
 
 from aioudp import UDPServer
 from pychonet import ECHONETAPIClient as api
+from pychonet.lib.const import ENL_SETMAP, ENL_GETMAP, ENL_UID, ENL_MANUFACTURER
 
 # This example will list the properties for all discovered instances on a given host
 
