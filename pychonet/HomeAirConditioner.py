@@ -271,7 +271,8 @@ class HomeAirConditioner(EchonetInstance):
         if mode == 'off':
             return self.setMessage(ENL_STATUS, 0x31)
         #
-        return self.setMessages([{'EPC': ENL_STATUS, 'PDC': 0x01, 'EDT': 0x30},{'EPC': ENL_HVAC_MODE, 'PDC': 0x01, 'EDT': MODES[mode]}])
+        return self.setMessages([{'EPC': ENL_STATUS, 'PDC': 0x01, 'EDT': 0x30},
+                                 {'EPC': ENL_HVAC_MODE, 'PDC': 0x01, 'EDT': MODES[mode]}])
 
     """
     GetFanSpeed gets the current fan speed (e.g Low, Medium, High etc)
