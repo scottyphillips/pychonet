@@ -114,8 +114,8 @@ await aircon.update(0x80)
 
 ## Using this library with Home Assistant
 
-NOTE: For Home Assistant users there is now a dedicated repo for the related Home Assistant 'Mitsubishi' custom component that makes use of this Python library:
-(https://github.com/scottyphillips/mitsubishi_hass)
+NOTE: For Home Assistant users there is a dedicated repo that can be installed via HACS that can provide custom components for discovered ECHONETlite devices such as Mitsubishi airconditioners:
+(https://github.com/scottyphillips/echonetlite_homeassistant)
 
 'example_hvac.py' gives you an idea how to drive a HVAC directly from Python using this library.
 
