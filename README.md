@@ -117,10 +117,10 @@ await aircon.update(0x80)
 NOTE: For Home Assistant users there is a dedicated repo that can be installed via HACS that can provide custom components for discovered ECHONETlite devices such as Mitsubishi airconditioners:
 (https://github.com/scottyphillips/echonetlite_homeassistant)
 
-'example_hvac.py' gives you an idea how to drive a HVAC directly from Python using this library.
+'example_async.py' gives you a boilerplate asyncio program that will discover your ECHONETLite instance and return information about supported services. 
 
 ## Hall of Fame
-Thanks to Jason Nader for all the quality of life updates to the codebase and doco. 
+Thanks to Jason Nader for all the quality of life updates to the codebase and doco.
 
 Thanks to khcnz (Karl Chaffey) and gvs for helping refector the old code
 and contributing to testing.
