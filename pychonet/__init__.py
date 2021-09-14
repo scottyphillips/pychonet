@@ -6,7 +6,7 @@ from .ElectricVehicleCharger import ElectricVehicleCharger
 from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
 from .ElectricBlind import ElectricBlind
-from .GeneralLighing import GeneralLighing
+from .GeneralLighting import GeneralLighting
 from pychonet.lib.eojx import EOJX_CLASS
 
 def Factory(host, server, eojgc, eojcc, eojci= 0x01):
@@ -22,7 +22,7 @@ def Factory(host, server, eojgc, eojcc, eojci= 0x01):
         'Temperature sensor': TemperatureSensor,
         'Storage Battery': StorageBattery,
         'Electrically operated blind/shade': ElectricBlind,
-        'General lighting': GeneralLighing
+        'General lighting': GeneralLighting
     }
     instance_object = instances.get(instance, None)
     if instance_object is not None:

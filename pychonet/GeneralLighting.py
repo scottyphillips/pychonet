@@ -1,6 +1,8 @@
 from pychonet.EchonetInstance import EchonetInstance
 
-ENL_LIGHTCOLORSETTING = 0xB1
+ENL_STATUS = 0x80
+ENL_BRIGHTNESS = 0xB0
+ENL_COLOR_TEMP = 0xB1
 
 # ----- General lighting class -------
 def _0290B1(edt):
@@ -38,7 +40,7 @@ def _0290B1(edt):
 
 
 """Class for General Lighting Objects"""
-class GeneralLighing(EchonetInstance):
+class GeneralLighting(EchonetInstance):
 
     EPC_FUNCTIONS = {
         0xB1: _0290B1
@@ -50,9 +52,33 @@ class GeneralLighing(EchonetInstance):
         EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
 
     """
-    getOpenCloseSetting get the status of the blind.
+    getBrightness get the brightness that has been set in the light
 
-    return: A string representing the blind/shade state
+    return: A string representing the configured brightness.
     """
-    def getLightColorSetting(self):
-        return self.getMessage(ENL_LIGHTCOLORSETTING)
+    def getBrightness(self):
+        return self.getMessage(ENL_BRIGHTNESS) #['brightness']
+    
+    """
+    setBrightness set the temperature of the light
+
+    param temperature: A string representing the desired temperature.
+    """
+    def setBrightness(self, brightness):
+        return self.setMessage(ENL_BRIGHTNESS, int(brightness))
+
+    """
+    getColorTemp get the color temperature that has been set in the light
+
+    return: A string representing the configured color temperature. # 68 67 66 64 65 coolest to warmest
+    """
+    def getColorTemperature(self):
+        return self.getMessage(ENL_COLOR_TEMP) #['color_temperature']
+    
+    """
+    setColorTemperature set the temperature of the light
+
+    param temperature: A string representing the desired temperature. # 68 67 66 64 65 coolest to warmest
+    """
+    def setColorTemperature(self, color_temperature):
+        return self.setMessage(ENL_COLOR_TEMP, color_temperature)
