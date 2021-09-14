@@ -15,12 +15,12 @@ class StorageBattery(EchonetInstance):
     }
 
     def __init__(self, host, api_connector = None, instance = 0x1):
-        self.eojgc = 0x02
-        self.eojcc = 0x7d
+        self._eojgc = 0x02
+        self._eojcc = 0x7d
         EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
 
     def getRemainingStoredElectricity3(self):
-        return int.from_bytes(self.getMessage(0xE4), 'big')
+        return self.getMessage(0xE4)
 
     def getWorkingOperationStatus(self):
-        return int.from_bytes(self.getMessage(0xCF), 'big')
+        return self.getMessage(0xCF)

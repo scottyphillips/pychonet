@@ -1,7 +1,9 @@
 import asyncio
+from pprint import pprint
 
 from aioudp import UDPServer
 from pychonet import ECHONETAPIClient as api
+from pychonet.lib.const import ENL_SETMAP, ENL_GETMAP, ENL_UID, ENL_MANUFACTURER
 
 # This example will list the properties for all discovered instances on a given host
 
@@ -18,7 +20,7 @@ async def main():
     for x in range(0, 300):
         await asyncio.sleep(0.01)
         if 'discovered' in list(server._state[host]):
-             print("ECHONET Node Discovery Successful!")
+             print(f"{host} - ECHONET Node Discovery Successful!")
              break
 
     instance_list = []
@@ -26,19 +28,19 @@ async def main():
     for eojgc in list(state['instances'].keys()):
         for eojcc in list(state['instances'][eojgc].keys()):
             for instance in list(state['instances'][eojgc][eojcc].keys()):
-                  print(f"instance is {instance}")
+                  instance_info = f"{hex(eojgc)}-{hex(eojcc)}-{hex(instance)}"
                   await server.getAllPropertyMaps(host, eojgc, eojcc, instance)
-                  print(f"{host} - ECHONET Instance {eojgc}-{eojcc}-{instance} map attributes discovered!")
-                  getmap = state['instances'][eojgc][eojcc][instance][ENL_GETMAP]
-                  setmap = state['instances'][eojgc][eojcc][instance][ENL_SETMAP]
+                  print(f"{host} - ECHONET Instance {instance_info} map attributes discovered!")
+                  getmap = [hex(e) for e in state['instances'][eojgc][eojcc][instance][ENL_GETMAP]]
+                  setmap = [hex(e) for e in state['instances'][eojgc][eojcc][instance][ENL_SETMAP]]
 
                   await server.getIdentificationInformation(host, eojgc, eojcc, instance)
                   uid = state['instances'][eojgc][eojcc][instance][ENL_UID]
                   manufacturer = state['instances'][eojgc][eojcc][instance][ENL_MANUFACTURER]
-                  print(f"{host} - ECHONET Instance {eojgc}-{eojcc}-{instance} Identification number discovered!")
-                  instance_list.append({"host":host,"eojgc":eojgc,"eojcc":eojcc,"eojci":instance,"getmap":getmap,"setmap":setmap,"uid":uid,"manufacturer":manufacturer})
+                  print(f"{host} - ECHONET Instance {instance_info} identification number discovered!")
+                  instance_list.append({"host":host,"eojgc":hex(eojgc),"eojcc":hex(eojcc),"eojci":hex(instance),"getmap":getmap,"setmap":setmap,"uid":uid,"manufacturer":manufacturer})
 
-        print(instance_list)
+        pprint(instance_list)
 
 if __name__ == "__main__":
     asyncio.run(main())
