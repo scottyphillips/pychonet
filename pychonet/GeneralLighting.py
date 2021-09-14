@@ -14,7 +14,7 @@ def _0290B1(edt):
     }
     return values.get(op_mode, "invalid_setting")
 
-# TODO - implemenet FUNCTIONS		
+# TODO - implemenet FUNCTIONS
 		# 	0xB0: 'Illuminance level',
 		# 	0xB2: 'Illuminance level step setting',
 		# 	0xB3: 'Light color step setting',
@@ -38,7 +38,7 @@ def _0290B1(edt):
 
 
 """Class for General Lighting Objects"""
-class GeneralLighing(EchonetInstance):
+class GeneralLighting(EchonetInstance):
 
     EPC_FUNCTIONS = {
         0xB1: _0290B1
