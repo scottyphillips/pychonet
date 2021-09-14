@@ -28,4 +28,4 @@ def Factory(host, server, eojgc, eojcc, eojci= 0x01):
     if instance_object is not None:
         return instance_object(host, server, eojci)
 
-    return EchonetInstance(host, server, eojgc, eojcc, eojci)
+    return EchonetInstance(host, eojgc, eojcc, eojci, server)
