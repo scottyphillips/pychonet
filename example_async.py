@@ -12,9 +12,10 @@ async def main():
     loop = asyncio.get_event_loop()
     udp.run("0.0.0.0", 3610, loop=loop)
     server = api(server=udp, loop=loop)
+    server._debug_flag = True
     server._message_timeout = 300
 
-    host = '192.168.1.6'
+    host = '192.168.1.230'
     await server.discover(host)
 
     # Timeout after 3 seconds

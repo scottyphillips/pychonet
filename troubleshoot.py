@@ -16,7 +16,7 @@ async def main():
 
     host = '192.168.1.50'
     await server.discover(host)
-    device = EchonetInstance("192.168.1.50", 2,90,1, server)
+    device1 = EchonetInstance("192.168.1.50", 2,144,1, server)
     # value = await device.getMessage(ENL_SETMAP)
     # print(value)
     value = await device.getMessage(ENL_GETMAP)
@@ -24,6 +24,16 @@ async def main():
 
     value = await device.getMessage(ENL_SETMAP)
     print(f"setmap is {value}")
+    
+    device2 = EchonetInstance("192.168.1.50", 2,144,2, server)
+    # value = await device.getMessage(ENL_SETMAP)
+    # print(value)
+    value = await device.getMessage(ENL_GETMAP)
+    print(f"getmap is {value}")
+
+    value = await device.getMessage(ENL_SETMAP)
+    print(f"setmap is {value}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

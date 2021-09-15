@@ -23,10 +23,13 @@ class ECHONETAPIClient:
         self._next_tx_tid = 0x01
         self._message_list = []
         self._message_timeout = MESSAGE_TIMEOUT
+        self._debug_flag = False
 
     async def echonetMessageReceived(self, raw_data, addr):
         host = addr[0]
         processed_data = decodeEchonetMsg(raw_data)
+        if self._debug_flag == True:
+            print(f"Echonet Message Received - Processed data is {processed_data}")
         self._message_list.remove(processed_data["TID"])
         # handle discovery message response
         for opc in processed_data['OPC']:
