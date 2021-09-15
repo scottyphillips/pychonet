@@ -6,7 +6,7 @@ from aioudp import UDPServer
 import struct
 import sys
 import time
-from pychonet.lib.const import GET
+from pychonet.lib.const import GET, MESSAGE_TIMEOUT
 from pychonet.lib.functions import decodeEchonetMsg, buildEchonetMsg, preparePayload
 from pychonet.lib.eojx import EOJX_GROUP, EOJX_CLASS
 from pychonet.lib.const import ENL_STATUS, ENL_UID, ENL_SETMAP, ENL_GETMAP, ENL_PORT, ENL_MANUFACTURER
@@ -22,6 +22,7 @@ class ECHONETAPIClient:
         self._state = {}
         self._next_tx_tid = 0x01
         self._message_list = []
+        self._message_timeout = MESSAGE_TIMEOUT
 
     async def echonetMessageReceived(self, raw_data, addr):
         host = addr[0]
@@ -66,7 +67,7 @@ class ECHONETAPIClient:
        })
        self._message_list.append(tx_tid)
        self._server.send(payload, (host, ENL_PORT))
-       for x in range(0,200):
+       for x in range(0,self._message_timeout):
             await asyncio.sleep(0.01)
             # if tx_tid is not in message list then the message listener has received the message
             if tx_tid not in self._message_list:

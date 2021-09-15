@@ -10,6 +10,8 @@ VERSION = "2.0.14"
 
 ENL_PORT = 3610
 ENL_MULTICAST_ADDRESS = "224.0.23.0"
+MESSAGE_TIMEOUT = 100
+
 
 # ------------------------------------------------------------------
 # EHD1: ECHONET Lite Header 1
