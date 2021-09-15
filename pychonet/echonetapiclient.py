@@ -66,7 +66,7 @@ class ECHONETAPIClient:
        })
        self._message_list.append(tx_tid)
        self._server.send(payload, (host, ENL_PORT))
-       for x in range(0,100):
+       for x in range(0,200):
             await asyncio.sleep(0.01)
             # if tx_tid is not in message list then the message listener has received the message
             if tx_tid not in self._message_list:
