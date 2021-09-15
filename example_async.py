@@ -3,11 +3,12 @@ from pprint import pprint
 
 from aioudp import UDPServer
 from pychonet import ECHONETAPIClient as api
-from pychonet.lib.const import ENL_SETMAP, ENL_GETMAP, ENL_UID, ENL_MANUFACTURER
+from pychonet.lib.const import ENL_SETMAP, ENL_GETMAP, ENL_UID, ENL_MANUFACTURER, VERSION
 
 # This example will list the properties for all discovered instances on a given host
 
 async def main():
+    print(f"ECHONET lite version is {VERSION}")
     udp = UDPServer()
     loop = asyncio.get_event_loop()
     udp.run("0.0.0.0", 3610, loop=loop)
@@ -17,7 +18,6 @@ async def main():
 
     host = '192.168.1.6'
     await server.discover(host)
-
     # Timeout after 3 seconds
     for x in range(0, 300):
         await asyncio.sleep(0.01)
