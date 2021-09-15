@@ -13,7 +13,7 @@ async def main():
     udp.run("0.0.0.0", 3610, loop=loop)
     server = api(server=udp, loop=loop)
 
-    host = '192.168.1.230'
+    host = '192.168.1.6'
     await server.discover(host)
 
     # Timeout after 3 seconds

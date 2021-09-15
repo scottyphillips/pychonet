@@ -31,7 +31,7 @@ class EchonetInstance:
         self._eojci = instance
         self._api = api_connector
 
-        #TODO self instntiate the API connector for backwards compatability with the older libary 
+        #TODO self instntiate the API connector for backwards compatability with the older libary
 
     """
     getMessage is used to fire a single ECHONET get messages to get Node information
@@ -47,8 +47,6 @@ class EchonetInstance:
         if not response:
             return False
         edt = self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][epc]
-        if epc in list(EPC_SUPER_FUNCTIONS.keys()):
-            return EPC_SUPER_FUNCTIONS[epc](edt)
         return edt
 
     """
