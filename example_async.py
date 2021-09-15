@@ -29,7 +29,7 @@ async def main():
         for eojcc in list(state['instances'][eojgc].keys()):
             for instance in list(state['instances'][eojgc][eojcc].keys()):
                   instance_info = f"{hex(eojgc)}-{hex(eojcc)}-{hex(instance)}"
-                  await server.getAllPropertyMaps(host, eojgc, eojcc, instance)
+                  await server.getAllPropertyMaps(host, eojgc, eojcc, 0x00)  # issue here??
                   print(f"{host} - ECHONET Instance {instance_info} map attributes discovered!")
                   print(f"get map is - {state['instances'][eojgc][eojcc][instance][ENL_GETMAP]}")
                   print(f"set map is - {state['instances'][eojgc][eojcc][instance][ENL_SETMAP]}")
