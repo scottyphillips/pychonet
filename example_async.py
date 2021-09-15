@@ -31,6 +31,8 @@ async def main():
                   instance_info = f"{hex(eojgc)}-{hex(eojcc)}-{hex(instance)}"
                   await server.getAllPropertyMaps(host, eojgc, eojcc, instance)
                   print(f"{host} - ECHONET Instance {instance_info} map attributes discovered!")
+                  print(f"get map is - {state['instances'][eojgc][eojcc][instance][ENL_GETMAP]}")
+                  print(f"set map is - {state['instances'][eojgc][eojcc][instance][ENL_SETMAP]}")
                   getmap = [hex(e) for e in state['instances'][eojgc][eojcc][instance][ENL_GETMAP]]
                   setmap = [hex(e) for e in state['instances'][eojgc][eojcc][instance][ENL_SETMAP]]
 
