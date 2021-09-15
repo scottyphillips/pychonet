@@ -15,7 +15,7 @@ async def main():
     server._debug_flag = True
     server._message_timeout = 300
 
-    host = '192.168.1.230'
+    host = '192.168.1.6'
     await server.discover(host)
 
     # Timeout after 3 seconds
@@ -45,6 +45,6 @@ async def main():
                   instance_list.append({"host":host,"eojgc":hex(eojgc),"eojcc":hex(eojcc),"eojci":hex(instance),"getmap":getmap,"setmap":setmap,"uid":uid,"manufacturer":manufacturer})
 
         pprint(instance_list)
-
+#    print(server._message_list)
 if __name__ == "__main__":
     asyncio.run(main())

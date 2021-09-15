@@ -30,7 +30,10 @@ class ECHONETAPIClient:
         processed_data = decodeEchonetMsg(raw_data)
         if self._debug_flag == True:
             print(f"Echonet Message Received - Processed data is {processed_data}")
-        self._message_list.remove(processed_data["TID"])
+        # if we get duplicate packets that have already been processed then dont worry about the message list.
+        # but still process them regardless. 
+        if processed_data["TID"] in self._message_list:
+            self._message_list.remove(processed_data["TID"])
         # handle discovery message response
         for opc in processed_data['OPC']:
             seojgc = processed_data['SEOJGC']

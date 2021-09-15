@@ -1,4 +1,4 @@
-VERSION = "2.0.16"
+VERSION = "2.0.17"
 # Echonetlite message format:
 #
 # - EDT0     |Property value data             |01 ..|01 01 30 01
