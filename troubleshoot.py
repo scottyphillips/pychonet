@@ -4,11 +4,14 @@ from pprint import pprint
 from aioudp import UDPServer
 from pychonet import ECHONETAPIClient as api
 from pychonet import Factory, EchonetInstance
-from pychonet.lib.const import ENL_SETMAP, ENL_GETMAP, ENL_UID, ENL_MANUFACTURER
+from pychonet.lib.const import VERSION, ENL_SETMAP, ENL_GETMAP, ENL_UID, ENL_MANUFACTURER
+from pychonet.lib.epc import EPC_CODE
 
 # This example will list the properties for all discovered instances on a given host
 
 async def main():
+
+    print(f'pychonet verison is {VERSION}')
     udp = UDPServer()
     loop = asyncio.get_event_loop()
     udp.run("0.0.0.0", 3610, loop=loop)
@@ -16,23 +19,17 @@ async def main():
 
     host = '192.168.1.50'
     await server.discover(host)
-    device1 = EchonetInstance("192.168.1.50", 2,144,1, server)
+    device2 = EchonetInstance("192.168.1.50", 2,163,1, server)
     # value = await device.getMessage(ENL_SETMAP)
     # print(value)
-    value = await device.getMessage(ENL_GETMAP)
+    value = await device2.getMessage(ENL_GETMAP)
     print(f"getmap is {value}")
 
-    value = await device.getMessage(ENL_SETMAP)
+    value = await device2.getMessage(ENL_SETMAP)
     print(f"setmap is {value}")
-    
-    device2 = EchonetInstance("192.168.1.50", 2,144,2, server)
-    # value = await device.getMessage(ENL_SETMAP)
-    # print(value)
-    value = await device.getMessage(ENL_GETMAP)
-    print(f"getmap is {value}")
 
-    value = await device.getMessage(ENL_SETMAP)
-    print(f"setmap is {value}")
+    if 0x80 in list(EPC_CODE[2][163].keys()):
+        print("EPC TABLE is correct!")
 
 
 if __name__ == "__main__":
