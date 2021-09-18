@@ -80,7 +80,8 @@ class EchonetInstance:
 
     """
     update is used as a way of producing a dict useful for API polling etc
-    Data can be formatted or returned as a hex string value by default.
+    Data will either be formatted if you are using a specific class (e.g HomeAirConditioner)
+    or returned as hex string values if you are using EchonetInstance
 
     :param attributes: optional list of EPC codes. eg [0x80, 0xBF], or a single code eg 0x80
 
@@ -117,7 +118,7 @@ class EchonetInstance:
                  elif epc in list(EPC_SUPER.keys()): # return hex value if code exists in superset but no function found
                      returned_json_data.update({epc: self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][epc].hex()})
                      continue
-                 elif epc in list(self.EPC_FUNCTIONS.keys()):
+                 elif epc in list(self.EPC_FUNCTIONS.keys()): # check the class-specific EPC function table.
                      returned_json_data.update({epc: self.EPC_FUNCTIONS[epc](self._api._state[self._host]["instances"][self._eojgc][self._eojcc][self._eojci][epc])})
                      continue
                  elif epc in list(EPC_CODE[self._eojgc][self._eojcc].keys()): # return hex value if EPC code exists in class but no function found

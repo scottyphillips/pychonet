@@ -72,57 +72,6 @@ EPC_SUPER_FUNCTIONS = {
 # TODO - Move these to their classes
 # -----------------------------------------------------------------------
 
-# ----- Electric Lock Class -------
-def _026FEX(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x41: 'lock',
-       0x42: 'unlock'
-    }
-    return values.get(op_mode, "invalid_setting")
-
-def _026FE3(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x41: 'open',
-       0x42: 'closed'
-    }
-    return values.get(op_mode, "invalid_setting")
-
-def _026FE4(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x41: 'occupant',
-       0x42: 'non-occupant'
-    }
-    return values.get(op_mode, "invalid_setting")
-
-def _026FE5(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x40: 'normal',
-       0x41: 'break_open',
-       0x42: 'door_open',
-       0x43: 'maunal_unlocked',
-       0x44: 'tampered'
-    }
-    return values.get(op_mode, "invalid_setting")
-
-def _026FE6(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x41: 'on',
-       0x42: 'off'
-    }
-    return values.get(op_mode, "invalid_setting")
-
-def _026FE7(edt):
-    op_mode = int.from_bytes(edt, 'big')
-    values = {
-       0x41: 'normal',
-       0x42: 'battery_replacement_notification'
-    }
-    return values.get(op_mode, "invalid_setting")
 
   #--- Low voltage smart meter class
 
