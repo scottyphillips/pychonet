@@ -147,7 +147,9 @@ EOJX_CLASS = {
 		0x91: 'Single function lighting',
 		0x99: 'Emergency lighting',
 		0x9D: 'Equipment light',
-		0xA0: 'Buzzer'
+		0xA0: 'Buzzer',
+        0xA2: 'Household small wind turbine',
+        0xA3: 'Lighting system'
 	},
 	0x03: { # Cooking/housework-related device group
 		0xB0: 'Coffee machine',

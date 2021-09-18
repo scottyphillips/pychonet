@@ -1052,6 +1052,31 @@ EPC_CODE = {
 			0x80: 'Operation status',
 			0xB1: 'Sound generation setting',
 			0xE0: 'Buzzer sound type'
+		},
+		0xA2: { # Household small wind turbine power generation
+			0x80: 'Operation status',
+			0xD0: 'System interconnection status',
+			0xE0: 'Measured instantaneous amount of electricity',
+			0xE1: 'Measured cumulative amount of electricity',
+			0xE2: 'Resetting cumulative amount of electricity',
+			0xE3: 'Measured cumulative amount of electricity sold',
+			0xE4: 'Resetting cumulative amount of electricity sold',
+			0xE5: 'Power generation output limit setting 1',
+			0xE6: 'Power generation output limit setting 2',
+			0xE7: 'Limit setting for the amount of electricity sold',
+			0xE8: 'Rated power',
+			0xEA: 'Measured wind speed',
+			0xEB: 'Rated wind speed',
+			0xEC: 'Cut-in wind speed',
+			0xED: 'Cut-out wind speed',
+			0xEE: 'Extreme wind speed',
+			0xEF: 'Braking status'
+		},
+		0xA0: { # Buzzer class
+			0x80: 'Operation status',
+			0xB0: 'Illuminance level setting',
+			0xC0: 'Scene control setting',
+			0xC1: 'Number that can assign scene control setting'
 		}
 	},
 	0x03: { # Cooking/housework-related device class group
