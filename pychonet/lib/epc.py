@@ -1072,7 +1072,7 @@ EPC_CODE = {
 			0xEE: 'Extreme wind speed',
 			0xEF: 'Braking status'
 		},
-		0xA0: { # Buzzer class
+		0xA3: { # Light Controller
 			0x80: 'Operation status',
 			0xB0: 'Illuminance level setting',
 			0xC0: 'Scene control setting',
