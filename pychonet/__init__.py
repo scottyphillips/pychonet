@@ -26,7 +26,7 @@ def Factory(host, server, eojgc, eojcc, eojci= 0x01):
         'Storage Battery': StorageBattery,
         'Electrically operated blind/shade': ElectricBlind,
         'General lighting': GeneralLighting,
-        'ElectricLock': GeneralLighting
+        'ElectricLock': ElectricLock
     }
     instance_object = instances.get(instance, None)
     if instance_object is not None:
