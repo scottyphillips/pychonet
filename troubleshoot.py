@@ -19,17 +19,22 @@ async def main():
 
     host = '192.168.1.50'
     await server.discover(host)
-    device2 = EchonetInstance("192.168.1.50", 2,163,1, server)
+    device = EchonetInstance("192.168.1.50", 2,163,1, server)
     # value = await device.getMessage(ENL_SETMAP)
     # print(value)
-    value = await device2.getMessage(ENL_GETMAP)
-    print(f"getmap is {value}")
+    getmap = await device.getMessage(ENL_GETMAP)
+    print(f"getmap is {getmap}")
 
-    value = await device2.getMessage(ENL_SETMAP)
-    print(f"setmap is {value}")
+    setmap = await device.getMessage(ENL_SETMAP)
+    print(f"setmap is {setmap}")
 
-    if 0x80 in list(EPC_CODE[2][163].keys()):
-        print("EPC TABLE is correct!")
+    for epc in getmap:
+        value = await device.getMessage(epc)
+        print(f"getmap value EPC code {epc} is {value}")
+
+    for epc in setmap:
+        value = await device.getMessage(epc)
+        print(f"setmap value EPC code {epc} is {value}")
 
 
 if __name__ == "__main__":
