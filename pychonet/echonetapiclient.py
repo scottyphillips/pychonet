@@ -20,7 +20,7 @@ class ECHONETAPIClient:
         self._loop = loop
         self._server.subscribe(self.echonetMessageReceived)
         self._state = {}
-        self._next_tx_tid = 0x01
+        self._next_tx_tid = 0x0000
         self._message_list = []
         self._message_timeout = MESSAGE_TIMEOUT
         self._debug_flag = False
@@ -31,7 +31,7 @@ class ECHONETAPIClient:
         if self._debug_flag == True:
             print(f"Echonet Message Received - Processed data is {processed_data}")
         # if we get duplicate packets that have already been processed then dont worry about the message list.
-        # but still process them regardless. 
+        # but still process them regardless.
         if processed_data["TID"] in self._message_list:
             self._message_list.remove(processed_data["TID"])
         # handle discovery message response
@@ -61,8 +61,12 @@ class ECHONETAPIClient:
        if host not in list(self._state.keys()):
           self._state[host] = {"instances":{}}
 
+       if self._next_tx_tid < 0xFFFF:
+            self._next_tx_tid += 1
+       else:
+            self._next_tx_tid = 1
        tx_tid = self._next_tx_tid
-       self._next_tx_tid+=1 if self._next_tx_tid < 0xFF else 1
+
        payload = buildEchonetMsg({
            'TID' : tx_tid, # Transaction ID 1
            'DEOJGC': deojgc,

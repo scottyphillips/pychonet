@@ -55,7 +55,7 @@ def buildEchonetMsg(data):
       # validate TID (set a default value if none provided)
       # TODO - TID message overlap.
       if 'TID' not in data:
-         data['TID'] = 0x01
+         data['TID'] = 0x0001
       elif data['TID'] > 0xFFFF:
          raise ValueError('Transaction ID is larger then 2 bytes.')
       message = (message << 16) + data['TID']
