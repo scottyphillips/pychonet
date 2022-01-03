@@ -79,6 +79,7 @@ ENL_AIR_VERT = 0xA4
 ENL_AIR_HORZ = 0xA5
 ENL_HVAC_MODE = 0xB0
 ENL_HVAC_SET_TEMP = 0xB3
+ENL_HVAC_ROOM_HUMIDITY = 0xBA
 ENL_HVAC_ROOM_TEMP = 0xBB
 ENL_HVAC_OUT_TEMP = 0xBE
 
@@ -223,6 +224,14 @@ class HomeAirConditioner(EchonetInstance):
     """
     def getOperationalTemperature(self):
         return self.getMessage(ENL_HVAC_SET_TEMP)
+
+    """
+    getRoomHumidity get the HVAC's room humidity.
+
+    return: A integer representing the room humidity.
+    """
+    def getRoomHumidity(self):
+        return self.getMessage(ENL_HVAC_ROOM_HUMIDITY)
 
     """
     getRoomTemperature get the HVAC's room temperature.

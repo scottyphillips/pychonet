@@ -5,7 +5,8 @@ from pychonet.lib.const import (
     ENL_GETMAP, ENL_SETMAP,
     ENL_STATUS, ENL_OFF, ENL_ON,
     ENL_UID, ENL_MANUFACTURER,
-    ENL_CUMULATIVE_POWER, ENL_CUMULATIVE_RUNTIME
+    ENL_INSTANTANEOUS_POWER, ENL_CUMULATIVE_POWER,
+    ENL_CUMULATIVE_RUNTIME
 )
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.epc import EPC_CODE, EPC_SUPER
@@ -148,6 +149,13 @@ class EchonetInstance:
     """
     async def getManufacturer(self): # EPC 0x8A
         return await self.update(ENL_MANUFACTURER)
+
+    """
+    getInstantaneousPower returns the current number of Wh the node is consuming.
+    :return: Instantaneous Wh as an integer.
+    """
+    async def getInstantaneousPower(self): # EPC 0x84
+        return self.update(ENL_INSTANTANEOUS_POWER)
 
     """
     getCumulativePower returns the total number of Wh the node has used.
