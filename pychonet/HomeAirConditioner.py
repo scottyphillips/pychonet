@@ -1,5 +1,5 @@
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import _int
+from pychonet.lib.epc_functions import _int, _signed_int
 
 MODES = {
 	'auto':		0x41,
@@ -200,9 +200,10 @@ class HomeAirConditioner(EchonetInstance):
         0xA5: _0130A5,
         0xAA: _0130AA,
         0xB0: _0130B0,
-        0xB3: _int,
-        0xBB: _int,
-        0xBE: _int
+		0xBA: _int,
+        0xB3: _signed_int,
+        0xBB: _signed_int,
+        0xBE: _signed_int
     }
 
     """

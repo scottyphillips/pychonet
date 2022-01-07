@@ -2,8 +2,11 @@ from datetime import datetime, timezone
 from pychonet.lib.const import MANUFACTURERS
 
 #------------ EPC GENERIC FUNCTIONS -------
-def _int(edt):
+def _int(edt): # unsigned int
     return int.from_bytes(edt, 'big')
+
+def _signed_int(edt): #signed ints
+    return int.from_bytes(edt, byteorder='big', signed=True)
 
 # Check status of Echonnet Instance
 #----------------- EPC SUPER FUNCTIONS -----------------------------
@@ -60,6 +63,7 @@ def _009A(edt): #cumulative runtime
 EPC_SUPER_FUNCTIONS = {
     0x80: _0080,
     0x83: _0083,
+    0x84: _int,
     0x85: _int,
     0x8A: _008A,
     0x9A: _009A,

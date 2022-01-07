@@ -15,3 +15,5 @@ v0.3, 2 March 2020 -- Added in function to measure outdoor temperature
 v2.0.9, 5 Sep 2021 -- fixed up factory method and pushed updates
 v2.0.13, 13 Sep 2021 -- Bug Fixes, better doco, promote to master
 v2.0.20, 22 Nov 2021 -- TID rollover bug fix
+v2.0.21, Jan 2022 -- Room humitiy and instantaneous power consumption
+v2.0.22, Jan 2022 -- Bug fixes for temp, power and humidity measurements
