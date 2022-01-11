@@ -29,7 +29,7 @@ def _0135E1(edt):
     return values.get(op_mode, "invalid_setting")
 
 
-# air volume 0x41 for auto 
+# air volume 0x41 for auto
 def _0135A0(edt):
     op_mode = int.from_bytes(edt, 'big')
     values = {
@@ -46,7 +46,7 @@ def _0135A0(edt):
     return values.get(op_mode, "invalid_setting")
 
 
-# cigarette sensor status 
+# cigarette sensor status
 def _0135C1(edt):
     op_mode = int.from_bytes(edt, 'big')
     values = {
@@ -56,7 +56,7 @@ def _0135C1(edt):
     return values.get(op_mode, "invalid_setting")
 
 
-# Photocatalyst setting 
+# Photocatalyst setting
 def _0135C2(edt):
     op_mode = int.from_bytes(edt, 'big')
     values = {
@@ -134,7 +134,7 @@ class HomeAirCleaner(EchonetInstance):
         return self.getMessage(0xC0)
 
     """
-    getPhotocatalystStatus get the status of Photocatalystn status.
+    getPhotocatalystStatus get the status of Photocatalyst status.
 
     return: A string representing the lock status
     """
@@ -144,7 +144,7 @@ class HomeAirCleaner(EchonetInstance):
     """
     setPhotocatalyst set the Photocatalyst status
 
-    param photocatalyst_status: A string representing the fan speed
+    param photocatalyst_status: A string representing the Photocatalyst speed
     """
     def setPhotocatalyst(self, photocatalyst_status):
         return self.setMessage(0xC2, PHOTOCATALYST_STATUS[photocatalyst_status])

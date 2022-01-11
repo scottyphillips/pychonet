@@ -17,3 +17,4 @@ v2.0.13, 13 Sep 2021 -- Bug Fixes, better doco, promote to master
 v2.0.20, 22 Nov 2021 -- TID rollover bug fix
 v2.0.21, Jan 2022 -- Room humitiy and instantaneous power consumption
 v2.0.22, Jan 2022 -- Bug fixes for temp, power and humidity measurements
+v2.1.0, 12 Jan 2022 -- inclusion of HomeAirCleaner class

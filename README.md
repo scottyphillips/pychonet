@@ -117,7 +117,7 @@ await aircon.update(0x80)
 NOTE: For Home Assistant users there is a dedicated repo that can be installed via HACS that can provide custom components for discovered ECHONETlite devices such as Mitsubishi airconditioners:
 (https://github.com/scottyphillips/echonetlite_homeassistant)
 
-'example_async.py' gives you a boilerplate asyncio program that will discover your ECHONETLite instance and return information about supported services. 
+'example_async.py' gives you a boilerplate asyncio program that will discover your ECHONETLite instance and return information about supported services.
 
 ## Hall of Fame
 Thanks to Jason Nader for all the quality of life updates to the codebase and doco.
@@ -125,18 +125,16 @@ Thanks to Jason Nader for all the quality of life updates to the codebase and do
 Thanks to khcnz (Karl Chaffey) and gvs for helping refector the old code
 and contributing to testing.
 
-Thanks to Dick Swart, Masaki Tagawa, Paul, khcnz,  Kolodnerd, and Alfie Gerner
-for each contributing code updates to to the original 'mitsubishi_echonet'
-and therefore this library
+Thanks to Dick Swart, Masaki Tagawa, Paul, khcnz,  Kolodnerd, Leonunix, and Alfie Gerner
+for each contributing code updates to this library.
 
 Thanks to Jeffro Carr who inspired me to write my own native Python ECHONET
 library for Home Assistant.
 Some ideas in his own repo got implemented in my own code.
 (https://github.com/jethrocarr/echonetlite-hvac-mqtt-service.git)
 
-Also big thanks to Futomi Hatano for open sourcing a well-documented ECHONET Lite
-library in Node JS that formed
-the basis of my reverse engineering efforts.
+Thanks to Futomi Hatano for open sourcing a well-documented ECHONET Lite
+library in Node JS that formed the basis of my reverse engineering efforts.
 (https://github.com/futomi/node-echonet-lite)
 
 ## License
