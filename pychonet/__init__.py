@@ -8,6 +8,7 @@ from .TemperatureSensor import TemperatureSensor
 from .ElectricBlind import ElectricBlind
 from .GeneralLighting import GeneralLighting
 from .ElectricLock import ElectricLock
+from .HomeAirCleaner import HomeAirCleaner
 from pychonet.lib.eojx import EOJX_CLASS
 
 def Factory(host, server, eojgc, eojcc, eojci= 0x01):
@@ -26,7 +27,8 @@ def Factory(host, server, eojgc, eojcc, eojci= 0x01):
         'Storage Battery': StorageBattery,
         'Electrically operated blind/shade': ElectricBlind,
         'General lighting': GeneralLighting,
-        'ElectricLock': ElectricLock
+        'ElectricLock': ElectricLock,
+        'Air cleaner': HomeAirCleaner
     }
     instance_object = instances.get(instance, None)
     if instance_object is not None:
