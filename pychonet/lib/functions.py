@@ -1,6 +1,10 @@
 from .eojx import EOJX_GROUP, EOJX_CLASS
 from .const import ESV_CODES, EHD1, EHD2
 
+class TIDError(Exception):
+    """Base class for other exceptions"""
+    pass
+
 def decodeEchonetMsg(byte):
   data = {}
   try:
@@ -48,46 +52,45 @@ def decodeEchonetMsg(byte):
   return data
 
 def buildEchonetMsg(data):
-   try:
       # EHD is fixed to 0x1081 because I am lazy.
-      message = 0x1081
+    message = 0x1081
 
-      # validate TID (set a default value if none provided)
-      # TODO - TID message overlap.
-      if 'TID' not in data:
+    # validate TID (set a default value if none provided)
+    # TODO - TID message overlap.
+    if 'TID' not in data:
          data['TID'] = 0x0001
-      elif data['TID'] > 0xFFFF:
-         raise ValueError('Transaction ID is larger then 2 bytes.')
-      message = (message << 16) + data['TID']
+    elif data['TID'] > 0xFFFF:
+         raise TIDError('Transaction ID is larger then 2 bytes.')
+    message = (message << 16) + data['TID']
 
       # append SEOJ which again is a fixed value to be lazy
-      message = (message << 24) + 0x05FF01
+    message = (message << 24) + 0x05FF01
 
       # validate DEOJ
-      if data['DEOJGC'] in EOJX_GROUP:
-          message = (message << 8) + data['DEOJGC']
-      else:
-          raise ValueError('Value ' + str(hex(data['DEOJGC'])) + ' not a valid SEO Group code')
+    if data['DEOJGC'] in EOJX_GROUP:
+         message = (message << 8) + data['DEOJGC']
+    else:
+         raise ValueError('Value ' + str(hex(data['DEOJGC'])) + ' not a valid SEO Group code')
 
-      if data['DEOJCC'] in EOJX_CLASS[data['DEOJGC']]:
-          message = (message << 8) + data['DEOJCC']
-      else:
-          raise ValueError('Value ' + str(hex(data['DEOJCC'])) + ' not a valid SEO class code')
+    if data['DEOJCC'] in EOJX_CLASS[data['DEOJGC']]:
+         message = (message << 8) + data['DEOJCC']
+    else:
+         raise ValueError('Value ' + str(hex(data['DEOJCC'])) + ' not a valid SEO class code')
 
-      message = (message << 8) + data['DEOJCI']
+    message = (message << 8) + data['DEOJCI']
 
-      # validate ESV by looking up the codes.
-      if data['ESV'] in ESV_CODES:
-          # ESV code is a string
-          message = (message << 8) + data['ESV']
-      else:
-          raise ValueError('Value not in ESV code table')
+    # validate ESV by looking up the codes.
+    if data['ESV'] in ESV_CODES:
+        # ESV code is a string
+        message = (message << 8) + data['ESV']
+    else:
+        raise ValueError('Value not in ESV code table')
 
-      # validate OPC
-      message = (message << 8) + len(data['OPC'])
+    # validate OPC
+    message = (message << 8) + len(data['OPC'])
 
-      # You can have multiple OPC per transaction.
-      for values in data['OPC']:
+    # You can have multiple OPC per transaction.
+    for values in data['OPC']:
         # validate EPC
         message =  (message << 8) + values['EPC']
         if 'PDC' in values:
@@ -98,11 +101,7 @@ def buildEchonetMsg(data):
         else:
             message =  (message << 8) + 0x00
       # print(message)
-      return bytearray.fromhex(format(int(message), 'x'))
-# some sloppy error handling here.
-   except ValueError as error:
-        # print('Caught this error: ' + repr(error))
-        quit()
+    return bytearray.fromhex(format(int(message), 'x'))
 
 def preparePayload(tid, deojgc, deojcc, deojci, esv, opc):
    tx_payload = {

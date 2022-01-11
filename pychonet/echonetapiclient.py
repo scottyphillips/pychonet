@@ -7,7 +7,7 @@ import struct
 import sys
 import time
 from pychonet.lib.const import GET, MESSAGE_TIMEOUT
-from pychonet.lib.functions import decodeEchonetMsg, buildEchonetMsg, preparePayload
+from pychonet.lib.functions import decodeEchonetMsg, buildEchonetMsg, preparePayload, TIDError
 from pychonet.lib.eojx import EOJX_GROUP, EOJX_CLASS
 from pychonet.lib.const import ENL_STATUS, ENL_UID, ENL_SETMAP, ENL_GETMAP, ENL_PORT, ENL_MANUFACTURER
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
@@ -58,23 +58,28 @@ class ECHONETAPIClient:
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{'EPC': 0xD6}])
 
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
-       if host not in list(self._state.keys()):
-          self._state[host] = {"instances":{}}
-
-       if self._next_tx_tid < 0xFFFF:
-            self._next_tx_tid += 1
-       else:
-            self._next_tx_tid = 1
-       tx_tid = self._next_tx_tid
-
-       payload = buildEchonetMsg({
-           'TID' : tx_tid, # Transaction ID 1
+       payload = None
+       message_array = {
            'DEOJGC': deojgc,
            'DEOJCC': deojcc,
            'DEOJCI': deojci,
            'ESV' : esv,
            'OPC' : opc
-       })
+       }
+       if host not in list(self._state.keys()):
+          self._state[host] = {"instances":{}}
+
+       self._next_tx_tid += 1
+       tx_tid = self._next_tx_tid
+       message_array['TID'] = tx_tid
+       try:
+           payload = buildEchonetMsg(message_array)
+       except TIDError: # Quashing the rollover bug hopefully once and for all...
+           self._next_tx_tid = 1
+           tx_tid = self._next_tx_tid
+           message_array['TID'] = tx_tid
+           payload = buildEchonetMsg(message_array)
+
        self._message_list.append(tx_tid)
        self._server.send(payload, (host, ENL_PORT))
        for x in range(0,self._message_timeout):
