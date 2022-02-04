@@ -1,17 +1,9 @@
 import asyncio
-import datetime
 
-from aioudp import UDPServer
-# import socket
-import struct
-import sys
-import time
-from pychonet.lib.const import GET, MESSAGE_TIMEOUT
-from pychonet.lib.functions import decodeEchonetMsg, buildEchonetMsg, preparePayload, TIDError
-from pychonet.lib.eojx import EOJX_GROUP, EOJX_CLASS
-from pychonet.lib.const import ENL_STATUS, ENL_UID, ENL_SETMAP, ENL_GETMAP, ENL_PORT, ENL_MANUFACTURER
+from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT,
+                                ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT)
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
-from pychonet.lib.epc import EPC_CODE, EPC_SUPER
+from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 
 
 class ECHONETAPIClient:
@@ -28,7 +20,7 @@ class ECHONETAPIClient:
     async def echonetMessageReceived(self, raw_data, addr):
         host = addr[0]
         processed_data = decodeEchonetMsg(raw_data)
-        if self._debug_flag == True:
+        if self._debug_flag:
             print(
                 f"Echonet Message Received - Processed data is {processed_data}")
         # if we get duplicate packets that have already been processed then dont worry about the message list.

@@ -117,14 +117,12 @@ def _0130A1(edt):
 
 def _0130AA(edt):
     op_mode = int.from_bytes(edt, 'big')
-    # print(hex(op_mode))
     values = {
         0x40: 'Normal operation',
         0x41: 'Defrosting',
         0x42: 'Preheating',
         0x43: 'Heat removal'
     }
-    # return({'special':hex(op_mode)})
     return values.get(op_mode, "invalid_setting")
 
 # Automatic swing of air flow direction setting
@@ -152,7 +150,6 @@ def _0130A4(edt):
         0x45: 'lower-central',
         0x42: 'lower'
     }
-    # return({'special':hex(op_mode)})
     return values.get(op_mode, "invalid_setting")
 
 # Air flow direction (horiziontal) setting
