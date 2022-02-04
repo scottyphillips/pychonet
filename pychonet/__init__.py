@@ -11,10 +11,11 @@ from .ElectricLock import ElectricLock
 from .HomeAirCleaner import HomeAirCleaner
 from pychonet.lib.eojx import EOJX_CLASS
 
-def Factory(host, server, eojgc, eojcc, eojci= 0x01):
+
+def Factory(host, server, eojgc, eojcc, eojci=0x01):
     Instance = None
     if eojgc in EOJX_CLASS:
-        if eojcc in  EOJX_CLASS[eojgc]:
+        if eojcc in EOJX_CLASS[eojgc]:
             instance = EOJX_CLASS[eojgc][eojcc]
 
     """Factory Method"""

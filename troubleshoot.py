@@ -9,6 +9,7 @@ from pychonet.lib.epc import EPC_CODE
 
 # This example will list the properties for all discovered instances on a given host
 
+
 async def main():
 
     print(f'pychonet verison is {VERSION}')
@@ -19,7 +20,7 @@ async def main():
 
     host = '192.168.1.50'
     await server.discover(host)
-    device = EchonetInstance("192.168.1.50", 2,163,1, server)
+    device = EchonetInstance("192.168.1.50", 2, 163, 1, server)
     # value = await device.getMessage(ENL_SETMAP)
     # print(value)
     getmap = await device.getMessage(ENL_GETMAP)

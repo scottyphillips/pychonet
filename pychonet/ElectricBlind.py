@@ -2,12 +2,13 @@ from pychonet.EchonetInstance import EchonetInstance
 
 ENL_OPENSTATE = 0xE0
 
+
 def _0260EO(edt):
     op_mode = int.from_bytes(edt, 'big')
     values = {
-       0x41: 'open',
-       0x42: 'close',
-       0x43: 'stop'
+        0x41: 'open',
+        0x42: 'close',
+        0x43: 'stop'
     }
     return values.get(op_mode, "invalid_setting")
 
@@ -33,21 +34,25 @@ def _0260EO(edt):
 
 
 """Class for Electric Blind/Shade Objects"""
+
+
 class ElectricBlind(EchonetInstance):
 
     EPC_FUNCTIONS = {
         0xE0: _0260EO
     }
 
-    def __init__(self, host, api_connector = None, instance = 0x1):
-        self._eojgc = 0x02 # Housing/facility-related device group
-        self._eojcc = 0x60 # Electrically operated blind/shade
-        EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
+    def __init__(self, host, api_connector=None, instance=0x1):
+        self._eojgc = 0x02  # Housing/facility-related device group
+        self._eojcc = 0x60  # Electrically operated blind/shade
+        EchonetInstance.__init__(
+            self, host, self._eojgc, self._eojcc, instance, api_connector)
 
     """
     getOpenCloseSetting get the status of the blind.
 
     return: A string representing the blind/shade state
     """
+
     def getOpenCloseSetting(self):
         return self.getMessage(ENL_OPENSTATE)
