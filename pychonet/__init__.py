@@ -14,7 +14,7 @@ from pychonet.lib.eojx import EOJX_CLASS
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
-    Instance = None
+    instance = None
     if eojgc in EOJX_CLASS:
         if eojcc in EOJX_CLASS[eojgc]:
             instance = EOJX_CLASS[eojgc][eojcc]
@@ -31,6 +31,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         "General lighting": GeneralLighting,
         "ElectricLock": ElectricLock,
         "Air cleaner": HomeAirCleaner,
+        None: None,
     }
     instance_object = instances.get(instance, None)
     if instance_object is not None:
