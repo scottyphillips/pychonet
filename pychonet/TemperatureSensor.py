@@ -3,6 +3,8 @@ from pychonet.EchonetInstance import EchonetInstance
 MEASURED_TEMP = 0xE0
 
 # ----- Tempereature Sensor -------
+
+
 def _0011E0(edt):
     return float(int.from_bytes(edt, "big")) / 10
 

@@ -1,17 +1,13 @@
 import asyncio
-from pprint import pprint
 
 from aioudp import UDPServer
 from pychonet import ECHONETAPIClient as api
-from pychonet import Factory, EchonetInstance
+from pychonet import EchonetInstance
 from pychonet.lib.const import (
     VERSION,
     ENL_SETMAP,
     ENL_GETMAP,
-    ENL_UID,
-    ENL_MANUFACTURER,
 )
-from pychonet.lib.epc import EPC_CODE
 
 # This example will list the properties for all discovered instances on a given host
 

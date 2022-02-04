@@ -1,4 +1,5 @@
-from pychonet.echonetapiclient import ECHONETAPIClient
+from pychonet.echonetapiclient import ECHONETAPIClient  # noqa
+
 from .EchonetInstance import EchonetInstance
 from .HomeAirConditioner import HomeAirConditioner
 from .HomeSolarPower import HomeSolarPower

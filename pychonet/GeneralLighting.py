@@ -5,6 +5,8 @@ ENL_BRIGHTNESS = 0xB0
 ENL_COLOR_TEMP = 0xB1
 
 # ----- General lighting class -------
+
+
 def _0290B1(edt):
     op_mode = int.from_bytes(edt, "big")
     values = {

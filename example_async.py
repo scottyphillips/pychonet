@@ -8,7 +8,6 @@ from pychonet.lib.const import (
     ENL_GETMAP,
     ENL_UID,
     ENL_MANUFACTURER,
-    VERSION,
 )
 from pychonet.lib.epc import EPC_SUPER, EPC_CODE
 from pychonet.lib.eojx import EOJX_GROUP, EOJX_CLASS

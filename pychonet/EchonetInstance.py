@@ -1,5 +1,3 @@
-import asyncio
-from pychonet.echonetapiclient import ECHONETAPIClient
 from pychonet.lib.const import (
     GET,
     SETC,
@@ -119,7 +117,7 @@ class EchonetInstance:
 
     async def update(self, attributes=None):
         opc = []
-        if attributes == None:
+        if attributes is None:
             attributes = self.getGetProperties()
         if isinstance(attributes, int):
             list_attributes = [attributes]
