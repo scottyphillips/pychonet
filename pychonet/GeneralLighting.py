@@ -14,7 +14,7 @@ def _0290B1(edt):
         0x41: "incandescent_lamp_color",
         0x42: "white",
         0x43: "daylight_white",
-        0x43: "daylight_color",
+        0x44: "daylight_color",
     }
     return values.get(op_mode, "invalid_setting")
 
