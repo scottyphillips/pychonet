@@ -1,34 +1,38 @@
 from datetime import datetime, timezone
 from pychonet.lib.const import MANUFACTURERS
 
-#------------ EPC GENERIC FUNCTIONS -------
-def _int(edt): # unsigned int
-    return int.from_bytes(edt, 'big')
+# ------------ EPC GENERIC FUNCTIONS -------
+def _int(edt):  # unsigned int
+    return int.from_bytes(edt, "big")
 
-def _signed_int(edt): #signed ints
-    return int.from_bytes(edt, byteorder='big', signed=True)
+
+def _signed_int(edt):  # signed ints
+    return int.from_bytes(edt, byteorder="big", signed=True)
+
 
 # Check status of Echonnet Instance
-#----------------- EPC SUPER FUNCTIONS -----------------------------
+# ----------------- EPC SUPER FUNCTIONS -----------------------------
 def _0080(edt):
-    ops_value = int.from_bytes(edt, 'big')
-    return ('On' if ops_value == 0x30 else 'Off')
+    ops_value = int.from_bytes(edt, "big")
+    return "On" if ops_value == 0x30 else "Off"
+
 
 def _009X(edt):
     payload = []
     if len(edt) < 17:
-        for i in range (1, len(edt)):
+        for i in range(1, len(edt)):
             payload.append(edt[i])
         return payload
 
-    for i in range (1, len(edt)):
-        code = i-1
-        binary = '{0:08b}'.format(edt[i])[::-1]
-        for j in range (0, 8):
+    for i in range(1, len(edt)):
+        code = i - 1
+        binary = "{0:08b}".format(edt[i])[::-1]
+        for j in range(0, 8):
             if binary[j] == "1":
-                EPC = (j+8) * 0x10 + code
+                EPC = (j + 8) * 0x10 + code
                 payload.append(EPC)
     return payload
+
 
 def _0083(edt):
     if edt is not None:
@@ -39,26 +43,29 @@ def _0083(edt):
         return ops_value
     return None
 
-def _008A(edt): #manufacturer
-    id = int.from_bytes(edt, 'big')
+
+def _008A(edt):  # manufacturer
+    id = int.from_bytes(edt, "big")
     if id in MANUFACTURERS.keys():
         return MANUFACTURERS[id]
     return id
 
-def _009A(edt): #cumulative runtime
+
+def _009A(edt):  # cumulative runtime
     if len(edt) > 1:
-        value = int.from_bytes(edt[1:], 'big')
+        value = int.from_bytes(edt[1:], "big")
         time_period_multiplier = 0
         if edt[0] == 0x41:
-            time_period_multiplier = 1 #measurement is in seconds
+            time_period_multiplier = 1  # measurement is in seconds
         elif edt[0] == 0x42:
-            time_period_multiplier = 60 #measurement is in minutes
+            time_period_multiplier = 60  # measurement is in minutes
         elif edt[0] == 0x43:
-            time_period_multiplier = 3600 #measurement is in hours
+            time_period_multiplier = 3600  # measurement is in hours
         elif edt[0] == 0x44:
-            time_period_multiplier = 3600*24 #measurement is in days
+            time_period_multiplier = 3600 * 24  # measurement is in days
         return value * time_period_multiplier
     return None
+
 
 EPC_SUPER_FUNCTIONS = {
     0x80: _0080,
@@ -68,7 +75,7 @@ EPC_SUPER_FUNCTIONS = {
     0x8A: _008A,
     0x9A: _009A,
     0x9E: _009X,
-    0x9F: _009X
+    0x9F: _009X,
 }
 
 
@@ -77,10 +84,11 @@ EPC_SUPER_FUNCTIONS = {
 # -----------------------------------------------------------------------
 
 
-  #--- Low voltage smart meter class
+# --- Low voltage smart meter class
+
 
 def _0288E1(edt):
-    op_mode = int.from_bytes(edt, 'big')
+    op_mode = int.from_bytes(edt, "big")
     values = {
         0x00: 1,
         0x01: 0.1,
@@ -97,23 +105,27 @@ def _0288E1(edt):
 
 # ----- Low voltage smart electric energy meter -------
 def _0288E7(edt):
-    value = int.from_bytes(edt, 'big', signed=True)
+    value = int.from_bytes(edt, "big", signed=True)
     return value
 
 
 def _0288E8(edt):
-    r_phase = float(int.from_bytes(edt[0:2], 'big', signed=True)) / 10 #R Phase
-    t_phase = float(int.from_bytes(edt[2:4], 'big', signed=True)) / 10 #T Phase
+    r_phase = float(int.from_bytes(edt[0:2], "big", signed=True)) / 10  # R Phase
+    t_phase = float(int.from_bytes(edt[2:4], "big", signed=True)) / 10  # T Phase
     return {"r_phase_amps": r_phase, "t_phase_amps": t_phase}
+
 
 def _0288EA(edt):
     print(edt)
-    year = int.from_bytes(edt[0:2], 'big')
-    month = int.from_bytes(edt[2:3], 'big')
-    day = int.from_bytes(edt[3:4], 'big')
-    hour = int.from_bytes(edt[4:5], 'big')
-    minute = int.from_bytes(edt[5:6], 'big')
-    second = int.from_bytes(edt[6:7], 'big')
-    culmative = int.from_bytes(edt[7:], 'big')
-    time = datetime(year, month, day, hour,minute,second)
-    return {'time': datetime(year, month, day, hour,minute,second).isoformat(), 'culmative_value': culmative}
+    year = int.from_bytes(edt[0:2], "big")
+    month = int.from_bytes(edt[2:3], "big")
+    day = int.from_bytes(edt[3:4], "big")
+    hour = int.from_bytes(edt[4:5], "big")
+    minute = int.from_bytes(edt[5:6], "big")
+    second = int.from_bytes(edt[6:7], "big")
+    culmative = int.from_bytes(edt[7:], "big")
+    time = datetime(year, month, day, hour, minute, second)
+    return {
+        "time": datetime(year, month, day, hour, minute, second).isoformat(),
+        "culmative_value": culmative,
+    }
