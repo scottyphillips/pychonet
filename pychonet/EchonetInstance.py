@@ -252,18 +252,6 @@ class EchonetInstance:
         return await self.getMessage(ENL_STATUS)
 
     """
-    setOperationalStatus sets the ON/OFF state of the node
-
-    :param status: True if On, False if Off.
-    """
-
-    async def setOperationalStatus(self, status):
-        if status == "on" or status == ENL_ON or status == True:
-            return await self.setMessage(ENL_STATUS, ENL_ON)
-        elif status == "of" or status == ENL_OFF or status == False:
-            return await self.setMessage(ENL_STATUS, ENL_OFF)
-
-    """
     On sets the node to ON.
 
     """
