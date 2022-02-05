@@ -1,5 +1,5 @@
-from .eojx import EOJX_GROUP, EOJX_CLASS
-from .const import ESV_CODES, EHD1, EHD2
+from .const import EHD1, EHD2, ESV_CODES
+from .eojx import EOJX_CLASS, EOJX_GROUP
 
 
 class TIDError(Exception):

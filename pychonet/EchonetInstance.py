@@ -1,19 +1,9 @@
-from pychonet.lib.const import (
-    GET,
-    SETC,
-    ENL_GETMAP,
-    ENL_SETMAP,
-    ENL_STATUS,
-    ENL_OFF,
-    ENL_ON,
-    ENL_UID,
-    ENL_MANUFACTURER,
-    ENL_INSTANTANEOUS_POWER,
-    ENL_CUMULATIVE_POWER,
-    ENL_CUMULATIVE_RUNTIME,
-)
-from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
+from pychonet.lib.const import (ENL_CUMULATIVE_POWER, ENL_CUMULATIVE_RUNTIME,
+                                ENL_GETMAP, ENL_INSTANTANEOUS_POWER,
+                                ENL_MANUFACTURER, ENL_OFF, ENL_ON, ENL_SETMAP,
+                                ENL_STATUS, ENL_UID, GET, SETC)
 from pychonet.lib.epc import EPC_CODE, EPC_SUPER
+from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 
 """
 Superclass for Echonet instance objects.

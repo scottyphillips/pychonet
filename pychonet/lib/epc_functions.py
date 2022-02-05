@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
+
 from pychonet.lib.const import MANUFACTURERS
+
 
 # ------------ EPC GENERIC FUNCTIONS -------
 def _int(edt):  # unsigned int

@@ -1,14 +1,7 @@
 import asyncio
 
-from pychonet.lib.const import (
-    ENL_GETMAP,
-    ENL_MANUFACTURER,
-    ENL_PORT,
-    ENL_SETMAP,
-    ENL_UID,
-    GET,
-    MESSAGE_TIMEOUT,
-)
+from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT,
+                                ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT)
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 

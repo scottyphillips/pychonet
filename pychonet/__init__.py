@@ -1,16 +1,16 @@
 from pychonet.echonetapiclient import ECHONETAPIClient  # noqa
+from pychonet.lib.eojx import EOJX_CLASS
 
 from .EchonetInstance import EchonetInstance
+from .ElectricBlind import ElectricBlind
+from .ElectricLock import ElectricLock
+from .ElectricVehicleCharger import ElectricVehicleCharger
+from .GeneralLighting import GeneralLighting
+from .HomeAirCleaner import HomeAirCleaner
 from .HomeAirConditioner import HomeAirConditioner
 from .HomeSolarPower import HomeSolarPower
-from .ElectricVehicleCharger import ElectricVehicleCharger
 from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
-from .ElectricBlind import ElectricBlind
-from .GeneralLighting import GeneralLighting
-from .ElectricLock import ElectricLock
-from .HomeAirCleaner import HomeAirCleaner
-from pychonet.lib.eojx import EOJX_CLASS
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
