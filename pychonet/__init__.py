@@ -11,6 +11,7 @@ from .HomeAirConditioner import HomeAirConditioner
 from .HomeSolarPower import HomeSolarPower
 from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
+from .DistributionPanelMeter import DistributionPanelMeter
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
