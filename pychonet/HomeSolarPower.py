@@ -20,14 +20,18 @@ def _0279D1(edt):
               0x45: "Unknown"}
     return values.get(op_mode, "Invalid setting")
 
+# Measured cumulative amount of electric energy generated (in kWH)
+def _0279E1(edt):  # Also used with 0xE3
+    return float(int.from_bytes(edt, "big")) * 1000
+
 class HomeSolarPower(EchonetInstance):
     EPC_FUNCTIONS = {
         0xD0: _0279D0,
         0xD1: _0279D1,
         0xE0: _int,
-        0xE1: _int,
+        0xE1: _0279E1,
         0xE2: _int,
-        0xE3: _int,
+        0xE3: _0279E1,
         0xE4: _int,
         0xE5: _int,
         0xE6: _int,
