@@ -24,6 +24,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instances = {
         "Home air conditioner": HomeAirConditioner,
         "Home solar power generation": HomeSolarPower,
+        "Distribution panel metering": DistributionPanelMeter,
         "Electric vehicle charger/discharger": ElectricVehicleCharger,
         "Temperature sensor": TemperatureSensor,
         "Storage Battery": StorageBattery,

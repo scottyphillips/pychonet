@@ -684,6 +684,7 @@ EPC_CODE = {
         0x79: {  # Home solar power generation class
             0x80: "Operation status",
             0xD0: "System-interconnected type",
+            0xD1: "Output power restraint status",
             0xE0: "Measured instantaneous amount of electricity generated",
             0xE1: "Measured cumulative amount of electric energy generated",
             0xE2: "Resetting cumulative amount of electric energy generated",
