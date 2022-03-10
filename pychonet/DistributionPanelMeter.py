@@ -23,14 +23,14 @@ def _0287C2(edt):
 def _0287C7(edt):
     r_phase = float(int.from_bytes(edt[0:2], "big", signed=True)) / 10  # R Phase
     t_phase = float(int.from_bytes(edt[2:4], "big", signed=True)) / 10  # T Phase
-    if t_phase = 3276.6:
+    if t_phase == 3276.6:
         t_phase = None
     return {"r_phase_amperes": r_phase, "t_phase_amperes": t_phase}
 
 def _0287C8(edt):
     r_sn = float(int.from_bytes(edt[0:2], "big", signed=True)) / 10  # R Phase
     sn_t = float(int.from_bytes(edt[2:4], "big", signed=True)) / 10  # T Phase
-    if sn_t = 6553.4:
+    if sn_t == 6553.4:
         sn_t = None
     return {"r_sn_voltage": r_sn, "sn_t_voltage": sn_t}
 
