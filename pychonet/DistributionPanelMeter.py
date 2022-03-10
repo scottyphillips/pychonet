@@ -10,7 +10,7 @@ def _0287C2(edt):
               0x04: 0.0001,
               0x0A: 10,
               0x0B: 100,
-              0x0C: 1000
+              0x0C: 1000,
               0x0D: 10000}
     return values.get(op_mode, None)
 
