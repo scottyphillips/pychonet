@@ -9,7 +9,7 @@ with open(path.join(this_directory, "README.md")) as f:
 
 setup(
     name="pychonet",
-    version="2.1.6",
+    version="2.1.7",
     author="Scott Phillips",
     author_email="scotty.phillips@hotmail.com",
     packages=["pychonet", "pychonet.lib"],
