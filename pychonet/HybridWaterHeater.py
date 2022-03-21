@@ -6,7 +6,7 @@ from pychonet.lib.epc_functions import _int, _signed_int
 # 0xB0 - Automatic water heating setting
 def _02A6B0(edt):
     op_mode = int.from_bytes(edt, "big")
-    AUTOMATIC_WATER_HEATING_STATES: {
+    AUTOMATIC_WATER_HEATING_STATES = {
         0x41: "Automatic water heating",
         0x42: "Manual water heating",
         0x43: "Water heating manual stop",
