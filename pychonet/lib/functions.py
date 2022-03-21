@@ -82,7 +82,7 @@ def buildEchonetMsg(data):
         message = (message << 8) + data["DEOJCC"]
     else:
         raise ValueError(
-            "Value " + str(hex(data["DEOJCC"])) + " not a valid SEO class code"
+            "Value " + str(hex(data["DEOJCC"])) + " missing from SEO Class table. Check current ECHONETlite specs for any update."
         )
 
     message = (message << 8) + data["DEOJCI"]

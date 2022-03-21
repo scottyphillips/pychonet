@@ -12,7 +12,7 @@ from .HomeSolarPower import HomeSolarPower
 from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
 from .DistributionPanelMeter import DistributionPanelMeter
-
+from .HybridWaterHeater import HybridWaterHeater
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -31,8 +31,9 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         "Storage Battery": StorageBattery,
         "Electrically operated blind/shade": ElectricBlind,
         "General lighting": GeneralLighting,
-        "ElectricLock": ElectricLock,
+        "Electric Lock": ElectricLock,
         "Air cleaner": HomeAirCleaner,
+        "Hybrid Water Heater": HybridWaterHeater,
         None: None,
     }
     instance_object = instances.get(instance, None)

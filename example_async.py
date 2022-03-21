@@ -5,6 +5,7 @@ from pprint import pprint
 from aioudp import UDPServer
 
 from pychonet import ECHONETAPIClient as api
+from pychonet import HybridWaterHeater
 from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_SETMAP,
                                 ENL_UID)
 from pychonet.lib.eojx import EOJX_CLASS, EOJX_GROUP

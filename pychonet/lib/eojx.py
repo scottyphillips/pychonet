@@ -149,6 +149,9 @@ EOJX_CLASS = {
         0xA0: "Buzzer",
         0xA2: "Household small wind turbine",
         0xA3: "Lighting system",
+        0xA4: "Extended Lighting system",
+        0xA5: "Multiple Input PCS",
+        0xA6: "Hybrid Water Heater"
     },
     0x03: {  # Cooking/housework-related device group
         0xB0: "Coffee machine",
