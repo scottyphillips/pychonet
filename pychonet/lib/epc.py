@@ -1079,6 +1079,18 @@ EPC_CODE = {
             0xC0: "Scene control setting",
             0xC1: "Number that can assign scene control setting",
         },
+        0xA6: { # Hybrid Water Heater
+            0xB0: "Automatic water heating setting",
+            0xB2: "Water heating status",
+            0xB3: "Heater status",
+            0xB6: "Hot water supply mode setting for auxiliary heat source machine",
+            0xB7: "Heater mode setting for auxiliary heat source machine",
+            0xB8: "Linkage mode setting for solar power generation",
+            0xB9: "Solar power generations utilization time",
+            0xC3: "Hot water supply status",
+            0xE1: "Measured amount of hot water remaining in tank",
+            0xE2: "Tank Capacity"
+        }
     },
     0x03: {  # Cooking/housework-related device class group
         0xB2: {  # Electric hot water pot (Electric thermos) class

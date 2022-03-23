@@ -111,20 +111,20 @@ class ECHONETAPIClient:
                 eojgc = bytearray(edt)[1 + (3 * x)]
                 eojcc = bytearray(edt)[2 + (3 * x)]
                 eojci = bytearray(edt)[3 + (3 * x)]
-
-                # populate state table
-                if eojgc not in list(self._state[host]["instances"].keys()):
-                    self._state[host]["instances"].update({eojgc: {}})
-                if eojcc not in list(self._state[host]["instances"][eojgc].keys()):
-                    self._state[host]["instances"][eojgc].update({eojcc: {}})
-                if eojci not in list(
-                    self._state[host]["instances"][eojgc][eojcc].keys()
-                ):
-                    self._state[host]["instances"][eojgc][eojcc][eojci] = {}
-                    self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                        {ENL_SETMAP: []}
-                    )
-                    self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                        {ENL_GETMAP: []}
-                    )
+                if eojgc != 0x0F: # ignore this group code.
+                    # populate state table
+                    if eojgc not in list(self._state[host]["instances"].keys()):
+                        self._state[host]["instances"].update({eojgc: {}})
+                    if eojcc not in list(self._state[host]["instances"][eojgc].keys()):
+                        self._state[host]["instances"][eojgc].update({eojcc: {}})
+                    if eojci not in list(
+                        self._state[host]["instances"][eojgc][eojcc].keys()
+                    ):
+                        self._state[host]["instances"][eojgc][eojcc][eojci] = {}
+                        self._state[host]["instances"][eojgc][eojcc][eojci].update(
+                            {ENL_SETMAP: []}
+                        )
+                        self._state[host]["instances"][eojgc][eojcc][eojci].update(
+                            {ENL_GETMAP: []}
+                        )
             self._state[host]["discovered"] = True
