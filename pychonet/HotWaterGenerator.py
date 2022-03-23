@@ -40,18 +40,18 @@ class HotWaterGenerator(EchonetInstance):
          0xE4: _0272EX,   # Bath additional boil-up operation setting
          0xE5: _0272EX,   # Bath adding hot water operation setting
          0xE6: _0272EX,   # Bath water temperature lowering operation setting
-         0xE7: _int,      # Bath hot water volume setting 1
-         0xE8: _int,      # Bath hot water volume setting 2
-         0xEE: _int,      # Bath hot water volume setting 3
-         0xD4: _int,      # Bath hot water volume setting 4
-         0xD5: _int,      # Bath hot water volume setting 4 - Maximum settable level
-         0xE9: _int,      # "Bathroom priority setting",
-         0xEA: _int,      # "Shower hot water supply status",
-         0xEB: _int,      # "Kitchen hot water supply status",
-         0xEC: _int,      # "Hot water warmer ON timer reservation setting",
+#          0xE7: XXX,      # Bath hot water volume setting 1
+#         0xE8: XXX,      # Bath hot water volume setting 2
+#         0xEE: XXX,      # Bath hot water volume setting 3
+#         0xD4: XXX,      # Bath hot water volume setting 4
+#         0xD5: XXX,      # Bath hot water volume setting 4 - Maximum settable level
+         0xE9: _0272EX,      # "Bathroom priority setting",
+         0xEA: _0272EX,      # "Shower hot water supply status",
+         0xEB: _0272EX,      # "Kitchen hot water supply status",
+         0xEC: _0272EX,      # "Hot water warmer ON timer reservation setting",
 #        0xED: ## "Set value of hot water warmer ON timer time",
-         0xEF: _int,      # "Bath operation status monitor",
-         0x90: _int,      # "ON timer reservation setting",
+#         0xEF: _XXX,      # "Bath operation status monitor",
+         0x90: _0272EX,      # "ON timer reservation setting",
 #        0x91: ## "Set value of ON timer time",
 #        0x92: ## "Set value of ON timer relative time",
          0xD6: _int,      # "Volume setting",
