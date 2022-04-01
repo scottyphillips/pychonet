@@ -23,6 +23,12 @@ FAN_SPEED = {
     "max": 0x38,
 }
 
+FAN_MODE = {
+    "normal": 0x41,
+    "high-speed": 0x42,
+    "silent": 0x43
+}
+
 AIRFLOW_HORIZ = {
     "rc-right": 0x41,
     "left-lc": 0x42,
@@ -68,6 +74,7 @@ ENL_SWING_MODE = 0xA3
 ENL_AIR_VERT = 0xA4
 ENL_AIR_HORZ = 0xA5
 ENL_HVAC_MODE = 0xB0
+ENL_HVAC_FAN_MODE = 0xB2
 ENL_HVAC_SET_TEMP = 0xB3
 ENL_HVAC_ROOM_HUMIDITY = 0xBA
 ENL_HVAC_ROOM_TEMP = 0xBB
@@ -175,6 +182,15 @@ def _0130B0(edt):
     }
     return values.get(op_mode, "invalid_setting")
 
+# Silent mode
+def _0130B2(edt):
+    op_mode = int.from_bytes(edt, "big")
+    values = {
+        0x41: "normal",
+        0x42: "high-speed",
+        0x43: "silent",
+    }
+    return values.get(op_mode, "invalid_setting")
 
 class HomeAirConditioner(EchonetInstance):
 
@@ -186,6 +202,7 @@ class HomeAirConditioner(EchonetInstance):
         0xA5: _0130A5,
         0xAA: _0130AA,
         0xB0: _0130B0,
+        0xB2: _0130B2,
         0xBA: _int,
         0xB3: _signed_int,
         0xBB: _signed_int,
@@ -374,3 +391,22 @@ class HomeAirConditioner(EchonetInstance):
 
     def getAirflowHoriz(self):  # 0xA5
         return self.getMessage(ENL_AIR_HORZ)
+
+    """
+    setFanMode sets the Fan normal/high-speed/silent operation
+
+    params airflow_mode: A string representing airflow mode setting
+                          e.g: 'normal', 'high-speed', 'silent'
+    """
+
+    def setFanMode(self, airflow_mode):  # 0xB2
+        return self.setMessage(ENL_HVAC_FAN_MODE, FAN_MODE[airflow_mode])
+
+    """
+    getFanMode get the Fan normal/high-speed/silent operation
+
+    return: A string representing airflow mode setting e.g: 'normal', 'high-speed', 'silent'
+    """
+
+    def getFanMode(self):  # 0xB2
+        return self.getMessage(ENL_HVAC_FAN_MODE)
