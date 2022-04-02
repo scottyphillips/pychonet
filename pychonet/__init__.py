@@ -13,6 +13,7 @@ from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
 from .DistributionPanelMeter import DistributionPanelMeter
 from .HybridWaterHeater import HybridWaterHeater
+from .HotWaterGenerator import HotWaterGenerator
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
