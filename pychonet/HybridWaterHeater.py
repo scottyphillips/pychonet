@@ -47,10 +47,10 @@ def _02A6B8(edt):
 
 # 0xB9 - Solar power generations utilization time
 def _02A6B9(edt):
-    start_hh = float(int.from_bytes(edt[0:1], "big"))
-    start_mm = float(int.from_bytes(edt[1:2], "big"))
-    end_hh = float(int.from_bytes(edt[2:3], "big"))
-    end_mm = float(int.from_bytes(edt[3:4], "big"))
+    start_hh = int.from_bytes(edt[0:1], "big")
+    start_mm = int.from_bytes(edt[1:2], "big")
+    end_hh = int.from_bytes(edt[2:3], "big")
+    end_mm = int.from_bytes(edt[3:4], "big")
     return { "start_time": f"{start_hh}:{start_mm}", "end_time": f"{end_hh}:{end_mm}" }
 
 # 0xC3 - Hot water supply status

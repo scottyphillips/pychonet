@@ -34,6 +34,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         "Electric Lock": ElectricLock,
         "Air cleaner": HomeAirCleaner,
         "Hybrid Water Heater": HybridWaterHeater,
+        "Hot water generator": HotWaterGenerator,
         None: None,
     }
     instance_object = instances.get(instance, None)
