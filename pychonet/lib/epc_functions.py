@@ -17,6 +17,9 @@ def _hh_mm(edt):  # basic time unit
     mm = int.from_bytes(edt[1:2], "big")
     return f"{hh}:{mm}"
 
+def _to_string(edt):
+    return edt.decode('utf-8')
+
 # Check status of Echonnet Instance
 # ----------------- EPC SUPER FUNCTIONS -----------------------------
 def _0080(edt):
