@@ -14,6 +14,7 @@ from .TemperatureSensor import TemperatureSensor
 from .DistributionPanelMeter import DistributionPanelMeter
 from .HybridWaterHeater import HybridWaterHeater
 from .HotWaterGenerator import HotWaterGenerator
+from .GasMeter import GasMeter
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -36,6 +37,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         "Air cleaner": HomeAirCleaner,
         "Hybrid Water Heater": HybridWaterHeater,
         "Hot water generator": HotWaterGenerator,
+        "Gas meter": GasMeter
         None: None,
     }
     instance_object = instances.get(instance, None)
