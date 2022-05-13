@@ -177,11 +177,11 @@ class EchonetInstance:
                     )
         for epc in attributes:
             if epc not in list(returned_json_data.keys()):
-                returned_json_data.update({epc: False})
+                returned_json_data.update({epc: None})
         if (len(returned_json_data)) == 1 and len(attributes) == 1:
             return returned_json_data[attributes[0]]
         elif (len(returned_json_data)) == 0:
-            return False
+            return None
         return returned_json_data
 
     """
