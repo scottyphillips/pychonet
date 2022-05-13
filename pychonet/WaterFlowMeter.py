@@ -1,5 +1,6 @@
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import _int, _signed_int, _to_string
+import struct
 
 def _0281D0(edt):
     # Water flow meter classification
