@@ -23,7 +23,7 @@ FAN_SPEED = {
     "max": 0x38,
 }
 
-FAN_MODE = {
+SILENT_MODE = {
     "normal": 0x41,
     "high-speed": 0x42,
     "silent": 0x43
@@ -401,8 +401,8 @@ class HomeAirConditioner(EchonetInstance):
                           e.g: 'normal', 'high-speed', 'silent'
     """
 
-    def setFanMode(self, airflow_mode):  # 0xB2
-        return self.setMessage(ENL_HVAC_FAN_MODE, FAN_MODE[airflow_mode])
+    def setSilentMode(self, mode):  # 0xB2
+        return self.setMessage(ENL_HVAC_SILENT_MODE, SILENT_MODE[mode])
 
     """
     getFanMode get the Fan normal/high-speed/silent operation
@@ -410,5 +410,5 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing airflow mode setting e.g: 'normal', 'high-speed', 'silent'
     """
 
-    def getFanMode(self):  # 0xB2
-        return self.getMessage(ENL_HVAC_FAN_MODE)
+    def getSilentMode(self):  # 0xB2
+        return self.getMessage(ENL_HVAC_SILENT_MODE)
