@@ -141,6 +141,9 @@ library in Node JS that formed the basis of my reverse engineering efforts.
 
 This application is licensed under an MIT license, refer to LICENSE for details.
 
+Portions of 'ECHONET Lite Device Emulator' (Copyright 2020 Kanagawa Institute of Technology)
+have been used in this application. This code was licensed under the MIT licence. 
+
 ***
 [pychonet]: https://github.com/scottyphillips/pychonet
 [releases-shield]: https://img.shields.io/github/release/scottyphillips/pychonet.svg?style=for-the-badge
