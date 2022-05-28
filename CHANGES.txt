@@ -23,3 +23,4 @@ v2.1.7, 11 Mar 2022 -- Update HomeSolarPower and implement DistributionPanelMete
 v2.2.0, 21 Mar 2022 -- Add HybridWaterHeater
 v2.2.1, 02 Apr 2022 -- Add HotWaterGenerator. Update HomeAirConditioner
 v2.2.2, 04 Apr 2022 -- Library now returns None rather then False if no data is received.
+v2.2.3, 28 May 2022 -- Minor update to HomeAirConditioner to support silent mode

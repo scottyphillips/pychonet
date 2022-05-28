@@ -63,6 +63,8 @@ AIRFLOW_VERT = {
     "lower": 0x42,
 }
 
+SILENT_MODE = {"normal": 0x41, "high-speed": 0x42, "silent": 0x43}
+
 AUTO_DIRECTION = {"auto": 0x41, "non-auto": 0x42, "auto-vert": 0x43, "auto-horiz": 0x44}
 
 SWING_MODE = {"not-used": 0x31, "vert": 0x41, "horiz": 0x42, "vert-horiz": 0x43}
@@ -74,7 +76,7 @@ ENL_SWING_MODE = 0xA3
 ENL_AIR_VERT = 0xA4
 ENL_AIR_HORZ = 0xA5
 ENL_HVAC_MODE = 0xB0
-ENL_HVAC_FAN_MODE = 0xB2
+ENL_HVAC_SILENT_MODE = 0xB2
 ENL_HVAC_SET_TEMP = 0xB3
 ENL_HVAC_ROOM_HUMIDITY = 0xBA
 ENL_HVAC_ROOM_TEMP = 0xBB
