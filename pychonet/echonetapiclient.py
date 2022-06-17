@@ -45,9 +45,10 @@ class ECHONETAPIClient:
                         epc
                     ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                 else:
-                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc[
-                        "EDT"
-                    ]
+                    if host not in self._state:
+                        print("Unknown host - probably multicast message")
+                    else:
+                        self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
 
     async def discover(self, host="224.0.23.0"):
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{"EPC": 0xD6}])

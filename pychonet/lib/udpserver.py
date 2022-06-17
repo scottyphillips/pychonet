@@ -13,6 +13,10 @@ class UDPServer():
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._sock.setblocking(False)
 
+        # enable multicast
+        mreq = struct.pack("=4sl", socket.inet_aton("224.0.23.0"), socket.INADDR_ANY)
+        self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
         self._send_event = asyncio.Event()
         self._send_queue = deque()
 
@@ -23,9 +27,7 @@ class UDPServer():
         self.loop = loop
 
         self._sock.bind((host, port))
-        # enable multicast
-        mreq = struct.pack("=4sl", socket.inet_aton("224.0.23.0"), socket.INADDR_ANY)
-        self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
 
         self._connection_made()
 
