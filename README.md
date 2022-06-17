@@ -145,7 +145,6 @@ have been used in this application. This code was licensed under the MIT licence
 
 The UDP code is based on 'aio-udp-server' (Copyright 2021 Dmitriy Bashkirtsev)
 This code is licenced under the GPL licence.
-The author is RuZZian so he gets no thanks from me.
 Слава Україні! 🇺🇦
 (https://github.com/bashkirtsevich-llc/aioudp)
 
