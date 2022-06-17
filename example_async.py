@@ -29,7 +29,7 @@ async def main(argv):
     udp = UDPServer()
     loop = asyncio.get_event_loop()
     udp.run("0.0.0.0", 3610, loop=loop)
-    server = api(server=udp, loop=loop)
+    server = api(udp)
     server._debug_flag = False
     server._message_timeout = 300
     target = argv[1]

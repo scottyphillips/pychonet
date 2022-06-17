@@ -13,8 +13,8 @@ from pychonet import EchonetInstance
 
 udp = UDPServer()
 loop = asyncio.get_event_loop()
-udp.run("0.0.0.0",3610, loop=loop)
-server = api(server=udp,loop=loop)
+udp.run("0.0.0.0", 3610, loop)
+server = api(udp)
 server._debug_flag = True
 await server.discover('192.168.1.6')
 await server.getAllPropertyMaps('192.168.1.6',1,48,1)

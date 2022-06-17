@@ -1,15 +1,14 @@
 import asyncio
 
 from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT,
-                                ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT)
+                                ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT, ENL_STATMAP)
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 
 
 class ECHONETAPIClient:
-    def __init__(self, server, loop):
+    def __init__(self, server):
         self._server = server
-        self._loop = loop
         self._server.subscribe(self.echonetMessageReceived)
         self._state = {}
         self._next_tx_tid = 0x0000
@@ -35,12 +34,12 @@ class ECHONETAPIClient:
             if seojgc == 14 and seojcc == 240 and epc == 0xD6:
                 await self.process_discovery_data(host, opc)
             else:
-                if epc == ENL_SETMAP:
+                if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
-                elif epc == ENL_GETMAP:
-                    map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
-                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
+#                elif epc == ENL_GETMAP:
+#                    map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
+#                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
                 elif epc in (ENL_UID, ENL_MANUFACTURER):
                     self._state[host]["instances"][seojgc][seojcc][seojci][
                         epc
