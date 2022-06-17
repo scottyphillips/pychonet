@@ -138,15 +138,16 @@ library in Node JS that formed the basis of my reverse engineering efforts.
 
 ## License
 
-This application is licensed under an MIT license, refer to LICENSE for details.
+This application is licensed under an MIT license, refer to LICENSE-MIT for details.
 
 Portions of 'ECHONET Lite Device Emulator' (Copyright 2020 Kanagawa Institute of Technology)
 have been used in this application. This code was licensed under the MIT licence.
 
 The UDP code is based on 'aio-udp-server' (Copyright 2021 Dmitriy Bashkirtsev)
 This code is licenced under the GPL licence.
-Слава Україні! 🇺🇦
 (https://github.com/bashkirtsevich-llc/aioudp)
+
+Слава Україні! 🇺🇦
 
 ***
 [pychonet]: https://github.com/scottyphillips/pychonet

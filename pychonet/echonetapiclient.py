@@ -31,9 +31,13 @@ class ECHONETAPIClient:
             seojcc = processed_data["SEOJCC"]
             seojci = processed_data["SEOJCI"]
             epc = opc["EPC"]
-            if seojgc == 14 and seojcc == 240 and epc == 0xD6:
+            if seojgc == 14 and seojcc == 240 and epc == 0xD6: # process discovery data
                 await self.process_discovery_data(host, opc)
-            else:
+            elif host not in self._state: # echonet packet arrived we dont know about
+                if self._debug_flag:
+                    print(f"Unknown ECHONETLite node has been identified at {host} - discovery packet fired")
+                await self.discover(host)
+            else: # process each EPC in order
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
@@ -45,9 +49,6 @@ class ECHONETAPIClient:
                         epc
                     ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                 else:
-                    if host not in self._state:
-                        print("Unknown host - probably multicast message")
-                    else:
                         self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
 
     async def discover(self, host="224.0.23.0"):
