@@ -131,7 +131,6 @@ for each contributing code updates to this library.
 Thanks to Jeffro Carr who inspired me to write my own native Python ECHONET
 library for Home Assistant.
 Some ideas in his own repo got implemented in my own code.
-(https://github.com/jethrocarr/echonetlite-hvac-mqtt-service.git)
 
 Thanks to Futomi Hatano for open sourcing a well-documented ECHONET Lite
 library in Node JS that formed the basis of my reverse engineering efforts.
@@ -147,7 +146,7 @@ have been used in this application. This code was licensed under the MIT licence
 The UDP code is based on 'aio-udp-server' (Copyright 2021 Dmitriy Bashkirtsev)
 This code is licenced under the GPL licence.
 The author is RuZZian so he gets no thanks from me.
-Слава Україні!
+Слава Україні! 🇺🇦
 (https://github.com/bashkirtsevich-llc/aioudp)
 
 ***
