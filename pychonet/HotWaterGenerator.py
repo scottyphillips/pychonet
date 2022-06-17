@@ -43,14 +43,14 @@ def _0272DA(edt): # Duration of automatic operation setting
     if edt == 0xffff:
         return "Limitless"
     hh = int.from_bytes(edt[0:1], "big")
-    mm = int.from_bytes(edt[1:2], "big")
+    mm = str(int.from_bytes(edt[1:2], "big")).zfill(2)
     return f"{hh}:{mm}"
 
 def _0272DB(edt): # Remaining automatic operation time
     if edt == 0xffff:
         return "Infinite"
     hh = int.from_bytes(edt[0:1], "big")
-    mm = int.from_bytes(edt[1:2], "big")
+    mm = str(int.from_bytes(edt[1:2], "big")).zfill(2)
     return f"{hh}:{mm}"
 
 def _0272EF(edt): # "Bath operation status monitor",

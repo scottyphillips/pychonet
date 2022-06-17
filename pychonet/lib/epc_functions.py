@@ -14,7 +14,7 @@ def _signed_int(edt):  # signed ints
 
 def _hh_mm(edt):  # basic time unit
     hh = int.from_bytes(edt[0:1], "big")
-    mm = int.from_bytes(edt[1:2], "big")
+    mm = str(int.from_bytes(edt[1:2], "big")).zfill(2)
     return f"{hh}:{mm}"
 
 def _to_string(edt):
