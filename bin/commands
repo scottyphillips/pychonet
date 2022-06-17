@@ -4,8 +4,7 @@ pip3 install pychonet
 2.	Fire up the python3 command line with asyncio event loop
 python3 -m asyncio
 
-
-from aioudp import UDPServer
+from pychonet.lib.udpserver import UDPServer
 from pychonet import Factory
 from pychonet import ECHONETAPIClient as api
 from pychonet import HomeAirConditioner
@@ -19,8 +18,7 @@ server._debug_flag = True
 await server.discover('192.168.1.6')
 await server.getAllPropertyMaps('192.168.1.6',1,48,1)
 device1 = Factory("192.168.1.6", server, 1,48,1)
-await device1.getMessage(0x80)
-await device1.update(0xA0)
+await device1.getMessage(0x9d)
 
 device2 = HomeAirConditioner("192.168.1.6", server)
 await device2.getMessage(0x80)
