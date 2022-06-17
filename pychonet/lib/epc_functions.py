@@ -84,7 +84,7 @@ EPC_SUPER_FUNCTIONS = {
     0x85: _int,
     0x8A: _008A,
     0x9A: _009A,
-    0x9D: _009D,
+    0x9D: _009X,
     0x9E: _009X,
     0x9F: _009X,
 }
