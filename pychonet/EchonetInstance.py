@@ -274,3 +274,6 @@ class EchonetInstance:
         return await self._api.getAllPropertyMaps(
             self._host, self._eojgc, self._eojcc, self._eojci
         )
+
+    def register_async_update_callbacks(self, fn):
+        self._api.register_async_update_callbacks(self._host, self._eojgc, self._eojcc, self._eojci, fn)

@@ -15,7 +15,7 @@ class ECHONETAPIClient:
         self._message_list = []
         self._message_timeout = MESSAGE_TIMEOUT
         self._debug_flag = False
-        self._update_callbacks = []
+        self._update_callbacks = {}
 
     async def echonetMessageReceived(self, raw_data, addr):
         updated = False
@@ -27,11 +27,12 @@ class ECHONETAPIClient:
         # but still process them regardless.
         if processed_data["TID"] in self._message_list:
             self._message_list.remove(processed_data["TID"])
+        seojgc = processed_data["SEOJGC"]
+        seojcc = processed_data["SEOJCC"]
+        seojci = processed_data["SEOJCI"]
+        key = f"{host}-{seojgc}-{seojcc}-{seojci}"
         # handle discovery message response
         for opc in processed_data["OPC"]:
-            seojgc = processed_data["SEOJGC"]
-            seojcc = processed_data["SEOJCC"]
-            seojci = processed_data["SEOJCI"]
             epc = opc["EPC"]
             if seojgc == 14 and seojcc == 240 and epc == 0xD6: # process discovery data
                 await self.process_discovery_data(host, opc)
@@ -55,8 +56,8 @@ class ECHONETAPIClient:
                         updated = True
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
 
-        if updated:
-            for update_func in self._update_callbacks:
+        if updated and key in self._update_callbacks:
+            for update_func in self._update_callbacks[key]:
                 await update_func()
 
     async def discover(self, host="224.0.23.0"):
@@ -138,5 +139,8 @@ class ECHONETAPIClient:
                         )
             self._state[host]["discovered"] = True
 
-    def register_async_update_callbacks(self, fn):
-        self._update_callbacks.append(fn)
+    def register_async_update_callbacks(self, host, eojgc, eojcc, eojci, fn):
+        key = f"{host}-{eojgc}-{eojcc}-{eojci}"
+        if key not in self._update_callbacks:
+            self._update_callbacks[key] = []
+        self._update_callbacks[key].append(fn)
