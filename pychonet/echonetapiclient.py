@@ -15,8 +15,10 @@ class ECHONETAPIClient:
         self._message_list = []
         self._message_timeout = MESSAGE_TIMEOUT
         self._debug_flag = False
+        self._update_callbacks = []
 
     async def echonetMessageReceived(self, raw_data, addr):
+        updated = False
         host = addr[0]
         processed_data = decodeEchonetMsg(raw_data)
         if self._debug_flag:
@@ -49,7 +51,13 @@ class ECHONETAPIClient:
                         epc
                     ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                 else:
-                        self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
+                    if (epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]):
+                        updated = True
+                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
+
+        if updated:
+            for update_func in self._update_callbacks:
+                await update_func()
 
     async def discover(self, host="224.0.23.0"):
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{"EPC": 0xD6}])
@@ -129,3 +137,6 @@ class ECHONETAPIClient:
                             {ENL_GETMAP: []}
                         )
             self._state[host]["discovered"] = True
+
+    def register_async_update_callbacks(self, fn):
+        self._update_callbacks.append(fn)
