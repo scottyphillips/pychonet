@@ -9,7 +9,7 @@ with open(path.join(this_directory, "README.md")) as f:
 
 setup(
     name="pychonet",
-    version="2.2.3",
+    version="2.3.0",
     author="Scott Phillips",
     author_email="scotty.phillips@hotmail.com",
     packages=["pychonet", "pychonet.lib"],
@@ -17,6 +17,5 @@ setup(
     license="LICENSE.txt",
     description="A library for interfacing via the ECHONETlite protocol.",
     long_description=long_description,
-    install_requires=["aio-udp-server"],
     long_description_content_type="text/markdown",
 )
