@@ -105,7 +105,7 @@ class EchonetInstance:
 
     """
 
-    async def update(self, attributes=None):
+    async def update(self, attributes=None, no_request=False):
         opc = []
         if attributes is None:
             attributes = self.getGetProperties()
@@ -113,12 +113,15 @@ class EchonetInstance:
             list_attributes = [attributes]
             attributes = list_attributes
         returned_json_data = {}
-        for value in attributes:
-            if value in self.getGetProperties():
-                opc.append({"EPC": value})
-        response = await self._api.echonetMessage(
-            self._host, self._eojgc, self._eojcc, self._eojci, GET, opc
-        )
+        if no_request:
+            response = True
+        else:
+            for value in attributes:
+                if value in self.getGetProperties():
+                    opc.append({"EPC": value})
+            response = await self._api.echonetMessage(
+                self._host, self._eojgc, self._eojcc, self._eojci, GET, opc
+            )
         if response is not False:
             for epc in attributes:
                 if epc not in list(
@@ -271,3 +274,6 @@ class EchonetInstance:
         return await self._api.getAllPropertyMaps(
             self._host, self._eojgc, self._eojcc, self._eojci
         )
+
+    def register_async_update_callbacks(self, fn):
+        self._api.register_async_update_callbacks(self._host, self._eojgc, self._eojcc, self._eojci, fn)
