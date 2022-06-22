@@ -18,6 +18,7 @@ class ECHONETAPIClient:
         self._update_callbacks = {}
 
     async def echonetMessageReceived(self, raw_data, addr):
+        isPush = True
         updated = False
         host = addr[0]
         processed_data = decodeEchonetMsg(raw_data)
@@ -27,6 +28,7 @@ class ECHONETAPIClient:
         # but still process them regardless.
         if processed_data["TID"] in self._message_list:
             self._message_list.remove(processed_data["TID"])
+            isPush = False
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
@@ -58,7 +60,7 @@ class ECHONETAPIClient:
 
         if updated and key in self._update_callbacks:
             for update_func in self._update_callbacks[key]:
-                await update_func()
+                await update_func(isPush)
 
     async def discover(self, host="224.0.23.0"):
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{"EPC": 0xD6}])
