@@ -50,6 +50,7 @@ def _026FE7(edt):
 class ElectricLock(EchonetInstance):
 
     EPC_FUNCTIONS = {
+        0xE0: _026FEX,
         0xE1: _026FEX,
         0xE2: _026FEX,
         0xE3: _026FE3,
