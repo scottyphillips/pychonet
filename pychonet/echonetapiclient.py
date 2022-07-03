@@ -24,11 +24,6 @@ class ECHONETAPIClient:
         processed_data = decodeEchonetMsg(raw_data)
         if self._debug_flag:
             print(f"Echonet Message Received - Processed data is {processed_data}")
-        # if we get duplicate packets that have already been processed then dont worry about the message list.
-        # but still process them regardless.
-        if processed_data["TID"] in self._message_list:
-            self._message_list.remove(processed_data["TID"])
-            isPush = False
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
@@ -57,6 +52,12 @@ class ECHONETAPIClient:
                     if (epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]):
                         updated = True
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
+
+        # if we get duplicate packets that have already been processed then dont worry about the message list.
+        # but still process them regardless.
+        if processed_data["TID"] in self._message_list:
+            self._message_list.remove(processed_data["TID"])
+            isPush = False
 
         if updated and key in self._update_callbacks:
             for update_func in self._update_callbacks[key]:
