@@ -10,7 +10,7 @@ VERSION = "2.3.0"
 
 ENL_PORT = 3610
 ENL_MULTICAST_ADDRESS = "224.0.23.0"
-MESSAGE_TIMEOUT = 100
+MESSAGE_TIMEOUT = 200
 
 
 # ------------------------------------------------------------------
