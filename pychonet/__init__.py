@@ -23,26 +23,25 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
     if eojgc in EOJX_CLASS:
         if eojcc in EOJX_CLASS[eojgc]:
-            instance = EOJX_CLASS[eojgc][eojcc]
+            instance = f"{eojgc}-{eojcc}"
 
     """Factory Method"""
-    # TODO - probably a much cleaner way of doing this.
     instances = {
-        "Home air conditioner": HomeAirConditioner,
-        "Home solar power generation": HomeSolarPower,
-        "Distribution panel metering": DistributionPanelMeter,
-        "Electric vehicle charger/discharger": ElectricVehicleCharger,
-        "Temperature sensor": TemperatureSensor,
-        "Storage Battery": StorageBattery,
-        "Electrically operated blind/shade": ElectricBlind,
-        "General lighting": GeneralLighting,
-        "Electric Lock": ElectricLock,
-        "Air cleaner": HomeAirCleaner,
-        "Hybrid Water Heater": HybridWaterHeater,
-        "Hot water generator": HotWaterGenerator,
-        "Gas meter": GasMeter,
-        "Electric energy meter": ElectricEnergyMeter,
-        "Water flow meter": WaterFlowMeter,
+        f"{0x00}-{0x11}": TemperatureSensor,
+        f"{0x01}-{0x30}": HomeAirConditioner,
+        f"{0x01}-{0x35}": HomeAirCleaner,
+        f"{0x02}-{0x60}": ElectricBlind,
+        f"{0x02}-{0x6F}": ElectricLock,
+        f"{0x02}-{0x72}": HotWaterGenerator,
+        f"{0x02}-{0x79}": HomeSolarPower,
+        f"{0x02}-{0x7D}": StorageBattery,
+        f"{0x02}-{0x7E}": ElectricVehicleCharger,
+        f"{0x02}-{0x80}": ElectricEnergyMeter,
+        f"{0x02}-{0x81}": WaterFlowMeter,
+        f"{0x02}-{0x82}": GasMeter,
+        f"{0x02}-{0x87}": DistributionPanelMeter,
+        f"{0x02}-{0x90}": GeneralLighting,
+        f"{0x02}-{0xA6}": HybridWaterHeater,
         None: None,
     }
     instance_object = instances.get(instance, None)
