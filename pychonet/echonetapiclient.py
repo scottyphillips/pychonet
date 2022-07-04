@@ -18,10 +18,11 @@ class ECHONETAPIClient:
         self._update_callbacks = {}
 
     async def echonetMessageReceived(self, raw_data, addr):
-        isPush = True
         updated = False
         host = addr[0]
         processed_data = decodeEchonetMsg(raw_data)
+        tid_found = processed_data["TID"] in self._message_list
+        isPush = not tid_found
         if self._debug_flag:
             print(f"Echonet Message Received - Processed data is {processed_data}")
         seojgc = processed_data["SEOJGC"]
@@ -53,15 +54,15 @@ class ECHONETAPIClient:
                         updated = True
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
 
-        # if we get duplicate packets that have already been processed then dont worry about the message list.
-        # but still process them regardless.
-        if processed_data["TID"] in self._message_list:
-            self._message_list.remove(processed_data["TID"])
-            isPush = False
-
+        # Call update callback functions
         if updated and key in self._update_callbacks:
             for update_func in self._update_callbacks[key]:
                 await update_func(isPush)
+
+        # if we get duplicate packets that have already been processed then dont worry about the message list.
+        # but still process them regardless.
+        if tid_found:
+            self._message_list.remove(processed_data["TID"])
 
     async def discover(self, host="224.0.23.0"):
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{"EPC": 0xD6}])
@@ -92,7 +93,8 @@ class ECHONETAPIClient:
         self._message_list.append(tx_tid)
         self._server.send(payload, (host, ENL_PORT))
         for x in range(0, self._message_timeout):
-            await asyncio.sleep(0.01)
+            # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
+            await asyncio.sleep(0.1)
             # if tx_tid is not in message list then the message listener has received the message
             if tx_tid not in self._message_list:
                 # transaction sucessful remove from list
