@@ -9,6 +9,7 @@ from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 class ECHONETAPIClient:
     def __init__(self, server):
         self._server = server
+        self._logger = None
         self._server.subscribe(self.echonetMessageReceived)
         self._state = {}
         self._next_tx_tid = 0x0000
@@ -24,7 +25,7 @@ class ECHONETAPIClient:
         tid_found = processed_data["TID"] in self._message_list
         isPush = not tid_found
         if self._debug_flag:
-            print(f"Echonet Message Received - Processed data is {processed_data}")
+            self._logger = f"Echonet Message Received - Processed data is {processed_data}"
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
@@ -36,8 +37,8 @@ class ECHONETAPIClient:
                 await self.process_discovery_data(host, opc)
             elif host not in self._state: # echonet packet arrived we dont know about
                 if self._debug_flag:
-                    print(f"Unknown ECHONETLite node has been identified at {host} - discovery packet fired")
-                await self.discover(host)
+                    self._logger = f"Unknown ECHONETLite node has been identified at {host} - discovery packet fired"
+                # await self.discover(host)
             else: # process each EPC in order
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
