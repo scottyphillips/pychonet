@@ -25,7 +25,7 @@ class ECHONETAPIClient:
         tid_found = processed_data["TID"] in self._message_list
         isPush = not tid_found
         if self._debug_flag:
-            self._logger("Echonet Message Received - Processed data is {processed_data}")
+            self._logger(f"Echonet Message Received - Processed data is {processed_data}")
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
