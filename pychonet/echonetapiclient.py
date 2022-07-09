@@ -29,7 +29,7 @@ class ECHONETAPIClient:
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
-        esv = processed_data["esv"]
+        esv = processed_data["ESV"]
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
         # handle discovery message response
         for opc in processed_data["OPC"]:
@@ -51,8 +51,8 @@ class ECHONETAPIClient:
                     self._state[host]["instances"][seojgc][seojcc][seojci][
                         epc
                     ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
-                else: # ignore get response (ESV 0x71)
-                    if esv != 0x71  and (epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]):
+                else: # process ESV read response only (ESV 0x72)
+                    if esv == 0x72  and (epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]):
                         updated = True
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
 
