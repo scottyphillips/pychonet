@@ -115,8 +115,6 @@ class UDPServer():
     async def _recv_periodically(self):
         while True:
             data, addr = await self._sock_recv()
-            print(data)
-            print(addr)
             self._notify_subscribers(*self._datagram_received(data, addr))
             await self._throttle(len(data), self._download_speed)
 

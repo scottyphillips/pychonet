@@ -35,7 +35,7 @@ pip install pychonet
 
 ### Create the ECHONETLite listener service on port 3610:
 ```python
-from aioudp import UDPServer
+from pychonet.lib.udpserver import UDPServer
 from pychonet import Factory
 from pychonet import ECHONETAPIClient as api
 from pychonet import HomeAirConditioner
@@ -120,6 +120,9 @@ NOTE: For Home Assistant users there is a dedicated repo that can be installed v
 'example_async.py' gives you a boilerplate asyncio program that will discover your ECHONETLite instance and return information about supported services.
 
 ## Hall of Fame
+Big Thanks to Naoki Sawada for many excellent updates to enable push notifications via multicast.
+どうもありがとうございます !
+
 Thanks to Jason Nader for all the quality of life updates to the codebase and doco.
 
 Thanks to khcnz (Karl Chaffey) and gvs for helping refector the old code
@@ -130,10 +133,9 @@ for each contributing code updates to this library.
 
 Thanks to Jeffro Carr who inspired me to write my own native Python ECHONET
 library for Home Assistant.
-Some ideas in his own repo got implemented in my own code.
 
 Thanks to Futomi Hatano for open sourcing a well-documented ECHONET Lite
-library in Node JS that formed the basis of my reverse engineering efforts.
+library in Node JS.
 (https://github.com/futomi/node-echonet-lite)
 
 ## License

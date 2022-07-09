@@ -2,7 +2,7 @@ import asyncio
 import sys
 from pprint import pprint
 
-from aioudp import UDPServer
+from pychonet.lib.udpserver import UDPServer
 
 from pychonet import ECHONETAPIClient as api
 from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_SETMAP,
