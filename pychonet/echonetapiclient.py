@@ -3,7 +3,7 @@ import asyncio
 from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT,
                                 ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT, ENL_STATMAP)
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
-from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg, debugPayloadMessage
+from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 
 
 class ECHONETAPIClient:
@@ -25,8 +25,7 @@ class ECHONETAPIClient:
         tid_found = processed_data["TID"] in self._message_list
         isPush = not tid_found
         if self._debug_flag:
-#            self._logger(f"Echonet Message Received - Processed data is {processed_data}")
-            debugPayloadMessage(self._logger, processed_data)
+            self._logger(f"ECHONETLite Message Received - Processed data is {processed_data}")
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
