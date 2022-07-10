@@ -122,3 +122,13 @@ def preparePayload(tid, deojgc, deojcc, deojci, esv, opc):
         "OPC": opc,
     }
     return tx_payload
+
+def debugPayloadMessage(logger, processed_data):
+    for key, value in processed_data:
+        logger(f"{key}: {value}")
+        if key == OPC:
+            for opc, data in value:
+                if opc == 'EDT':
+                   logger(f"{opc}: {data.hex()}")
+                else:
+                   logger(f"{opc}:  {data}")
