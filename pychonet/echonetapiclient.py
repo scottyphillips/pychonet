@@ -31,6 +31,8 @@ class ECHONETAPIClient:
         seojci = processed_data["SEOJCI"]
         esv = processed_data["ESV"]
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
+        esv_ok = esv in [0x72, 0x73, 0x74]
+        esv_part = esv in [0x52, 0x53]
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
@@ -51,10 +53,11 @@ class ECHONETAPIClient:
                     self._state[host]["instances"][seojgc][seojcc][seojci][
                         epc
                     ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
-                else: # ignore ESV set response only (ESV 0x71)
-                    if esv != 0x71  and (epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]):
-                        updated = True
-                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
+                else: # Check for responses to ignore
+                    if esv_ok or (esv_part and opc["PDC"] > 0):
+                        if epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]:
+                            updated = True
+                        self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
 
         # Call update callback functions
         if updated and key in self._update_callbacks:
