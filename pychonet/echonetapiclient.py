@@ -34,7 +34,7 @@ class ECHONETAPIClient:
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
-            if seojgc == 14 and seojcc == 240 and epc == 0xD6: # process discovery data
+            if seojgc == 14 and seojcc == 240 and (epc == 0xD6 or epc == ENL_MANUFACTURER or epc == ENL_UID): # process discovery data
                 await self.process_discovery_data(host, opc)
             elif host not in self._state: # echonet packet arrived we dont know about
                 if self._debug_flag:
@@ -67,7 +67,11 @@ class ECHONETAPIClient:
             self._message_list.remove(processed_data["TID"])
 
     async def discover(self, host="224.0.23.0"):
-        return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [{"EPC": 0xD6}])
+        return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [
+            {"EPC": ENL_MANUFACTURER},
+            {"EPC": ENL_UID},
+            {"EPC": 0xD6}
+        ])
 
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
         payload = None
@@ -120,34 +124,40 @@ class ECHONETAPIClient:
 
     async def process_discovery_data(self, host, opc_data):
         if "discovered" not in self._state[host]:
-            edt = bytearray(opc_data["EDT"])
-            # 1st byte: Total number of instances
-            # 2nd to 253rd bytes: ECHONET object codes (EOJ3 bytes) enumerated
-            edtnum = bytearray(edt)[0]
-            for x in range(edtnum):
-                eojgc = bytearray(edt)[1 + (3 * x)]
-                eojcc = bytearray(edt)[2 + (3 * x)]
-                eojci = bytearray(edt)[3 + (3 * x)]
-                if eojgc != 0x0F: # ignore this group code.
-                    # populate state table
-                    if eojgc not in list(self._state[host]["instances"].keys()):
-                        self._state[host]["instances"].update({eojgc: {}})
-                    if eojcc not in list(self._state[host]["instances"][eojgc].keys()):
-                        self._state[host]["instances"][eojgc].update({eojcc: {}})
-                    if eojci not in list(
-                        self._state[host]["instances"][eojgc][eojcc].keys()
-                    ):
-                        self._state[host]["instances"][eojgc][eojcc][eojci] = {}
-                        self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                            {ENL_STATMAP: []}
-                        )
-                        self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                            {ENL_SETMAP: []}
-                        )
-                        self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                            {ENL_GETMAP: []}
-                        )
-            self._state[host]["discovered"] = True
+            if opc_data["EPC"] == ENL_UID:
+                self._state[host]['uid'] = EPC_SUPER_FUNCTIONS[ENL_UID](opc_data["EDT"])
+            elif opc_data["EPC"] == ENL_MANUFACTURER:
+                self._state[host]['manufacturer'] = EPC_SUPER_FUNCTIONS[ENL_MANUFACTURER](opc_data["EDT"])
+            else:
+                edt = bytearray(opc_data["EDT"])
+                # 1st byte: Total number of instances
+                # 2nd to 253rd bytes: ECHONET object codes (EOJ3 bytes) enumerated
+                edtnum = bytearray(edt)[0]
+                for x in range(edtnum):
+                    eojgc = bytearray(edt)[1 + (3 * x)]
+                    eojcc = bytearray(edt)[2 + (3 * x)]
+                    eojci = bytearray(edt)[3 + (3 * x)]
+                    if eojgc != 0x0F: # ignore this group code.
+                        # populate state table
+                        if eojgc not in list(self._state[host]["instances"].keys()):
+                            self._state[host]["instances"].update({eojgc: {}})
+                        if eojcc not in list(self._state[host]["instances"][eojgc].keys()):
+                            self._state[host]["instances"][eojgc].update({eojcc: {}})
+                        if eojci not in list(
+                            self._state[host]["instances"][eojgc][eojcc].keys()
+                        ):
+                            self._state[host]["instances"][eojgc][eojcc][eojci] = {}
+                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
+                                {ENL_STATMAP: []}
+                            )
+                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
+                                {ENL_SETMAP: []}
+                            )
+                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
+                                {ENL_GETMAP: []}
+                            )
+            if self._state[host].get('uid') != None and self._state[host].get('manufacturer') != None and len(self._state[host]["instances"]):
+                self._state[host]["discovered"] = True
 
     def register_async_update_callbacks(self, host, eojgc, eojcc, eojci, fn):
         key = f"{host}-{eojgc}-{eojcc}-{eojci}"
