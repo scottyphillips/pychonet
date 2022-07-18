@@ -13,7 +13,8 @@ class ECHONETAPIClient:
         self._server.subscribe(self.echonetMessageReceived)
         self._state = {}
         self._next_tx_tid = 0x0000
-        self._message_list = []
+        self._message_list = {}
+        self._failure_list = {}
         self._message_timeout = MESSAGE_TIMEOUT
         self._debug_flag = False
         self._update_callbacks = {}
@@ -22,7 +23,7 @@ class ECHONETAPIClient:
         updated = False
         host = addr[0]
         processed_data = decodeEchonetMsg(raw_data)
-        tid_found = processed_data["TID"] in self._message_list
+        tid_found = self._message_list.get(processed_data["TID"])
         isPush = not tid_found
         if self._debug_flag:
             self._logger(f"ECHONETLite Message Received - Processed data is {processed_data}")
@@ -33,6 +34,7 @@ class ECHONETAPIClient:
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
         esv_ok = esv in [0x72, 0x73, 0x74]
         esv_part = esv in [0x52, 0x53]
+        esv_ng = esv in [0x51, 0x5E]
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
@@ -58,6 +60,8 @@ class ECHONETAPIClient:
                         if epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]:
                             updated = True
                         self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
+                    elif tid_found and (esv_ng or (esv_part and opc["PDC"] == 0)):
+                        self._failure_list[processed_data["TID"]] = True
 
         # Call update callback functions
         if updated and key in self._update_callbacks:
@@ -67,7 +71,7 @@ class ECHONETAPIClient:
         # if we get duplicate packets that have already been processed then dont worry about the message list.
         # but still process them regardless.
         if tid_found:
-            self._message_list.remove(processed_data["TID"])
+            del self._message_list[processed_data["TID"]]
 
     async def discover(self, host="224.0.23.0"):
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [
@@ -99,15 +103,21 @@ class ECHONETAPIClient:
             message_array["TID"] = tx_tid
             payload = buildEchonetMsg(message_array)
 
-        self._message_list.append(tx_tid)
+        self._message_list[tx_tid] = True
         self._server.send(payload, (host, ENL_PORT))
         for x in range(0, self._message_timeout):
             # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
             await asyncio.sleep(0.1)
             # if tx_tid is not in message list then the message listener has received the message
-            if tx_tid not in self._message_list:
+            if not self._message_list.get(tx_tid):
                 # transaction sucessful remove from list
-                return True
+                if not self._failure_list.get(tx_tid):
+                    res = True
+                else:
+                    res = False
+                    del self._failure_list[tx_tid]
+                return res
+        del self._message_list[tx_tid]
         return False
 
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
