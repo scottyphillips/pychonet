@@ -60,7 +60,7 @@ class ECHONETAPIClient:
                         if epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]:
                             updated = True
                         self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
-                    elif tid_found && (esv_ng or (esv_part and opc["PDC"] == 0)):
+                    elif tid_found and (esv_ng or (esv_part and opc["PDC"] == 0)):
                         self._failure_list[processed_data["TID"]] = True
 
         # Call update callback functions
