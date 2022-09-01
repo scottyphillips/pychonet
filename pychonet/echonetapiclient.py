@@ -32,7 +32,7 @@ class ECHONETAPIClient:
         seojci = processed_data["SEOJCI"]
         esv = processed_data["ESV"]
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
-        esv_ok = esv in [0x72, 0x73, 0x74]
+        esv_ok = esv in [0x71, 0x72, 0x73, 0x74]
         esv_part = esv in [0x52, 0x53]
         esv_ng = esv in [0x51, 0x5E]
         # handle discovery message response
