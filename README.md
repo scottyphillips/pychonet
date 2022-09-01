@@ -3,7 +3,6 @@
 [![GitHub Release][releases-shield]][releases]
 [![License][license-shield]](LICENSE)
 ![Project Maintenance][maintenance-shield]
-[![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
 
 
 A library for interfacing with the ECHONETlite protocol as commonly used in Japan.
