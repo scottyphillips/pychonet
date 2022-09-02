@@ -1,6 +1,7 @@
 from pychonet.echonetapiclient import ECHONETAPIClient  # noqa
 from pychonet.lib.eojx import EOJX_CLASS
 
+from .version import __version__
 from .EchonetInstance import EchonetInstance
 from .ElectricBlind import ElectricBlind
 from .ElectricLock import ElectricLock
