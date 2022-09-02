@@ -1,4 +1,4 @@
-VERSION = "2.3.2"
+from pychonet.version import __version__ as VERSION
 # Echonetlite message format:
 #
 # - EDT0     |Property value data             |01 ..|01 01 30 01
