@@ -25,3 +25,5 @@ v2.2.1, 02 Apr 2022 -- Add HotWaterGenerator. Update HomeAirConditioner
 v2.2.2, 04 Apr 2022 -- Library now returns None rather then False if no data is received.
 v2.2.3, 28 May 2022 -- Minor update to HomeAirConditioner to support silent mode
 v2.3.0, 22 June 2022 -- Support Push updated from supported ECHONETlite entities. 
+v2.3.1, 09 Jul 2022 -- Electronic lock bug fixes and stability improvements.
+v2.3.2, 30 Jul 2022 -- Discover process optimization and request success/failure detection.
