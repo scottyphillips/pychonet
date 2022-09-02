@@ -42,7 +42,7 @@ from pychonet import EchonetInstance
 udp = UDPServer()
 loop = asyncio.get_event_loop()
 udp.run("0.0.0.0", 3610, loop=loop)
-server = api(server=udp, loop=loop)
+server = api(server=udp)
 ```
 
 ### Discover a list of ECHONETlite instances on a particular server:
