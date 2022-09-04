@@ -23,8 +23,9 @@ class ECHONETAPIClient:
         updated = False
         host = addr[0]
         processed_data = decodeEchonetMsg(raw_data)
-        tid_found = self._message_list.get(processed_data["TID"])
-        isPush = not tid_found
+        tid = processed_data["TID"]
+        tid_data = self._message_list.get(tid)
+        isPush = not tid_data
         if self._debug_flag:
             self._logger(f"ECHONETLite Message Received - Processed data is {processed_data}")
         seojgc = processed_data["SEOJGC"]
@@ -32,9 +33,8 @@ class ECHONETAPIClient:
         seojci = processed_data["SEOJCI"]
         esv = processed_data["ESV"]
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
-        esv_ok = esv in [0x71, 0x72, 0x73, 0x74]
-        esv_part = esv in [0x52, 0x53]
-        esv_ng = esv in [0x51, 0x5E]
+        esv_set = esv in [0x71, 0x51]
+        esv_get = esv in [0x72, 0x52, 0x73, 0x53, 0x74]
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
@@ -48,20 +48,36 @@ class ECHONETAPIClient:
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
-#                elif epc == ENL_GETMAP:
-#                    map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
-#                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
                 elif epc in (ENL_UID, ENL_MANUFACTURER):
                     self._state[host]["instances"][seojgc][seojcc][seojci][
                         epc
                     ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                 else: # Check for responses to ignore
-                    if esv_ok or (esv_part and opc["PDC"] > 0):
-                        if epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]:
-                            updated = True
-                        self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
-                    elif tid_found and (esv_ng or (esv_part and opc["PDC"] == 0)):
-                        self._failure_list[processed_data["TID"]] = True
+                    if esv_set:
+                        if opc["PDC"] > 0 or tid_data is None:
+                            if tid_data:
+                                self._failure_list[tid] = True
+                            continue
+                        if tid_data.get(epc) is None:
+                            self._failure_list[tid] = True
+                            if self._debug_flag:
+                                self._logger(f"EDT is not set in send data for EPC '{epc}' - process each EPC")
+                            continue
+                        else:
+                            # set request data
+                            opc["EDT"] = tid_data[epc]
+                    elif esv_get:
+                        if opc["PDC"] == 0:
+                            if tid_data:
+                                self._failure_list[tid] = True
+                            continue
+                    else:
+                        # @todo more esv support
+                        continue
+
+                    if epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]:
+                        updated = True
+                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
 
         # Call update callback functions
         if updated and key in self._update_callbacks:
@@ -70,8 +86,8 @@ class ECHONETAPIClient:
 
         # if we get duplicate packets that have already been processed then dont worry about the message list.
         # but still process them regardless.
-        if tid_found:
-            del self._message_list[processed_data["TID"]]
+        if tid_data:
+            del self._message_list[tid]
 
     async def discover(self, host="224.0.23.0"):
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [
@@ -92,6 +108,12 @@ class ECHONETAPIClient:
         if host not in list(self._state.keys()):
             self._state[host] = {"instances": {}}
 
+        tid_data = {}
+        for opc_data in opc:
+            if opc_data.get("EDT") is not None:
+                if isinstance(opc_data["EDT"], int):
+                    tid_data[opc_data["EPC"]] = opc_data["EDT"].to_bytes(opc_data["PDC"], 'big')
+
         self._next_tx_tid += 1
         tx_tid = self._next_tx_tid
         message_array["TID"] = tx_tid
@@ -103,7 +125,7 @@ class ECHONETAPIClient:
             message_array["TID"] = tx_tid
             payload = buildEchonetMsg(message_array)
 
-        self._message_list[tx_tid] = True
+        self._message_list[tx_tid] = tid_data
         self._server.send(payload, (host, ENL_PORT))
         for x in range(0, self._message_timeout):
             # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
