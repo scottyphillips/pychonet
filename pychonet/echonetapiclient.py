@@ -1,7 +1,8 @@
 import asyncio
 
-from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT,
-                                ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT, ENL_STATMAP)
+from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT, INSTANCE_LIST,
+                                ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT, ENL_STATMAP,
+                                SETRES, GETRES, INF, INFC, SETC_SND, GET_SNA, INF_SNA)
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 
@@ -33,12 +34,12 @@ class ECHONETAPIClient:
         seojci = processed_data["SEOJCI"]
         esv = processed_data["ESV"]
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
-        esv_set = esv in [0x71, 0x51]
-        esv_get = esv in [0x72, 0x52, 0x73, 0x53, 0x74]
+        esv_set = esv in [SETRES, SETC_SND]
+        esv_get = esv in [GETRES, GET_SNA, INF, INF_SNA, INFC]
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
-            if seojgc == 14 and seojcc == 240 and (epc == 0xD6 or epc == ENL_MANUFACTURER or epc == ENL_UID): # process discovery data
+            if seojgc == 14 and seojcc == 240 and (epc == INSTANCE_LIST or epc == ENL_MANUFACTURER or epc == ENL_UID): # process discovery data
                 await self.process_discovery_data(host, opc)
             elif host not in self._state: # echonet packet arrived we dont know about
                 if self._debug_flag:
@@ -93,7 +94,7 @@ class ECHONETAPIClient:
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [
             {"EPC": ENL_MANUFACTURER},
             {"EPC": ENL_UID},
-            {"EPC": 0xD6}
+            {"EPC": INSTANCE_LIST}
         ])
 
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
