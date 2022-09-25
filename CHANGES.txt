@@ -29,3 +29,4 @@ v2.3.1, 09 Jul 2022 -- Electronic lock bug fixes and stability improvements.
 v2.3.2, 30 Jul 2022 -- Discover process optimization and request success/failure detection.
 v2.3.3, 03 Aug 2022 -- Fixed a bug in judging the success or failure of the data set request.
 v2.3.4, 04 Aug 2022 -- Fix data handling issues in process_discovery_data().
+v2.3.5, 25 Sep 2022 -- Ignore not-yet-supported notifications of node profile class.
