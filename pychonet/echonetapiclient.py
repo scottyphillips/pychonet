@@ -39,8 +39,12 @@ class ECHONETAPIClient:
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
-            if seojgc == 14 and seojcc == 240 and (epc == INSTANCE_LIST or epc == ENL_MANUFACTURER or epc == ENL_UID): # process discovery data
-                await self.process_discovery_data(host, opc)
+            if seojgc == 0x0E and seojcc == 0xF0:
+                if (epc in [INSTANCE_LIST, ENL_MANUFACTURER, ENL_UID]): # process discovery data
+                    await self.process_discovery_data(host, opc)
+                else:
+                    # @todo handling others (0x05: Notify of change instance list, etc...)
+                    continue
             elif host not in self._state: # echonet packet arrived we dont know about
                 if self._debug_flag:
                     self._logger(f"Unknown ECHONETLite node has been identified at {host} - discovery packet fired")
