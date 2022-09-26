@@ -1,6 +1,14 @@
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import _int, _signed_int
 
+ENL_DPM_ENG_NOR = 0xC0
+ENL_DPM_ENG_REV = 0xC1
+ENL_DPM_ENG_UNIT = 0xC2
+ENL_DPM_DAY_GET_HISTORY = 0xC5
+ENL_DPM_INSTANT_ENG = 0xC6
+ENL_DPM_INSTANT_CUR = 0xC7
+ENL_DPM_INSTANT_VOL = 0xC8
+
 def _0287C2(edt):
     op_mode = int.from_bytes(edt, "big")
     values = {0x00: 1,
