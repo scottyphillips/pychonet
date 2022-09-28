@@ -19,16 +19,27 @@ class ECHONETAPIClient:
         self._message_timeout = MESSAGE_TIMEOUT
         self._debug_flag = False
         self._update_callbacks = {}
+        self._discover_callback = None
 
     async def echonetMessageReceived(self, raw_data, addr):
         updated = False
         host = addr[0]
+
         processed_data = decodeEchonetMsg(raw_data)
+
+        if self._debug_flag:
+            self._logger(f"ECHONETLite Message Received - Processed data is {processed_data}")
+
+        if host not in self._state: # echonet packet arrived we dont know about
+            if self._debug_flag:
+                self._logger(f"Unknown ECHONETLite node has been identified - called _discover_callback('{host}')")
+            if callable(self._discover_callback):
+                await self._discover_callback(host)
+            return
+
         tid = processed_data["TID"]
         tid_data = self._message_list.get(tid)
         isPush = not tid_data
-        if self._debug_flag:
-            self._logger(f"ECHONETLite Message Received - Processed data is {processed_data}")
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
@@ -45,10 +56,6 @@ class ECHONETAPIClient:
                 else:
                     # @todo handling others (0x05: Notify of change instance list, etc...)
                     continue
-            elif host not in self._state: # echonet packet arrived we dont know about
-                if self._debug_flag:
-                    self._logger(f"Unknown ECHONETLite node has been identified at {host} - discovery packet fired")
-                # await self.discover(host)
             else: # process each EPC in order
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
