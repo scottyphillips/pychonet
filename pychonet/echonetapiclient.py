@@ -28,14 +28,7 @@ class ECHONETAPIClient:
         processed_data = decodeEchonetMsg(raw_data)
 
         if self._debug_flag:
-            self._logger(f"ECHONETLite Message Received - Processed data is {processed_data}")
-
-        if host not in self._state: # echonet packet arrived we dont know about
-            if self._debug_flag:
-                self._logger(f"Unknown ECHONETLite node has been identified - called _discover_callback('{host}')")
-            if callable(self._discover_callback):
-                await self._discover_callback(host)
-            return
+            self._logger(f"ECHONETLite Message Received from {host} - Processed data is {processed_data}")
 
         tid = processed_data["TID"]
         tid_data = self._message_list.get(tid)
@@ -44,6 +37,16 @@ class ECHONETAPIClient:
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
         esv = processed_data["ESV"]
+
+        if self._state.get(host) is None: # echonet packet arrived we dont know about
+            if not (seojgc == 0x05 and seojcc == 0xFF):
+                self._logger(f"Unknown ECHONETLite node has been identified - {host}")
+                if callable(self._discover_callback):
+                    if self._debug_flag:
+                        self._logger(f"Called _discover_callback('{host}')")
+                    await self._discover_callback(host)
+            return
+
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
         esv_set = esv in [SETRES, SETC_SND]
         esv_get = esv in [GETRES, GET_SNA, INF, INF_SNA, INFC]
@@ -117,7 +120,7 @@ class ECHONETAPIClient:
             "ESV": esv,
             "OPC": opc,
         }
-        if host not in list(self._state.keys()):
+        if self._state.get(host) is None:
             self._state[host] = {"instances": {}}
 
         tid_data = {}
