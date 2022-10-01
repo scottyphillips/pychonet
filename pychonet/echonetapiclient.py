@@ -53,11 +53,21 @@ class ECHONETAPIClient:
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
-            if seojgc == 0x0E and seojcc == 0xF0:
+            if seojgc == 0x0E and seojcc == 0xF0: # Node Profile Class Response
                 if (epc in [INSTANCE_LIST, ENL_MANUFACTURER, ENL_UID]): # process discovery data
                     await self.process_discovery_data(host, opc)
                 else:
-                    # @todo handling others (0x05: Notify of change instance list, etc...)
+                    # @todo handling others
+                    '''
+                    Ex. 0x05: Instance list notification
+                    A property to announce the configuration of instances to be disclosed to the network at startup.
+                    This property also announces instances held at the self-node each time the configuration of
+                    instances disclosed to the network is changed during system operation, such as instance
+                    addition or deletion.
+                    '''
+                    '''
+                    It is desirable to dynamically add and delete entities when there is an increase or decrease in the number of instances within a device already configured with HA, but that will be an issue for the future.
+                    '''
                     continue
             else: # process each EPC in order
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
