@@ -137,6 +137,12 @@ Thanks to Futomi Hatano for open sourcing a well-documented ECHONET Lite
 library in Node JS.
 (https://github.com/futomi/node-echonet-lite)
 
+## References for ECHONET specifications
+
+- [ECHONET Lite Specification, Version 1.13](https://echonet.jp/spec_v113_lite_en/)
+  - [Part 2 ECHONET Lite Communications Middleware Specifications](https://echonet.jp/wp/wp-content/uploads/pdf/General/Standard/ECHONET_lite_V1_13_en/ECHONET-Lite_Ver.1.13(02)_E.pdf)
+- [APPENDIX, Detailed Requirements for ECHONET Device objects, Release Q](https://echonet.jp/wp/wp-content/uploads/pdf/General/Standard/Release/Release_Q/Appendix_Release_Q_E.pdf)
+
 ## License
 
 This application is licensed under an MIT license, refer to LICENSE-MIT for details.
