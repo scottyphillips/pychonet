@@ -66,7 +66,9 @@ class ECHONETAPIClient:
                     addition or deletion.
                     '''
                     '''
-                    It is desirable to dynamically add and delete entities when there is an increase or decrease in the number of instances within a device already configured with HA, but that will be an issue for the future.
+                    It is desirable to dynamically add and delete entities when there is an increase
+                    or decrease in the number of instances within a device already configured with HA,
+                    but that will be an issue for the future.
                     '''
                     continue
             else: # process each EPC in order
