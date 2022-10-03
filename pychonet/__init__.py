@@ -13,6 +13,7 @@ from .HomeSolarPower import HomeSolarPower
 from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
 from .DistributionPanelMeter import DistributionPanelMeter
+from .LowVoltageSmartElectricEnergyMeter import LowVoltageSmartElectricEnergyMeter
 from .HybridWaterHeater import HybridWaterHeater
 from .HotWaterGenerator import HotWaterGenerator
 from .GasMeter import GasMeter
@@ -41,6 +42,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x81}": WaterFlowMeter,
         f"{0x02}-{0x82}": GasMeter,
         f"{0x02}-{0x87}": DistributionPanelMeter,
+        f"{0x02}-{0x88}": LowVoltageSmartElectricEnergyMeter,
         f"{0x02}-{0x90}": GeneralLighting,
         f"{0x02}-{0xA6}": HybridWaterHeater,
         None: None,
