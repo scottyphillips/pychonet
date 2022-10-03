@@ -129,7 +129,7 @@ class EchonetInstance:
                         self._eojci
                     ].keys()
                 ):
-                    returned_json_data.update({epc: False})
+                    returned_json_data.update({epc: None})
                     continue
                 elif epc in list(
                     EPC_SUPER_FUNCTIONS.keys()
