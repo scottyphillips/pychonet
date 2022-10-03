@@ -24,12 +24,17 @@ def _0288E1(edt):
 
 def _0288E2(edt):
     '''
-    1～2 バイト目：積算履歴収集日
-    0x0000～0x0063(0～99)
-    3 バイト目以降：積算電力量計測
-    値
-    0x00000000～0x05F5E0FF
-    (0～99,999,999)
+    1-2 bytes: day for which the
+    historical data of measured
+    cumulative amounts of electric
+    energy is to be retrieved 0x0000–
+    0x0063 (0-99)
+    3 and succeeding bytes: measured
+    cumulative amounts of electric
+    energy 0x00000000–0x05F5E0FF
+    (0–99,999,999)
+
+    unsigned short + unsigned long × 48
     '''
     return "Not implemented"
 
@@ -42,60 +47,70 @@ def _0288E8(edt):
 
 def _0288EA(edt):
     '''
-    1～４バイト目：計測年月日
-    YYYY:0x0001～0x270F
-    (1～9999)
-    MM:0x01～0x0C(1～12)
-    DD:0x01～0x1F(1～31)
-    5～７バイト目：計測時刻
-    ｈｈ:0x00～0x17(0～23)
-    mm:0x00～0x3B(0～59)
-    ss:0x00～0x3B(0～59)
-    8～11 バイト目：積算電力量計測値
-    0x00000000～0x05F5E0FF
-    (0～99,999,999)
+    1–4 bytes: date of measurement
+    YYYY: 0x0001–0x270F
+    (1–9999)
+    MM: 0x01–0x0C (1–12)
+    DD: 0x01–0x1F (1–31)
+    5–7 bytes: time of measurement
+    hh: 0x00–0x17 (0–23)
+    mm: 0x00–0x3B (0–59)
+    ss: 0x00–0x3B (0–59)
+    8–11 bytes: cumulative amounts of
+    electric energy measured
+    0x00000000–0x05F5E0FF
+    (0–99,999,999)
+
+    unsigned short + unsigned char ×2
+        +
+    unsigned char × 3
+        +
+    unsigned long
     '''
     return "Not implemented"
 
 def _0288EC(edt):
     """
-    1～6 バイト目：積算履歴収集日時
-    YYYY:0x0001～0x270F
-    (1～9999 年)
-    MM:0x01～0x0C(1～12 月)
-    DD:0x01～0x1F(1～31 日)
-    hh:0x00～0x17(0～23 時)
-    mm:0x00/0x1E(0/30 分)
-    7 バイト目：収集コマ数
-    0x01～0x0C(1～12 コマ)
-    8 バイト目以降：
-    積算電力量計測値(正方向)
-    0x00000000～0x05F5E0FF
-    (0～99,999,999)
-    積算電力量計測値(逆方向)
-    0x00000000～0x05F5E0FF
-    (0～99,999,999)
+    1–6 bytes: date and time for which
+    the historical data is to be retrieved
+    YYYY: 0x0001–0x270F (1–9999)
+    MM: 0x01–0x0C (1–12)
+    DD: 0x01–0x1F (1–31)
+    hh: 0x00–0x17 (0–23)
+    mm: 0x00/0x1E (0/30)
+    7 byte: number of collection
+    segments
+    0x01–0x0C (1–12)
+    8th and succeeding bytes:
+    Measured cumulative amount of
+    electric energy (normal direction)
+    0x00000000–0x05F5E0FF
+    (0–99,999,999)
+    Measured cumulative amount of
+    electric energy (reverse direction)
+    0x00000000–0x05F5E0FF
+    (0–99,999,999)
+
+    unsigned short + unsigned char × 4
+        +
+    unsigned char + (unsigned long + unsigned long) × (Max) 12
     """
     return "Not implemented"
 
 def _0288ED(edt):
     '''
-    1～6 バイト目：積算履歴収集日時
-    YYYY:0x0001～0x270F
-    (1～9999 年)
-    MM:0x01～0x0C(1～12 月)
-    DD:0x01～0x1F(1～31 日)
-    hh:0x00～0x17(0～23 時)
-    mm:0x00/0x1E(0/30 分)
-    7 バイト目：収集コマ数
-    0x01～0x0C(1～12 コマ)
-    8 バイト目以降：
-    積算電力量計測値(正方向)
-    0x00000000～0x05F5E0FF
-    (0～99,999,999)
-    積算電力量計測値(逆方向)
-    0x00000000～0x05F5E0FF
-    (0～99,999,999)
+    1–6 bytes: date and time for which
+    the historical data is to be retrieved
+    YYYY: 0x0001–0x270F (1–9999)
+    MM: 0x01–0x0C (1–12)
+    DD: 0x01–0x1F (1–31)
+    hh: 0x00–0x17 (0–23)
+    mm: 0x00/0x1E (0/30)
+    7 byte: number of collection
+    segments
+    0x01–0x0C (1–12)
+
+    unsigned short + unsigned char × 4 + unsigned char
     '''
     return "Not implemented"
 
