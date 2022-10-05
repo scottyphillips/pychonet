@@ -13,6 +13,8 @@ class UDPServer():
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._sock.setblocking(False)
 
+        self._send_sock = None
+
         # enable multicast
         mreq = struct.pack("=4sl", socket.inet_aton("224.0.23.0"), socket.INADDR_ANY)
         self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
@@ -74,7 +76,11 @@ class UDPServer():
         return fut
 
     def _sock_send(self, data, addr, fut=None, registered=False):
-        fd = self._sock.fileno()
+        if registered == False:
+            self._send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
+            self._send_sock.setblocking(False)
+
+        fd = self._send_sock.fileno()
 
         if fut is None:
             fut = self.loop.create_future()
@@ -86,7 +92,7 @@ class UDPServer():
             return
 
         try:
-            bytes_sent = self._sock.sendto(data, addr)
+            bytes_sent = self._send_sock.sendto(data, addr)
         except (BlockingIOError, InterruptedError):
             self.loop.add_writer(fd, self._sock_send, data, addr, fut, True)
         except Exception as e:
@@ -94,6 +100,8 @@ class UDPServer():
             self._socket_error(e)
         else:
             fut.set_result(bytes_sent)
+
+        self._send_sock.close()
 
         return fut
 
