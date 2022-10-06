@@ -33,3 +33,4 @@ v2.3.5, 25 Sep 2022 -- Ignore not-yet-supported notifications of node profile cl
 v2.3.6, 26 Sep 2022 -- Added some ENL codes for HomeAirConditioner and DistributionPanelMeter.
 v2.3.7, 28 Sep 2022 -- Added _discover_callback to echonetapiclient.
 v2.3.8, 30 Sep 2022 -- Bug fix of calling _discover_callback().
+v2.3.9, 06 Aug 2022 -- Added LowVoltageSmartElectricEnergyMeter, Create a another socket for sending.
