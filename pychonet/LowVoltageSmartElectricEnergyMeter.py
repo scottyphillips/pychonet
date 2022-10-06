@@ -9,8 +9,12 @@ ENL_LVSEEM_ENG_REV = 0xE3
 ENL_LVSEEM_INSTANT_ENG = 0xE7
 ENL_LVSEEM_INSTANT_CUR = 0xE8
 
+def _0288E0(edt):
+    power_val = _int(edt)
+    return None if power_val == 4294967294 else power_val # no measurement
+
 def _0288E1(edt):
-    op_mode = int.from_bytes(edt, "big")
+    op_mode = _int(edt)
     values = {0x00: 1,
               0x01: 0.1,
               0x02: 0.01,
@@ -38,10 +42,18 @@ def _0288E2(edt):
     '''
     return "Not implemented"
 
+def _0288E7(edt):
+    power_val = _signed_int(edt)
+    as_None = power_val in [-2147483648, 2147483647, 2147483646] # underflow, overflow, no measurement
+    return None if as_None else power_val
+
 def _0288E8(edt):
-    r_phase = float(int.from_bytes(edt[0:2], "big", signed=True)) / 10  # R Phase
-    t_phase = float(int.from_bytes(edt[2:4], "big", signed=True)) / 10  # T Phase
-    if t_phase == 3276.6:
+    r_phase = float(_signed_int(edt[0:2])) / 10  # R Phase
+    t_phase = float(_signed_int(edt[2:4])) / 10  # T Phase
+    asNone = [-3276.8, 3276.7, 3276.6] # underflow, overflow, no measurement
+    if r_phase in asNone:
+        r_phase = None
+    if t_phase in asNone:
         t_phase = None
     return {"r_phase_amperes": r_phase, "t_phase_amperes": t_phase}
 
@@ -118,13 +130,13 @@ class LowVoltageSmartElectricEnergyMeter(EchonetInstance):
     EPC_FUNCTIONS = {
         0xD3: _int, #"Coefficient"
         0xD7: _int, #"Number of effective digits for cumulative amounts of electric energy"
-        0xE0: _int, #"Measured cumulative amount of electric energy (normal direction)"
+        0xE0: _0288E0, #"Measured cumulative amount of electric energy (normal direction)"
         0xE1: _0288E1, #"Unit for cumulative amounts of electric energy (normal and reverse directions)"
         # 0xE2: _0288E2, #"Historical data of measured cumulative amounts of electric energy 1 (normal direction)"
-        0xE3: _int, #"Measured cumulative amounts of electric energy (reverse direction)"
+        0xE3: _0288E0, #"Measured cumulative amounts of electric energy (reverse direction)"
         # 0xE4: _0288E2, #"Historical data of measured cumulative amounts of electric energy 1 (reverse direction)"
         # 0xE5: _int, #"Day for which the historical data of measured cumulative amounts of electric energy is to be retrieved 1"
-        0xE7: _signed_int, #"Measured instantaneous electric energy"
+        0xE7: _0288E7, #"Measured instantaneous electric energy"
         0xE8: _0288E8, #"Measured instantaneous currents"
         # 0xEA: _0288EA, #"Cumulative amounts of electric energy measured at fixed time (normal direction)"
         # 0xEB: _0288EA, #"Cumulative amounts of electric energy measured at fixed time (reverse direction)"
