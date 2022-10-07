@@ -72,6 +72,10 @@ class ECHONETAPIClient:
                     '''
                     continue
             else: # process each EPC in order
+                if "discovered" not in self._state[host]:
+                    # Ignore received data such as push notification. until initialization by discovery is completed.
+                    continue
+
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
