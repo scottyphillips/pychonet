@@ -24,6 +24,7 @@ class ECHONETAPIClient:
     async def echonetMessageReceived(self, raw_data, addr):
         updated = False
         host = addr[0]
+        is_discovery = False
 
         processed_data = decodeEchonetMsg(raw_data)
 
@@ -39,12 +40,11 @@ class ECHONETAPIClient:
         esv = processed_data["ESV"]
 
         if self._state.get(host) is None: # echonet packet arrived we dont know about
-            if not (seojgc == 0x05 and seojcc == 0xFF):
-                self._logger(f"Unknown ECHONETLite node has been identified - {host}")
-                if callable(self._discover_callback):
-                    if self._debug_flag:
-                        self._logger(f"Called _discover_callback('{host}')")
-                    await self._discover_callback(host)
+            self._logger(f"Unknown ECHONETLite node has been identified - {host}")
+            if callable(self._discover_callback):
+                if self._debug_flag:
+                    self._logger(f"Called _discover_callback('{host}')")
+                await self._discover_callback(host)
             return
 
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
@@ -55,6 +55,7 @@ class ECHONETAPIClient:
             epc = opc["EPC"]
             if seojgc == 0x0E and seojcc == 0xF0: # Node Profile Class Response
                 if (epc in [INSTANCE_LIST, ENL_MANUFACTURER, ENL_UID]): # process discovery data
+                    is_discovery = True
                     await self.process_discovery_data(host, opc)
                 else:
                     # @todo handling others
@@ -105,6 +106,11 @@ class ECHONETAPIClient:
                     if epc not in self._state[host]["instances"][seojgc][seojcc][seojci] or self._state[host]["instances"][seojgc][seojcc][seojci][epc] != opc["EDT"]:
                         updated = True
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
+
+        # Markup "discovered"
+        if is_discovery and self._state[host].get('uid') != None and self._state[host].get('manufacturer') != None and len(self._state[host]["instances"]):
+            self._state[host]["discovered"] = True
+
 
         # Call update callback functions
         if updated and key in self._update_callbacks:
@@ -218,8 +224,6 @@ class ECHONETAPIClient:
                             self._state[host]["instances"][eojgc][eojcc][eojci].update(
                                 {ENL_GETMAP: []}
                             )
-            if self._state[host].get('uid') != None and self._state[host].get('manufacturer') != None and len(self._state[host]["instances"]):
-                self._state[host]["discovered"] = True
 
     def register_async_update_callbacks(self, host, eojgc, eojcc, eojci, fn):
         key = f"{host}-{eojgc}-{eojcc}-{eojci}"
