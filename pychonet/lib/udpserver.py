@@ -9,6 +9,8 @@ class UDPServer():
         self._download_speed = download_speed
         self._recv_max_size = recv_max_size
 
+        self._ip = socket.gethostbyname(socket.gethostname())
+
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._sock.setblocking(False)
@@ -79,6 +81,7 @@ class UDPServer():
         if registered == False:
             self._send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
             self._send_sock.setblocking(False)
+            self._send_sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(self._ip))
 
         fd = self._send_sock.fileno()
 
