@@ -78,11 +78,6 @@ class UDPServer():
         return fut
 
     def _sock_send(self, data, addr, fut=None, registered=False):
-        if registered == False:
-            self._send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
-            self._send_sock.setblocking(False)
-            self._send_sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(self._ip))
-
         fd = self._send_sock.fileno()
 
         if fut is None:
@@ -104,8 +99,6 @@ class UDPServer():
         else:
             fut.set_result(bytes_sent)
 
-        self._send_sock.close()
-
         return fut
 
     async def _throttle(self, data_len, speed=0):
@@ -116,10 +109,14 @@ class UDPServer():
         while True:
             await self._send_event.wait()
             try:
-                while self._send_queue:
-                    data, addr = self._send_queue.popleft()
-                    bytes_sent = await self._sock_send(data, addr)
-                    await self._throttle(bytes_sent, self._upload_speed)
+                if self._send_queue:
+                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0) as self._send_sock:
+                        self._send_sock.setblocking(False)
+                        self._send_sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(self._ip))
+                        while self._send_queue:
+                            data, addr = self._send_queue.popleft()
+                            bytes_sent = await self._sock_send(data, addr)
+                            await self._throttle(bytes_sent, self._upload_speed)
             finally:
                 self._send_event.clear()
 
