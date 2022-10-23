@@ -2,7 +2,8 @@ import asyncio
 
 from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT, INSTANCE_LIST,
                                 ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT, ENL_STATMAP,
-                                SETRES, GETRES, INF, INFC, SETC_SND, GET_SNA, INF_SNA)
+                                SETRES, GETRES, INF, INFC, SETC_SND, GET_SNA, INF_SNA,
+                                ENL_MULTICAST_ADDRESS)
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 
@@ -122,12 +123,16 @@ class ECHONETAPIClient:
         if tid_data:
             del self._message_list[tid]
 
-    async def discover(self, host="224.0.23.0"):
-        return await self.echonetMessage(host, 0x0E, 0xF0, 0x00, GET, [
-            {"EPC": ENL_MANUFACTURER},
-            {"EPC": ENL_UID},
-            {"EPC": INSTANCE_LIST}
-        ])
+    async def discover(self, host=ENL_MULTICAST_ADDRESS):
+        if host is ENL_MULTICAST_ADDRESS:
+            opc = [{"EPC": INSTANCE_LIST}]
+        else:
+            opc = [
+                {"EPC": ENL_MANUFACTURER},
+                {"EPC": ENL_UID},
+                {"EPC": INSTANCE_LIST}
+            ]
+        return await self.echonetMessage(host, 0x0E, 0xF0, 0x01, GET, opc)
 
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
         payload = None
