@@ -10,10 +10,14 @@ ENL_LVSEEM_INSTANT_ENG = 0xE7
 ENL_LVSEEM_INSTANT_CUR = 0xE8
 
 def _0288E0(edt):
+    if len(edt) < 1:
+        return None
     power_val = _int(edt)
     return None if power_val == 4294967294 else power_val # no measurement
 
 def _0288E1(edt):
+    if len(edt) < 1:
+        return None
     op_mode = _int(edt)
     values = {0x00: 1,
               0x01: 0.1,
@@ -43,11 +47,15 @@ def _0288E2(edt):
     return "Not implemented"
 
 def _0288E7(edt):
+    if len(edt) < 1:
+        return None
     power_val = _signed_int(edt)
     as_None = power_val in [-2147483648, 2147483647, 2147483646] # underflow, overflow, no measurement
     return None if as_None else power_val
 
 def _0288E8(edt):
+    if len(edt) < 1:
+        return {"r_phase_amperes": None, "t_phase_amperes": None}
     r_phase = float(_signed_int(edt[0:2])) / 10  # R Phase
     t_phase = float(_signed_int(edt[2:4])) / 10  # T Phase
     asNone = [-3276.8, 3276.7, 3276.6] # underflow, overflow, no measurement
