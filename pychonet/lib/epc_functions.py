@@ -44,12 +44,16 @@ def _009X(edt):
     return payload
 
 
-def _0083(edt):
+def _0083(edt, host = None):  # UID
     if edt is not None:
         if len(edt) > 1:
             ops_value = edt[1:].hex()
         else:
-            ops_value = None
+            if host is not None:
+                digits = host.split(".")
+                ops_value =  digits[2].zfill(3) + digits[3].zfill(3)
+            else:
+                ops_value = None
         return ops_value
     return None
 
