@@ -27,6 +27,9 @@ class ECHONETAPIClient:
         host = addr[0]
         is_discovery = False
 
+        if self._debug_flag:
+            self._logger(f"ECHONETLite Message Received from {host} - Raw data is {raw_data}")
+
         processed_data = decodeEchonetMsg(raw_data)
 
         if self._debug_flag:
@@ -34,7 +37,11 @@ class ECHONETAPIClient:
 
         tid = processed_data["TID"]
         tid_data = self._message_list.get(tid)
-        isPush = not tid_data
+
+        if self._debug_flag:
+            self._logger(f"ECHONETLite Message Received from {host} - tid_data is {tid_data}")
+
+        isPush = tid_data is None
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
@@ -83,8 +90,8 @@ class ECHONETAPIClient:
                     ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                 else: # Check for responses to ignore
                     if esv_set:
-                        if opc["PDC"] > 0 or tid_data is None:
-                            if tid_data:
+                        if opc["PDC"] > 0 or isPush:
+                            if not isPush:
                                 self._failure_list[tid] = True
                             continue
                         if tid_data.get(epc) is None:
@@ -97,7 +104,7 @@ class ECHONETAPIClient:
                             opc["EDT"] = tid_data[epc]
                     elif esv_get:
                         if opc["PDC"] == 0:
-                            if tid_data:
+                            if tid_data is not None:
                                 self._failure_list[tid] = True
                             continue
                     else:
@@ -109,9 +116,12 @@ class ECHONETAPIClient:
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc["EDT"]
 
         # Markup "discovered"
-        if is_discovery and self._state[host].get('uid') != None and self._state[host].get('manufacturer') != None and len(self._state[host]["instances"]):
+        if is_discovery and len(self._state[host]["instances"]):
+            if self._state[host].get('uid') is None:
+                self._state[host]['uid'] = EPC_SUPER_FUNCTIONS[ENL_UID](b'', host)
+            if self._state[host].get('manufacturer') is None:
+                self._state[host]['manufacturer'] = EPC_SUPER_FUNCTIONS[ENL_MANUFACTURER](0xFFFFFF.to_bytes(3, 'big'))
             self._state[host]["discovered"] = True
-
 
         # Call update callback functions
         if updated and key in self._update_callbacks:
@@ -120,7 +130,7 @@ class ECHONETAPIClient:
 
         # if we get duplicate packets that have already been processed then dont worry about the message list.
         # but still process them regardless.
-        if tid_data:
+        if tid_data is not None:
             del self._message_list[tid]
 
     async def discover(self, host=ENL_MULTICAST_ADDRESS):
@@ -169,9 +179,9 @@ class ECHONETAPIClient:
             # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
             await asyncio.sleep(0.1)
             # if tx_tid is not in message list then the message listener has received the message
-            if not self._message_list.get(tx_tid):
+            if self._message_list.get(tx_tid) is None:
                 # transaction sucessful remove from list
-                if not self._failure_list.get(tx_tid):
+                if self._failure_list.get(tx_tid) is None:
                     res = True
                 else:
                     res = False
@@ -198,7 +208,7 @@ class ECHONETAPIClient:
     async def process_discovery_data(self, host, opc_data):
         if "discovered" not in self._state[host]:
             if opc_data["EPC"] == ENL_UID:
-                self._state[host]['uid'] = EPC_SUPER_FUNCTIONS[ENL_UID](opc_data["EDT"])
+                self._state[host]['uid'] = EPC_SUPER_FUNCTIONS[ENL_UID](opc_data["EDT"], host)
             elif opc_data["EPC"] == ENL_MANUFACTURER:
                 self._state[host]['manufacturer'] = EPC_SUPER_FUNCTIONS[ENL_MANUFACTURER](opc_data["EDT"])
             else:
