@@ -15,11 +15,10 @@ class UDPServer():
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._sock.setblocking(False)
 
-        self._send_sock = None
-
         # enable multicast
         mreq = struct.pack("=4sl", socket.inet_aton("224.0.23.0"), socket.INADDR_ANY)
         self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+        self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(self._ip))
 
         self._send_event = asyncio.Event()
         self._send_queue = deque()
@@ -78,7 +77,7 @@ class UDPServer():
         return fut
 
     def _sock_send(self, data, addr, fut=None, registered=False):
-        fd = self._send_sock.fileno()
+        fd = self._sock.fileno()
 
         if fut is None:
             fut = self.loop.create_future()
@@ -90,7 +89,7 @@ class UDPServer():
             return
 
         try:
-            bytes_sent = self._send_sock.sendto(data, addr)
+            bytes_sent = self._sock.sendto(data, addr)
         except (BlockingIOError, InterruptedError):
             self.loop.add_writer(fd, self._sock_send, data, addr, fut, True)
         except Exception as e:
@@ -109,14 +108,10 @@ class UDPServer():
         while True:
             await self._send_event.wait()
             try:
-                if self._send_queue:
-                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0) as self._send_sock:
-                        self._send_sock.setblocking(False)
-                        self._send_sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(self._ip))
-                        while self._send_queue:
-                            data, addr = self._send_queue.popleft()
-                            bytes_sent = await self._sock_send(data, addr)
-                            await self._throttle(bytes_sent, self._upload_speed)
+                while self._send_queue:
+                    data, addr = self._send_queue.popleft()
+                    bytes_sent = await self._sock_send(data, addr)
+                    await self._throttle(bytes_sent, self._upload_speed)
             finally:
                 self._send_event.clear()
 
