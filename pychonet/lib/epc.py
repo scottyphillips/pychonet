@@ -1276,7 +1276,27 @@ EPC_CODE = {
         0xFD: {  # Switch (supporting JEM-A/HA terminals) class
             0x80: "Operation status",
             0xE0: "Connected device",
-        }
+        },
+        0xFF: { # Controller class
+            0x80: "Operation status",
+            0xC0: "Controller ID",
+            0xC1: "Number of devices connected",
+            0xC2: "Index",
+            0xC3: "Device ID",
+            0xC4: "Device Type",
+            0xC5: "Name",
+            0xC6: "Connection status",
+            0xC7: "Business code of the device to be controlled",
+            0xC8: "Product code of the device to be controlled",
+            0xC9: "Manufacture date of the device to be controlled",
+            0xCA: "Registered Information renewal date of the device to be controlled",
+            0xCB: "Registered information rewnewal version inormation of the device to be controlled",
+            0xCC: "Place to install device to be controlled",
+            0xCD: "Fault Status of the device to be controlled",
+            0xE0: "Address of installation location",
+            0xCE: "Set property map for the device to be controlled",
+            0xCF: "Get property map for the device to be controlled"
+        } 
     },
     0x06: {  # AV-related device class group
         0x01: {  # Display class
