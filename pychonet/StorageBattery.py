@@ -79,6 +79,20 @@ def _027DDB(edt):
     return values.get(op_mode, "Invalid setting")
 
 
+def _027DE6(edt):
+    op_mode = int.from_bytes(edt, "big")
+    values = {
+        0x00: "unknown",
+        0x01: "lead",
+        0x02: "ni_mh",
+        0x03: "ni_cd",
+        0x04: "Lithium",
+        0x05: "zinc",
+        0x06: "alkaline",
+    }
+    return values.get(op_mode, "Invalid setting")
+
+
 class StorageBattery(EchonetInstance):
     EPC_FUNCTIONS = {
         0x83: _to_string,  #Identification number
@@ -134,7 +148,7 @@ class StorageBattery(EchonetInstance):
         0xE3: _int,  #Remaining stored electricity 2
         0xE4: _int,  #Remaining stored electricity 3
         0xE5: _int,  #Battery state of health
-        0xE6: _int,  #Battery type
+        0xE6: _027DE6,  #Battery type
         0xE7: _int,  #Charging amount setting 1
         0xE8: _int,  #Discharging amount setting 1
         0xE9: _int,  #Charging amount setting 2
