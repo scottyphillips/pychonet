@@ -17,8 +17,17 @@ def _hh_mm(edt):  # basic time unit
     mm = str(int.from_bytes(edt[1:2], "big")).zfill(2)
     return f"{hh}:{mm}"
 
+
+def _yyyy_mm_dd(edt):  # basic year unit
+    yyyy = str(int.from_bytes(edt[0:4], "big")).zfill(4)
+    mm = str(int.from_bytes(edt[4:6], "big")).zfill(2)
+    dd = str(int.from_bytes(edt[6:8], "big")).zfill(2)
+    return f"{yyyy}:{mm}:{dd}"
+
+
 def _to_string(edt):
     return edt.decode('utf-8')
+
 
 # Check status of Echonnet Instance
 # ----------------- EPC SUPER FUNCTIONS -----------------------------
@@ -44,14 +53,14 @@ def _009X(edt):
     return payload
 
 
-def _0083(edt, host = None):  # UID
+def _0083(edt, host=None):  # UID
     if edt is not None:
         if len(edt) > 1:
             ops_value = edt[1:].hex()
         else:
             if host is not None:
                 digits = host.split(".")
-                ops_value =  digits[2].zfill(3) + digits[3].zfill(3)
+                ops_value = digits[2].zfill(3) + digits[3].zfill(3)
             else:
                 ops_value = None
         return ops_value
@@ -93,11 +102,9 @@ EPC_SUPER_FUNCTIONS = {
     0x9F: _009X,
 }
 
-
 # ------- EPC FUNCTIONS -------------------------------------------------
 # TODO - Move these to their classes
 # -----------------------------------------------------------------------
-
 
 # --- Low voltage smart meter class
 
@@ -125,8 +132,10 @@ def _0288E7(edt):
 
 
 def _0288E8(edt):
-    r_phase = float(int.from_bytes(edt[0:2], "big", signed=True)) / 10  # R Phase
-    t_phase = float(int.from_bytes(edt[2:4], "big", signed=True)) / 10  # T Phase
+    r_phase = float(int.from_bytes(edt[0:2], "big",
+                                   signed=True)) / 10  # R Phase
+    t_phase = float(int.from_bytes(edt[2:4], "big",
+                                   signed=True)) / 10  # T Phase
     return {"r_phase_amps": r_phase, "t_phase_amps": t_phase}
 
 
