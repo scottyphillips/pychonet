@@ -21,6 +21,7 @@ class ECHONETAPIClient:
         self._debug_flag = False
         self._update_callbacks = {}
         self._discover_callback = None
+        self._waiting = {}
 
     async def echonetMessageReceived(self, raw_data, addr):
         updated = False
@@ -156,6 +157,19 @@ class ECHONETAPIClient:
         if self._state.get(host) is None:
             self._state[host] = {"instances": {}}
 
+        # Consecutive requests to the device must wait for a response
+        if self._waiting.get(host) is None:
+            self._waiting[host] = 0
+        if self._waiting[host] > 0:
+            for x in range(0, self._message_timeout):
+                # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
+                await asyncio.sleep(0.1)
+                if not self._waiting[host]:
+                    break
+            if self._waiting[host]:
+                return False
+        self._waiting[host] += 1
+
         tid_data = {}
         for opc_data in opc:
             if opc_data.get("EDT") is not None:
@@ -175,6 +189,7 @@ class ECHONETAPIClient:
 
         self._message_list[tx_tid] = tid_data
         self._server.send(payload, (host, ENL_PORT))
+        res = False
         for x in range(0, self._message_timeout):
             # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
             await asyncio.sleep(0.1)
@@ -183,12 +198,11 @@ class ECHONETAPIClient:
                 # transaction sucessful remove from list
                 if self._failure_list.get(tx_tid) is None:
                     res = True
-                else:
-                    res = False
-                    del self._failure_list[tx_tid]
-                return res
-        del self._message_list[tx_tid]
-        return False
+                break
+        if not res:
+            del self._message_list[tx_tid]
+        self._waiting[host] -= 1
+        return res
 
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
         return await self.echonetMessage(
