@@ -38,3 +38,4 @@ V2.3.10, 26 Aug 2022 -- Revert use of send-only socket
                      -- Bug fix for acceptability judgment when sending a request
                      -- Adjusting the LowVoltageSmartElectricEnergyMeter
 V2.3.11, 1 Dec 2022 -- Add storage battery support
+                    -- Add single function lighting support
