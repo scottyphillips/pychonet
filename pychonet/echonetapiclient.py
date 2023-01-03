@@ -198,8 +198,10 @@ class ECHONETAPIClient:
                 # transaction sucessful remove from list
                 if self._failure_list.get(tx_tid) is None:
                     res = True
+                else:
+                    del self._failure_list[tx_tid]
                 break
-        if not res:
+        if not res and self._message_list.get(tx_tid) is not None:
             del self._message_list[tx_tid]
         self._waiting[host] -= 1
         return res
