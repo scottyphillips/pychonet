@@ -3,7 +3,7 @@ import asyncio
 from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT, INSTANCE_LIST,
                                 ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT, ENL_STATMAP,
                                 SETRES, GETRES, INF, INFC, SETC_SND, GET_SNA, INF_SNA,
-                                ENL_MULTICAST_ADDRESS)
+                                SETI, ENL_MULTICAST_ADDRESS)
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 
@@ -146,6 +146,7 @@ class ECHONETAPIClient:
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x01, GET, opc)
 
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
+        no_res = True if esv is SETI else False
         payload = None
         message_array = {
             "DEOJGC": deojgc,
@@ -170,12 +171,6 @@ class ECHONETAPIClient:
                 return False
         self._waiting[host] += 1
 
-        tid_data = {}
-        for opc_data in opc:
-            if opc_data.get("EDT") is not None:
-                if isinstance(opc_data["EDT"], int):
-                    tid_data[opc_data["EPC"]] = opc_data["EDT"].to_bytes(opc_data["PDC"], 'big')
-
         self._next_tx_tid += 1
         tx_tid = self._next_tx_tid
         message_array["TID"] = tx_tid
@@ -187,24 +182,36 @@ class ECHONETAPIClient:
             message_array["TID"] = tx_tid
             payload = buildEchonetMsg(message_array)
 
-        self._message_list[tx_tid] = tid_data
+        if no_res:
+            result = True
+        else:
+            result = False
+            tid_data = {}
+            for opc_data in opc:
+                if opc_data.get("EDT") is not None:
+                    if isinstance(opc_data["EDT"], int):
+                        tid_data[opc_data["EPC"]] = opc_data["EDT"].to_bytes(opc_data["PDC"], 'big')
+            self._message_list[tx_tid] = tid_data
+
         self._server.send(payload, (host, ENL_PORT))
-        res = False
-        for x in range(0, self._message_timeout):
-            # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
-            await asyncio.sleep(0.1)
-            # if tx_tid is not in message list then the message listener has received the message
-            if self._message_list.get(tx_tid) is None:
-                # transaction sucessful remove from list
-                if self._failure_list.get(tx_tid) is None:
-                    res = True
-                else:
-                    del self._failure_list[tx_tid]
-                break
-        if not res and self._message_list.get(tx_tid) is not None:
-            del self._message_list[tx_tid]
+
+        if not no_res:
+            for x in range(0, self._message_timeout):
+                # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
+                await asyncio.sleep(0.1)
+                # if tx_tid is not in message list then the message listener has received the message
+                if self._message_list.get(tx_tid) is None:
+                    # transaction sucessful remove from list
+                    if self._failure_list.get(tx_tid) is None:
+                        result = True
+                    else:
+                        del self._failure_list[tx_tid]
+                    break
+            if not result and self._message_list.get(tx_tid) is not None:
+                del self._message_list[tx_tid]
+
         self._waiting[host] -= 1
-        return res
+        return result
 
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
         return await self.echonetMessage(
