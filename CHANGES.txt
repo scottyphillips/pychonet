@@ -34,8 +34,9 @@ v2.3.6, 26 Sep 2022 -- Added some ENL codes for HomeAirConditioner and Distribut
 v2.3.7, 28 Sep 2022 -- Added _discover_callback to echonetapiclient.
 v2.3.8, 30 Sep 2022 -- Bug fix of calling _discover_callback().
 v2.3.9, 06 Aug 2022 -- Added LowVoltageSmartElectricEnergyMeter, Create a another socket for sending.
-V2.3.10, 26 Aug 2022 -- Revert use of send-only socket
+v2.3.10, 26 Aug 2022 -- Revert use of send-only socket
                      -- Bug fix for acceptability judgment when sending a request
                      -- Adjusting the LowVoltageSmartElectricEnergyMeter
-V2.3.11, 1 Dec 2022 -- Add storage battery support
-                    -- Add single function lighting support
+v2.3.11, 01 Dec 2022 -- Add storage battery support
+                     -- Add single function lighting support
+v2.3.12, 07 Jan 2023 -- Fix #58 Consecutive requests to a device must wait for a response
