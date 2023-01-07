@@ -29,7 +29,8 @@ EHD2 = {
 # ------------------------------------------------------------------
 # ESV
 # ------------------------------------------------------------------
-GETC = 0x60
+GETC = 0x60 # Deprecated, for backward compatibility
+SETI = 0x60
 SETC = 0x61
 GET = 0x62
 INFREQ = 0x63
@@ -49,7 +50,7 @@ INSTANCE_LIST = 0xD6
 
 ESV_CODES = {
     0x60: {
-        "name": "GetC",
+        "name": "SetI",
         "description": "Property value write request (no response required)",
     },
     0x61: {
