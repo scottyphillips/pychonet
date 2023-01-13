@@ -40,3 +40,4 @@ v2.3.10, 26 Aug 2022 -- Revert use of send-only socket
 v2.3.11, 01 Dec 2022 -- Add storage battery support
                      -- Add single function lighting support
 v2.3.12, 07 Jan 2023 -- Fix #58 Consecutive requests to a device must wait for a response
+v2.3.13, 13 Jan 2023 -- Changed method of obtaining local IP address of HA, Rel. #124
