@@ -9,7 +9,8 @@ class UDPServer():
         self._download_speed = download_speed
         self._recv_max_size = recv_max_size
 
-        self._ip = socket.gethostbyname(socket.gethostname())
+        # Get Local IP address
+        self._ip = [(s.connect(('224.0.23.0', 3610)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
 
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
