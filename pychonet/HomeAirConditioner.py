@@ -208,6 +208,7 @@ class HomeAirConditioner(EchonetInstance):
         0xB2: _0130B2,
         0xBA: _int,
         0xB3: _signed_int,
+        0xB4: _signed_int,
         0xBB: _signed_int,
         0xBE: _signed_int,
     }
@@ -230,11 +231,20 @@ class HomeAirConditioner(EchonetInstance):
     """
     getOperationalTemperature get the temperature that has been set in the HVAC
 
-    return: A string representing the configured temperature.
+    return: A integer representing the configured temperature.
     """
 
     def getOperationalTemperature(self):
         return self.getMessage(ENL_HVAC_SET_TEMP)
+
+    """
+    getOperationalHumidity get the humidity that has been set in the HVAC
+
+    return: A integer representing the configured humidity.
+    """
+
+    def getOperationalHumidity(self):
+        return self.getMessage(ENL_HVAC_SET_HUMIDITY)
 
     """
     getRoomHumidity get the HVAC's room humidity.
@@ -266,11 +276,20 @@ class HomeAirConditioner(EchonetInstance):
     """
     setOperationalTemperature get the temperature that has been set in the HVAC
 
-    param temperature: A string representing the desired temperature.
+    param temperature: A integer representing the desired temperature.
     """
 
     def setOperationalTemperature(self, temperature):
         return self.setMessage(ENL_HVAC_SET_TEMP, int(temperature))
+
+    """
+    setOperationalHumidity get the temperature that has been set in the HVAC
+
+    param humidity: A integer representing the desired humidity.
+    """
+
+    def setOperationalHumidity(self, humidity):
+        return self.setMessage(ENL_HVAC_SET_HUMIDITY, int(humidity))
 
     """
     GetMode returns the current configured mode (e.g Heating, Cooling, Fan etc)
