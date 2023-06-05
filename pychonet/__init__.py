@@ -8,6 +8,7 @@ from .ElectricLock import ElectricLock
 from .ElectricVehicleCharger import ElectricVehicleCharger
 from .GeneralLighting import GeneralLighting
 from .SingleFunctionLighting import SingleFunctionLighting
+from .LightingSystem import LightingSystem
 from .HomeAirCleaner import HomeAirCleaner
 from .HomeAirConditioner import HomeAirConditioner
 from .HomeSolarPower import HomeSolarPower
@@ -46,6 +47,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x88}": LowVoltageSmartElectricEnergyMeter,
         f"{0x02}-{0x90}": GeneralLighting,
         f"{0x02}-{0x91}": SingleFunctionLighting,
+        f"{0x02}-{0xA3}": LightingSystem,
         f"{0x02}-{0xA6}": HybridWaterHeater,
         None: None,
     }
