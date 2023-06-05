@@ -28,6 +28,8 @@ def _yyyy_mm_dd(edt):  # basic year unit
 def _to_string(edt):
     return edt.decode('utf-8')
 
+def _null_padded_optional_string(edt):
+    return edt.decode('utf-8').rstrip('\0') if edt is not None and len(edt) > 0 else None
 
 # Check status of Echonnet Instance
 # ----------------- EPC SUPER FUNCTIONS -----------------------------
@@ -73,7 +75,6 @@ def _008A(edt):  # manufacturer
         return MANUFACTURERS[id]
     return id
 
-
 def _009A(edt):  # cumulative runtime
     if len(edt) > 1:
         value = int.from_bytes(edt[1:], "big")
@@ -96,6 +97,7 @@ EPC_SUPER_FUNCTIONS = {
     0x84: _int,
     0x85: _int,
     0x8A: _008A,
+    0x8C: _null_padded_optional_string,
     0x9A: _009A,
     0x9D: _009X,
     0x9E: _009X,
