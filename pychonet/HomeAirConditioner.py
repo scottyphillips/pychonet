@@ -82,6 +82,8 @@ ENL_HVAC_SET_HUMIDITY = 0xB4
 ENL_HVAC_ROOM_HUMIDITY = 0xBA
 ENL_HVAC_ROOM_TEMP = 0xBB
 ENL_HVAC_OUT_TEMP = 0xBE
+ENL_HVAC_HUMIDIFIER_STATE = 0xC1
+ENL_HVAC_HUMIDIFIER_VALUE = 0xC4
 
 # ----- Home Air conditioner functions -------
 
@@ -290,6 +292,16 @@ class HomeAirConditioner(EchonetInstance):
 
     def setOperationalHumidity(self, humidity):
         return self.setMessage(ENL_HVAC_SET_HUMIDITY, int(humidity))
+
+    def setHeaterHumidifier(self, state, humidity):
+        if not state:
+            return self.setMessage(ENL_HVAC_HUMIDIFIER_STATE, 0x42)
+        return self.setMessages(
+            [
+                {"EPC": ENL_HVAC_HUMIDIFIER_STATE, "PDC": 0x01, "EDT": 0x41},
+                {"EPC": ENL_HVAC_HUMIDIFIER_VALUE, "PDC": 0x01, "EDT": humidity},
+            ]
+        )
 
     """
     GetMode returns the current configured mode (e.g Heating, Cooling, Fan etc)
