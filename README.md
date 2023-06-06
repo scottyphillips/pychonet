@@ -6,7 +6,7 @@
 
 
 A library for interfacing with the ECHONETlite protocol as commonly used in Japan.
-Useful for interfacing to many interesting devices such as HVACs,
+Useful for interfacing to many interesting devices such as HVACs, light systems,
 electric car chargers, rice cookers (not joking), and solar systems
 that support ECHONETLite.
 
