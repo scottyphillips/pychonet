@@ -4,27 +4,43 @@ import struct
 from collections import deque
 
 class UDPServer():
-    def __init__(self, upload_speed=0, download_speed=0, recv_max_size=256 * 1024):
+    def __init__(self, upload_speed=0, download_speed=0, recv_max_size=256 * 1024, local_ip=None):
         self._upload_speed = upload_speed
         self._download_speed = download_speed
         self._recv_max_size = recv_max_size
 
         # Get Local IP address
-        self._ip = [(s.connect(('224.0.23.0', 3610)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
+        self._ip = local_ip or [(s.connect(('224.0.23.0', 3610)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
 
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._sock.setblocking(False)
 
         # enable multicast
-        mreq = struct.pack("=4sl", socket.inet_aton("224.0.23.0"), socket.INADDR_ANY)
-        self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-        self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(self._ip))
+        self._multicast_ips = set()
+        self.register_multicast(self._ip)
 
         self._send_event = asyncio.Event()
         self._send_queue = deque()
 
         self._subscribers = {}
+
+    # figure out which multicast IP would be used to reach host
+    def register_multicast_from_host(self, host):
+        # connect to known destination, e.g. via UDP port 80
+        temp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        temp_sock.connect((host, 80))
+        with temp_sock:
+            local_ip, *_ = temp_sock.getsockname()
+            self.register_multicast(local_ip)
+
+
+    def register_multicast(self, local_ip):
+        if (local_ip not in self._multicast_ips):
+            self._multicast_ips.add(local_ip)
+            self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(local_ip))
+            mreq = struct.pack("=4s4s", socket.inet_aton("224.0.23.0"), socket.inet_aton(local_ip))
+            self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
     # region Interface
     def run(self, host, port, loop):

@@ -1098,7 +1098,7 @@ EPC_CODE = {
             0x80: "Operation status",
             0xB0: "Illuminance level setting",
             0xC0: "Scene control setting",
-            0xC1: "Number that can assign scene control setting",
+            0xC1: "Max scene control setting",
         },
         0xA6: { # Hybrid Water Heater
             0xB0: "Automatic water heating setting",

@@ -41,3 +41,8 @@ v2.3.11, 01 Dec 2022 -- Add storage battery support
                      -- Add single function lighting support
 v2.3.12, 07 Jan 2023 -- Fix #58 Consecutive requests to a device must wait for a response
 v2.3.13, 13 Jan 2023 -- Changed method of obtaining local IP address of HA, Rel. #124
+v2.3.14, 05 Jun 2023 -- Added support for AC with heater + humidity at the same time
+                     -- Added support for Lighting System (0x02, 0xA3)
+                     -- Added support for Fuel Cell (0x02, 0x7C)
+                     -- Query and store "product code" on host/device registration
+                     -- Added better control over which IP to listen to for multicast

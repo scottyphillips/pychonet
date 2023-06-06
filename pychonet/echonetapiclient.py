@@ -1,6 +1,6 @@
 import asyncio
 
-from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PORT, INSTANCE_LIST,
+from pychonet.lib.const import (ENL_GETMAP, ENL_MANUFACTURER, ENL_PRODUCT_CODE, ENL_PORT, INSTANCE_LIST,
                                 ENL_SETMAP, ENL_UID, GET, MESSAGE_TIMEOUT, ENL_STATMAP,
                                 SETRES, GETRES, INF, INFC, SETC_SND, GET_SNA, INF_SNA,
                                 SETI, ENL_MULTICAST_ADDRESS)
@@ -63,7 +63,7 @@ class ECHONETAPIClient:
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
             if seojgc == 0x0E and seojcc == 0xF0: # Node Profile Class Response
-                if (epc in [INSTANCE_LIST, ENL_MANUFACTURER, ENL_UID]): # process discovery data
+                if (epc in [INSTANCE_LIST, ENL_MANUFACTURER, ENL_PRODUCT_CODE, ENL_UID]): # process discovery data
                     is_discovery = True
                     await self.process_discovery_data(host, opc)
                 else:
@@ -85,7 +85,7 @@ class ECHONETAPIClient:
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
-                elif epc in (ENL_UID, ENL_MANUFACTURER):
+                elif epc in (ENL_UID, ENL_MANUFACTURER, ENL_PRODUCT_CODE):
                     self._state[host]["instances"][seojgc][seojcc][seojci][
                         epc
                     ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
@@ -140,6 +140,7 @@ class ECHONETAPIClient:
         else:
             opc = [
                 {"EPC": ENL_MANUFACTURER},
+                {"EPC": ENL_PRODUCT_CODE},
                 {"EPC": ENL_UID},
                 {"EPC": INSTANCE_LIST}
             ]
@@ -215,7 +216,7 @@ class ECHONETAPIClient:
 
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
         return await self.echonetMessage(
-            host, eojgc, eojcc, eojci, GET, [{"EPC": ENL_STATMAP}, {"EPC": ENL_GETMAP}, {"EPC": ENL_SETMAP}]
+            host, eojgc, eojcc, eojci, GET, [{"EPC": ENL_STATMAP}, {"EPC": ENL_GETMAP}, {"EPC": ENL_SETMAP}, {"EPC": ENL_PRODUCT_CODE}]
         )
 
     async def getIdentificationInformation(self, host, eojgc, eojcc, eojci):
@@ -234,6 +235,8 @@ class ECHONETAPIClient:
                 self._state[host]['uid'] = EPC_SUPER_FUNCTIONS[ENL_UID](opc_data["EDT"], host)
             elif opc_data["EPC"] == ENL_MANUFACTURER:
                 self._state[host]['manufacturer'] = EPC_SUPER_FUNCTIONS[ENL_MANUFACTURER](opc_data["EDT"])
+            elif opc_data["EPC"] == ENL_PRODUCT_CODE:
+                self._state[host]['product_code'] = EPC_SUPER_FUNCTIONS[ENL_PRODUCT_CODE](opc_data["EDT"])
             else:
                 edt = bytearray(opc_data["EDT"])
                 # 1st byte: Total number of instances

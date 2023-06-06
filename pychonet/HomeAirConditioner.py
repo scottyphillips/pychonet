@@ -82,6 +82,8 @@ ENL_HVAC_SET_HUMIDITY = 0xB4
 ENL_HVAC_ROOM_HUMIDITY = 0xBA
 ENL_HVAC_ROOM_TEMP = 0xBB
 ENL_HVAC_OUT_TEMP = 0xBE
+ENL_HVAC_HUMIDIFIER_STATE = 0xC1
+ENL_HVAC_HUMIDIFIER_VALUE = 0xC4
 
 # ----- Home Air conditioner functions -------
 
@@ -208,6 +210,7 @@ class HomeAirConditioner(EchonetInstance):
         0xB2: _0130B2,
         0xBA: _int,
         0xB3: _signed_int,
+        0xB4: _signed_int,
         0xBB: _signed_int,
         0xBE: _signed_int,
     }
@@ -230,11 +233,20 @@ class HomeAirConditioner(EchonetInstance):
     """
     getOperationalTemperature get the temperature that has been set in the HVAC
 
-    return: A string representing the configured temperature.
+    return: A integer representing the configured temperature.
     """
 
     def getOperationalTemperature(self):
         return self.getMessage(ENL_HVAC_SET_TEMP)
+
+    """
+    getOperationalHumidity get the humidity that has been set in the HVAC
+
+    return: A integer representing the configured humidity.
+    """
+
+    def getOperationalHumidity(self):
+        return self.getMessage(ENL_HVAC_SET_HUMIDITY)
 
     """
     getRoomHumidity get the HVAC's room humidity.
@@ -266,11 +278,30 @@ class HomeAirConditioner(EchonetInstance):
     """
     setOperationalTemperature get the temperature that has been set in the HVAC
 
-    param temperature: A string representing the desired temperature.
+    param temperature: A integer representing the desired temperature.
     """
 
     def setOperationalTemperature(self, temperature):
         return self.setMessage(ENL_HVAC_SET_TEMP, int(temperature))
+
+    """
+    setOperationalHumidity get the temperature that has been set in the HVAC
+
+    param humidity: A integer representing the desired humidity.
+    """
+
+    def setOperationalHumidity(self, humidity):
+        return self.setMessage(ENL_HVAC_SET_HUMIDITY, int(humidity))
+
+    def setHeaterHumidifier(self, state, humidity):
+        if not state:
+            return self.setMessage(ENL_HVAC_HUMIDIFIER_STATE, 0x42)
+        return self.setMessages(
+            [
+                {"EPC": ENL_HVAC_HUMIDIFIER_STATE, "PDC": 0x01, "EDT": 0x41},
+                {"EPC": ENL_HVAC_HUMIDIFIER_VALUE, "PDC": 0x01, "EDT": humidity},
+            ]
+        )
 
     """
     GetMode returns the current configured mode (e.g Heating, Cooling, Fan etc)
