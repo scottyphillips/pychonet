@@ -1,8 +1,8 @@
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import _int, _hh_mm, _signed_int
 
-def _0142A0(data):
-    # Logic to interpret data for EPC 0xA0
+def _014290(data):
+    # Logic to interpret data for EPC 0x90
     if data == 0x41:
         return 'Automatic'
     elif data == 0x42:
