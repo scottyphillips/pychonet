@@ -1,6 +1,48 @@
 from pychonet import EchonetInstance
 from pychonet.lib.epc_functions import _hh_mm, _int
 
+@staticmethod
+def _0143BB(payload):
+    return str(payload)
+
+@staticmethod
+def _0143B1(payload):
+    return str(payload)
+
+@staticmethod
+def _014390(payload):
+    return str(payload)
+
+@staticmethod
+def _014394(payload):
+    return str(payload)
+
+@staticmethod
+def _0143C0(payload):
+    if payload == 0x41:
+        return 'Extension ON'
+    elif payload == 0x42:
+        return 'Extension OFF'
+    else:
+        return 'Unknown'
+
+@staticmethod
+def _0143C2(payload):
+    if payload == 0x41:
+        return 'Ion emission ON'
+    elif payload == 0x42:
+        return 'Ion emission OFF'
+    else:
+        return 'Unknown'
+
+@staticmethod
+def _0143C3(payload):
+    return str(payload)
+
+@staticmethod
+def _0143C4(payload):
+    return str(payload)
+
 class FanHeater(EchonetInstance):
     class_codes = {
         'class_group_code': 0x01,
@@ -104,44 +146,3 @@ class FanHeater(EchonetInstance):
     def getOilAmountLevel(self):
         return self.getMessage(0xC4)
 
-    @staticmethod
-    def _0143BB(payload):
-        return str(payload)
-
-    @staticmethod
-    def _0143B1(payload):
-        return str(payload)
-
-    @staticmethod
-    def _014390(payload):
-        return str(payload)
-
-    @staticmethod
-    def _014394(payload):
-        return str(payload)
-
-    @staticmethod
-    def _0143C0(payload):
-        if payload == 0x41:
-            return 'Extension ON'
-        elif payload == 0x42:
-            return 'Extension OFF'
-        else:
-            return 'Unknown'
-
-    @staticmethod
-    def _0143C2(payload):
-        if payload == 0x41:
-            return 'Ion emission ON'
-        elif payload == 0x42:
-            return 'Ion emission OFF'
-        else:
-            return 'Unknown'
-
-    @staticmethod
-    def _0143C3(payload):
-        return str(payload)
-
-    @staticmethod
-    def _0143C4(payload):
-        return str(payload)
