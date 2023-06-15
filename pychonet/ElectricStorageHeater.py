@@ -1,4 +1,5 @@
 #TODO fix this ChatGPT created code. 
+from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import _hh_mm, _int
 
 # Static methods for ElectricStorageHeater
