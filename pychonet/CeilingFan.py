@@ -1,5 +1,9 @@
 from pychonet.EchonetInstance import EchonetInstance
 
+ENL_FANSPEED_PERCENT = 0xF0
+ENL_FAN_DIRECTION = 0xF1
+ENL_OSCILLATION = 0xF2
+
 # ----- Ceiling Fan Class -------
 # Fan speed in percentage
 def _013AF0(edt):
