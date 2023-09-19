@@ -14,13 +14,13 @@ def _013AF0(edt):
 # Fan Direction
 def _013AF1(edt):
     op_mode = int.from_bytes(edt, "big")
-    values = {0x41: "down", 0x42: "up"}
+    values = {0x41: "forward", 0x42: "reverse"}
     return values.get(op_mode, "invalid_setting")
 
 # Fan Fluctuation
 def _013AF2(edt):
     op_mode = int.from_bytes(edt, "big")
-    values = {0x30: "on", 0x31: "off"}
+    values = {0x30: True, 0x31: False}
     return values.get(op_mode, "invalid_setting")
 
 """Class for Celing Fan Objects"""
