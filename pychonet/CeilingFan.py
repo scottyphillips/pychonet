@@ -14,7 +14,7 @@ def _013AF1(edt):
     return values.get(op_mode, "invalid_setting")
 
 # Fan Fluctuation
-def _0135A1(edt):
+def _013AF2(edt):
     op_mode = int.from_bytes(edt, "big")
     values = {0x30: "on", 0x31: "off"}
     return values.get(op_mode, "invalid_setting")
