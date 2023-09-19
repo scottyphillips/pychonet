@@ -331,6 +331,12 @@ EPC_CODE = {
             0xC4: "Special operation mode setting",
             0xC5: "Water amount level",
         },
+        0x3A: { # Ceiling fan class
+            0x80: "Operation status",
+            0xF0: "Fan speed",
+            0xF1: "Fan direction",
+            0xF2: "Fan fluctuation"
+        },
         0x42: {  # Electric heater class
             0x80: "Operation status",
             0xB1: "Automatic temperature control setting",
