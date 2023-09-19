@@ -22,7 +22,7 @@ from .FuelCell import FuelCell
 from .GasMeter import GasMeter
 from .ElectricEnergyMeter import ElectricEnergyMeter
 from .WaterFlowMeter import WaterFlowMeter
-
+from .CeilingFan import CeilingFan
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -35,6 +35,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x00}-{0x11}": TemperatureSensor,
         f"{0x01}-{0x30}": HomeAirConditioner,
         f"{0x01}-{0x35}": HomeAirCleaner,
+        f"{0x01}-{0x3A}": CeilingFan,
         f"{0x02}-{0x60}": ElectricBlind,
         f"{0x02}-{0x6F}": ElectricLock,
         f"{0x02}-{0x72}": HotWaterGenerator,
