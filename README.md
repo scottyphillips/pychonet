@@ -17,7 +17,7 @@ The basic boilerplate EchoNetInstance class can be used to provide
 raw connectivity to any compatible device but it is up to the developer
 to create useful classes. Any ECHONETlite class additions to the library are welcome.
 
-Version 2.0.0 of this libray was rebuilt to use asyncio for better compatability with home assistant.
+Version 2.0.0 of this library was rebuilt to use asyncio for better compatability with home assistant.
 
 
 It is designed to work with Python 3.9.5+
