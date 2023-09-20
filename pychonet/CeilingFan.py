@@ -28,8 +28,8 @@ class CeilingFan(EchonetInstance):
 
     EPC_FUNCTIONS = {
         0xF0: _013AF0,
-        0xA0: _013AF1,
-        0xC0: _013AF2,
+        0xF1: _013AF1,
+        0xF2: _013AF2,
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):
