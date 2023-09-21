@@ -335,7 +335,8 @@ EPC_CODE = {
             0x80: "Operation status",
             0xF0: "Fan speed",
             0xF1: "Fan direction",
-            0xF2: "Fan fluctuation"
+            0xF2: "Fan fluctuation",
+            0xFC: "Fan Buzzer"
         },
         0x42: {  # Electric heater class
             0x80: "Operation status",
