@@ -1107,6 +1107,13 @@ EPC_CODE = {
             0xC0: "Scene control setting",
             0xC1: "Max scene control setting",
         },
+        0xA5: {  # Multiple Input PCS
+            0xD0: "Grid connection status",
+            0xE0: "Measured cumulative amount of electric energy (normal direction)",
+            0xE3: "Measured cumulative amount of electric energy (reverse direction)",
+            0xE7: "Measured instantaneous amount of electricity",
+            0xE8: "Connected devices",
+        },
         0xA6: { # Hybrid Water Heater
             0xB0: "Automatic water heating setting",
             0xB2: "Water heating status",
