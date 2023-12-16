@@ -97,7 +97,7 @@ class ECHONETAPIClient:
                         ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                     except KeyError as e:
                         raise Exception(f"ECHONET Packet contains the following data: {processed_data}")
-                                  
+                else:                   
                     if esv_set:
                         if opc["PDC"] > 0 or isPush:
                             if not isPush:
