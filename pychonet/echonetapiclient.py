@@ -81,6 +81,11 @@ class ECHONETAPIClient:
                     but that will be an issue for the future.
                     '''
                     continue
+            elif seojgc == 0x0F: # User definition class group
+                if self._debug_flag:
+                    self._logger(f"Packet received from {host} for user definition class group 0x0F")
+                    self._logger(f'Full packet details are {processed_data}')
+                    self._logger(f'ignoring packet but please notify devs on Github.')                
             else: # process each EPC in order
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
