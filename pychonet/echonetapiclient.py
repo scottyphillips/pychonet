@@ -91,10 +91,13 @@ class ECHONETAPIClient:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
                 elif epc in (ENL_UID, ENL_MANUFACTURER, ENL_PRODUCT_CODE):
-                    self._state[host]["instances"][seojgc][seojcc][seojci][
-                        epc
-                    ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
-                else: # Check for responses to ignore
+                    try:
+                        self._state[host]["instances"][seojgc][seojcc][seojci][
+                            epc
+                        ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
+                    except KeyError as e:
+                        raise Exception(f"ECHONET Packet contains the following data: {processed_data}")
+                                  
                     if esv_set:
                         if opc["PDC"] > 0 or isPush:
                             if not isPush:
