@@ -250,11 +250,28 @@ def _026BD9(edt):
 # 0xDD - Rated power consumptions of H/P unit in summer time
 
 
+# 0xCB - Expected electric energy at daytime heating shift time 1
+def _026BCB(edt):
+    return("not implemented")
+
+# 0xCC - Consumption of electric energy per hour 1
+def _026BCC(edt):
+    return("not implemented")
+
+# 0xCE - Expected electric energy at daytime heating shift time 2
+def _026BCE(edt):
+    return("not implemented")
+
+# 0xCF - Consumption of electric energy per hour 2
+def _026BCF(edt):
+    return("not implemented")
+
+
 class ElectricWaterHeater(EchonetInstance):
     EPC_FUNCTIONS = {
         0xB0: _026BB0,
         0xB1: _026BB1,
-        0xB2: _026BB3,
+        0xB2: _026BB2,
         0xB3: _int,
         0xB4: _int,
         0xB5: _026BB5,
@@ -297,7 +314,7 @@ class ElectricWaterHeater(EchonetInstance):
         0xCB: _026BCB, #todo
         0xCC: _026BCC, #todo
         0xCD: _int,
-        0xCE: _026BCE, #todo
+        0xCE: _026BCB, #todo
         0xCF: _026BCF #todo
         
     }
