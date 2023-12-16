@@ -6,9 +6,9 @@ from pychonet.lib.epc_functions import _int, _signed_int
 def _026BB0(edt):
     op_mode = int.from_bytes(edt, "big")
     AUTOMATIC_WATER_HEATING_STATES = {
-        0x41: "Automatic water heating",
-        0x42: "Manual water heating",
-        0x43: "Water heating manual stop",
+        0x41: "Automatic",
+        0x42: "Manual",
+        0x43: "Stop",
     }
     return AUTOMATIC_WATER_HEATING_STATES.get(op_mode, "Invalid setting")
 
@@ -17,8 +17,8 @@ def _026BB0(edt):
 def _026BB1(edt):
     op_mode = int.from_bytes(edt, "big")
     AUTOMATIC_WATER_TEMP_CONTROL = {
-        0x41: "Automatic water temperature control in use",
-        0x42: "Automatic water temperature control not used",
+        0x41: "On",
+        0x42: "Off",
     }
     return AUTOMATIC_WATER_TEMP_CONTROL.get(op_mode, "Invalid setting")
 
@@ -27,8 +27,8 @@ def _026BB1(edt):
 def _026BB2(edt):
     op_mode = int.from_bytes(edt, "big")
     WATER_HEATING_STATUS = {
-        0x41: "Water is heating",
-        0x42: "Water is not heating",
+        0x41: "Heating",
+        0x42: "Not Heating",
     }
     return WATER_HEATING_STATUS.get(op_mode, "Invalid setting")
 
