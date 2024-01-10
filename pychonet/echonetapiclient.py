@@ -179,7 +179,7 @@ class ECHONETAPIClient:
 
         # Markup "available"
         if host in self._state:
-            if not self._state[host]["available"]:
+            if not self._state[host].get("available"):
                 updated = True
                 self._state[host]["available"] = True
 
@@ -281,7 +281,7 @@ class ECHONETAPIClient:
                 # Call update callback functions
                 if key in self._update_callbacks:
                     for update_func in self._update_callbacks[key]:
-                        await update_func(isPush)
+                        await update_func(False)
 
         self._waiting[host] -= 1
         return result
