@@ -179,7 +179,9 @@ class ECHONETAPIClient:
 
         # Markup "available"
         if host in self._state:
-            self._state[host]["available"] = True
+            if not self._state[host]["available"]:
+                updated = True
+                self._state[host]["available"] = True
 
         # Call update callback functions
         if updated and key in self._update_callbacks:
@@ -271,9 +273,15 @@ class ECHONETAPIClient:
                     if tx_tid in self._failure_list:
                         del self._failure_list[tx_tid]
                     break
-            if not result and self._message_list.get(tx_tid) is not None:
-                del self._message_list[tx_tid]
-            self._state[host]["available"] = result
+            if not result:
+                if self._message_list.get(tx_tid) is not None:
+                    del self._message_list[tx_tid]
+                self._state[host]["available"] = False
+                key = f"{host}-{deojgc}-{deojcc}-{deojci}"
+                # Call update callback functions
+                if key in self._update_callbacks:
+                    for update_func in self._update_callbacks[key]:
+                        await update_func(isPush)
 
         self._waiting[host] -= 1
         return result
