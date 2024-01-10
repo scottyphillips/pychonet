@@ -82,6 +82,8 @@ class ECHONETAPIClient:
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
         esv_set = esv in [SETRES, SETC_SND]
         esv_get = esv in [GETRES, GET_SNA, INF, INF_SNA, INFC]
+        if not isPush:
+            self._failure_list[tid] = 0
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
@@ -133,10 +135,10 @@ class ECHONETAPIClient:
                     if esv_set:
                         if opc["PDC"] > 0 or isPush:
                             if not isPush:
-                                self._failure_list[tid] = True
+                                self._failure_list[tid] += 1
                             continue
                         if tid_data.get(epc) is None:
-                            self._failure_list[tid] = True
+                            self._failure_list[tid] += 1
                             if self._debug_flag:
                                 self._logger(
                                     f"EDT is not set in send data for EPC '{epc}' - process each EPC"
@@ -147,8 +149,8 @@ class ECHONETAPIClient:
                             opc["EDT"] = tid_data[epc]
                     elif esv_get:
                         if opc["PDC"] == 0:
-                            if tid_data is not None:
-                                self._failure_list[tid] = True
+                            if not isPush:
+                                self._failure_list[tid] += 1
                             continue
                     else:
                         # @todo more esv support
@@ -236,6 +238,7 @@ class ECHONETAPIClient:
             message_array["TID"] = tx_tid
             payload = buildEchonetMsg(message_array)
 
+        opc_count = len(opc)
         if no_res:
             result = True
         else:
@@ -258,9 +261,12 @@ class ECHONETAPIClient:
                 # if tx_tid is not in message list then the message listener has received the message
                 if self._message_list.get(tx_tid) is None:
                     # transaction sucessful remove from list
-                    if self._failure_list.get(tx_tid) is None:
+                    if (
+                        not self._failure_list.get(tx_tid)
+                        or self._failure_list.get(tx_tid) < opc_count
+                    ):
                         result = True
-                    else:
+                    if tx_tid in self._failure_list:
                         del self._failure_list[tx_tid]
                     break
             if not result and self._message_list.get(tx_tid) is not None:
