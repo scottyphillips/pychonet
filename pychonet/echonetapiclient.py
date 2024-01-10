@@ -224,8 +224,6 @@ class ECHONETAPIClient:
                 # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
                 await asyncio.sleep(0.1)
                 if not self._waiting[host]:
-                    # Wait 1 sec for Echonet specifications.
-                    await asyncio.sleep(0.9)
                     break
             if self._waiting[host]:
                 return False
