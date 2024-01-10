@@ -177,6 +177,10 @@ class ECHONETAPIClient:
                 ](0xFFFFFF.to_bytes(3, "big"))
             self._state[host]["discovered"] = True
 
+        # Markup "available"
+        if host in self._state:
+            self._state[host]["available"] = True
+
         # Call update callback functions
         if updated and key in self._update_callbacks:
             for update_func in self._update_callbacks[key]:
@@ -210,7 +214,7 @@ class ECHONETAPIClient:
             "OPC": opc,
         }
         if self._state.get(host) is None:
-            self._state[host] = {"instances": {}}
+            self._state[host] = {"instances": {}, "available": True}
 
         # Consecutive requests to the device must wait for a response
         if self._waiting.get(host) is None:
@@ -271,6 +275,7 @@ class ECHONETAPIClient:
                     break
             if not result and self._message_list.get(tx_tid) is not None:
                 del self._message_list[tx_tid]
+            self._state[host]["available"] = result
 
         self._waiting[host] -= 1
         return result
