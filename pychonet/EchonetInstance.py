@@ -187,6 +187,10 @@ class EchonetInstance:
                             ][self._eojci][epc].hex()
                         }
                     )
+        else:
+            # Timeout Error
+            raise TimeoutError("Pychonet UDP request timeout.")
+
         for epc in attributes:
             if epc not in list(returned_json_data.keys()):
                 returned_json_data.update({epc: None})
