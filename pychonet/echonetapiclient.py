@@ -34,6 +34,7 @@ class ECHONETAPIClient:
         self._next_tx_tid = 0x0000
         self._message_list = {}
         self._failure_list = {}
+        self._opc_counts = {}
         self._message_timeout = MESSAGE_TIMEOUT
         self._debug_flag = False
         self._update_callbacks = {}
@@ -139,6 +140,7 @@ class ECHONETAPIClient:
                             continue
                         if tid_data.get(epc) is None:
                             self._failure_list[tid] += 1
+                            self._opc_counts[tid] = len(processed_data["OPC"])
                             if self._debug_flag:
                                 self._logger(
                                     f"EDT is not set in send data for EPC '{epc}' - process each EPC"
@@ -264,6 +266,17 @@ class ECHONETAPIClient:
                 await asyncio.sleep(0.1)
                 # if tx_tid is not in message list then the message listener has received the message
                 if self._message_list.get(tx_tid) is None:
+                    # Check OPC count in results
+                    if tx_tid in self._opc_counts:
+                        res_opc_count = self._opc_counts[tx_tid]
+                        del self._opc_counts[tx_tid]
+                        if self._debug_flag:
+                            self._logger(
+                                f"OPC count in results is {res_opc_count}/{opc_count} from IP {host}."
+                            )
+                        if res_opc_count < opc_count:
+                            raise EchonetMaxOpcError(res_opc_count)
+
                     # transaction sucessful remove from list
                     if (
                         not self._failure_list.get(tx_tid)
@@ -361,3 +374,7 @@ class ECHONETAPIClient:
         if key not in self._update_callbacks:
             self._update_callbacks[key] = []
         self._update_callbacks[key].append(fn)
+
+
+class EchonetMaxOpcError(Exception):
+    pass
