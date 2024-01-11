@@ -85,6 +85,7 @@ class ECHONETAPIClient:
         esv_get = esv in [GETRES, GET_SNA, INF, INF_SNA, INFC]
         if not isPush:
             self._failure_list[tid] = 0
+            self._opc_counts[tid] = len(processed_data["OPC"])
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
@@ -140,7 +141,6 @@ class ECHONETAPIClient:
                             continue
                         if tid_data.get(epc) is None:
                             self._failure_list[tid] += 1
-                            self._opc_counts[tid] = len(processed_data["OPC"])
                             if self._debug_flag:
                                 self._logger(
                                     f"EDT is not set in send data for EPC '{epc}' - process each EPC"
