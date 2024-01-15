@@ -1,7 +1,17 @@
-from pychonet.lib.const import (ENL_CUMULATIVE_POWER, ENL_CUMULATIVE_RUNTIME,
-                                ENL_GETMAP, ENL_INSTANTANEOUS_POWER,
-                                ENL_MANUFACTURER, ENL_OFF, ENL_ON, ENL_SETMAP,
-                                ENL_STATUS, ENL_UID, GET, SETC)
+from pychonet.lib.const import (
+    ENL_CUMULATIVE_POWER,
+    ENL_CUMULATIVE_RUNTIME,
+    ENL_GETMAP,
+    ENL_INSTANTANEOUS_POWER,
+    ENL_MANUFACTURER,
+    ENL_OFF,
+    ENL_ON,
+    ENL_SETMAP,
+    ENL_STATUS,
+    ENL_UID,
+    GET,
+    SETC,
+)
 from pychonet.lib.epc import EPC_CODE, EPC_SUPER
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 
@@ -11,7 +21,6 @@ Superclass for Echonet instance objects.
 
 
 class EchonetInstance:
-
     EPC_FUNCTIONS = {}
     """
     Constructs an object to represent an Echonet lite instance .
@@ -178,6 +187,10 @@ class EchonetInstance:
                             ][self._eojci][epc].hex()
                         }
                     )
+        else:
+            # Timeout Error
+            raise TimeoutError("Pychonet UDP request timeout.")
+
         for epc in attributes:
             if epc not in list(returned_json_data.keys()):
                 returned_json_data.update({epc: None})
@@ -276,4 +289,6 @@ class EchonetInstance:
         )
 
     def register_async_update_callbacks(self, fn):
-        self._api.register_async_update_callbacks(self._host, self._eojgc, self._eojcc, self._eojci, fn)
+        self._api.register_async_update_callbacks(
+            self._host, self._eojgc, self._eojcc, self._eojci, fn
+        )
