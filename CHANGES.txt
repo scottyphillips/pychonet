@@ -46,3 +46,7 @@ v2.3.14, 05 Jun 2023 -- Added support for AC with heater + humidity at the same 
                      -- Added support for Fuel Cell (0x02, 0x7C)
                      -- Query and store "product code" on host/device registration
                      -- Added better control over which IP to listen to for multicast
+v2.4.2, 16 Dec 2023 -- Support Multiple Input PCS
+                    -- Support Electric Water Heater
+v2.5.0, 15 Jan 2024 -- Detect timeout and state available
+                    -- Raise error (EchonetMaxOpcError) of the error maximum number of OPC
