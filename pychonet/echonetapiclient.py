@@ -219,6 +219,8 @@ class ECHONETAPIClient:
         }
         if self._state.get(host) is None:
             self._state[host] = {"instances": {}, "available": True}
+        # Is node profile
+        is_node_profile = deojgc == 0x0E and deojcc == 0xF0
 
         # Consecutive requests to the device must wait for a response
         if self._waiting.get(host) is None:
@@ -267,7 +269,7 @@ class ECHONETAPIClient:
                 # if tx_tid is not in message list then the message listener has received the message
                 if self._message_list.get(tx_tid) is None:
                     # Check OPC count in results
-                    if tx_tid in self._opc_counts:
+                    if not is_node_profile and tx_tid in self._opc_counts:
                         res_opc_count = self._opc_counts[tx_tid]
                         del self._opc_counts[tx_tid]
                         if self._debug_flag:
