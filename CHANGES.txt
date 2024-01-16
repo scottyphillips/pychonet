@@ -50,3 +50,4 @@ v2.4.2, 16 Dec 2023 -- Support Multiple Input PCS
                     -- Support Electric Water Heater
 v2.5.0, 15 Jan 2024 -- Detect timeout and state available
                     -- Raise error (EchonetMaxOpcError) of the error maximum number of OPC
+v2.5.1, 16 Jan 2024 -- Do not check of OPC count at querying node profile
