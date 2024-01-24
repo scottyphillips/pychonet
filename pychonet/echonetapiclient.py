@@ -19,6 +19,7 @@ from pychonet.lib.const import (
     GET_SNA,
     INF_SNA,
     SETI,
+    SETC,
     ENL_MULTICAST_ADDRESS,
 )
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
@@ -210,6 +211,30 @@ class ECHONETAPIClient:
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
         no_res = True if esv is SETI else False
         payload = None
+        # Is node profile
+        is_node_profile = deojgc == 0x0E and deojcc == 0xF0
+        # Check OPC Code
+        try:
+            if not is_node_profile:
+                if esv == GET:
+                    check_map = self._state[host]["instances"][deojgc][deojcc][
+                        deojci
+                    ].get(ENL_GETMAP, [])
+                elif esv == SETC:
+                    check_map = self._state[host]["instances"][deojgc][deojcc][
+                        deojci
+                    ].get(ENL_SETMAP, [])
+                else:
+                    check_map = []
+                if len(check_map):
+                    checked_opc = []
+                    for values in opc:
+                        if values.get("EPC") in check_map:
+                            checked_opc.append(values)
+                    opc = checked_opc
+        except KeyError:
+            pass
+
         message_array = {
             "DEOJGC": deojgc,
             "DEOJCC": deojcc,
@@ -219,8 +244,6 @@ class ECHONETAPIClient:
         }
         if self._state.get(host) is None:
             self._state[host] = {"instances": {}, "available": True}
-        # Is node profile
-        is_node_profile = deojgc == 0x0E and deojcc == 0xF0
 
         # Consecutive requests to the device must wait for a response
         if self._waiting.get(host) is None:
