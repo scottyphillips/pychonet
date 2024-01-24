@@ -312,7 +312,6 @@ class ECHONETAPIClient:
                 {"EPC": ENL_STATMAP},
                 {"EPC": ENL_GETMAP},
                 {"EPC": ENL_SETMAP},
-                {"EPC": ENL_PRODUCT_CODE},
             ],
         )
 
