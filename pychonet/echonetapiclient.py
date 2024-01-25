@@ -271,9 +271,9 @@ class ECHONETAPIClient:
 
         opc_count = len(opc)
         if no_res:
-            result = True
+            is_success = True
         else:
-            result = False
+            is_success = False
             tid_data = {}
             for opc_data in opc:
                 if opc_data.get("EDT") is not None:
@@ -307,22 +307,24 @@ class ECHONETAPIClient:
                         not self._failure_list.get(tx_tid)
                         or self._failure_list.get(tx_tid) < opc_count
                     ):
-                        result = True
+                        is_success = True
                     if tx_tid in self._failure_list:
                         del self._failure_list[tx_tid]
                     break
-            if not result:
+            if not is_success:
                 if self._message_list.get(tx_tid) is not None:
                     del self._message_list[tx_tid]
-                self._state[host]["available"] = False
-                key = f"{host}-{deojgc}-{deojcc}-{deojci}"
+            if self._state[host]["available"] != is_success:
+                self._state[host]["available"] = is_success
                 # Call update callback functions
-                if key in self._update_callbacks:
-                    for update_func in self._update_callbacks[key]:
-                        await update_func(False)
+                # key is f"{host}-{deojgc}-{deojcc}-{deojci}"
+                for key in self._update_callbacks:
+                    if key.startswith(host):
+                        for update_func in self._update_callbacks[key]:
+                            await update_func(False)
 
         self._waiting[host] -= 1
-        return result
+        return is_success
 
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
         return await self.echonetMessage(
