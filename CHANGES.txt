@@ -51,3 +51,7 @@ v2.4.2, 16 Dec 2023 -- Support Multiple Input PCS
 v2.5.0, 15 Jan 2024 -- Detect timeout and state available
                     -- Raise error (EchonetMaxOpcError) of the error maximum number of OPC
 v2.5.1, 16 Jan 2024 -- Do not check of OPC count at querying node profile
+v2.5.2, 25 Jan 2024 -- Remove `ENL_PRODUCT_CODE` from request getAllPropertyMap()
+                    -- Filter only valid properties during GET/SET requests
+                    -- Add ENL_DPM_CHANNEL_SIMPLEX_CUMULATIVE_ENG, ENL_DPM_CHANNEL_SIMPLEX_INSTANT_ENG
+                    -- Improved notification for state "available"
