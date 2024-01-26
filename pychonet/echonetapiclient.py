@@ -286,6 +286,7 @@ class ECHONETAPIClient:
         self._server.send(payload, (host, ENL_PORT))
 
         if not no_res:
+            not_timeout = False
             for x in range(0, self._message_timeout):
                 # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
                 await asyncio.sleep(0.1)
@@ -303,19 +304,17 @@ class ECHONETAPIClient:
                             raise EchonetMaxOpcError(res_opc_count)
 
                     # transaction sucessful remove from list
-                    if (
-                        not self._failure_list.get(tx_tid)
-                        or self._failure_list.get(tx_tid) < opc_count
-                    ):
+                    if self._failure_list.get(tx_tid, opc_count) < opc_count:
                         is_success = True
                     if tx_tid in self._failure_list:
                         del self._failure_list[tx_tid]
+                    not_timeout = True
                     break
             if not is_success:
                 if self._message_list.get(tx_tid) is not None:
                     del self._message_list[tx_tid]
-            if self._state[host]["available"] != is_success:
-                self._state[host]["available"] = is_success
+            if self._state[host]["available"] != not_timeout:
+                self._state[host]["available"] = not_timeout
                 # Call update callback functions
                 # key is f"{host}-{deojgc}-{deojcc}-{deojci}"
                 for key in self._update_callbacks:
