@@ -18,12 +18,14 @@ from .DistributionPanelMeter import DistributionPanelMeter
 from .LowVoltageSmartElectricEnergyMeter import LowVoltageSmartElectricEnergyMeter
 from .HybridWaterHeater import HybridWaterHeater
 from .HotWaterGenerator import HotWaterGenerator
+from .FloorHeater import FloorHeater
 from .FuelCell import FuelCell
 from .GasMeter import GasMeter
 from .ElectricEnergyMeter import ElectricEnergyMeter
 from .WaterFlowMeter import WaterFlowMeter
 from .CeilingFan import CeilingFan
 from .ElectricWaterHeater import ElectricWaterHeater
+
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -42,6 +44,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x6F}": ElectricLock,
         f"{0x02}-{0x72}": HotWaterGenerator,
         f"{0x02}-{0x79}": HomeSolarPower,
+        f"{0x02}-{0x7B}": FloorHeater,
         f"{0x02}-{0x7C}": FuelCell,
         f"{0x02}-{0x7D}": StorageBattery,
         f"{0x02}-{0x7E}": ElectricVehicleCharger,

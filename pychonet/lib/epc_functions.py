@@ -26,10 +26,20 @@ def _yyyy_mm_dd(edt):  # basic year unit
 
 
 def _to_string(edt):
-    return edt.decode('utf-8')
+    return edt.decode("utf-8")
+
 
 def _null_padded_optional_string(edt):
-    return edt.decode('utf-8').rstrip('\0') if edt is not None and len(edt) > 0 else None
+    return (
+        edt.decode("utf-8").rstrip("\0") if edt is not None and len(edt) > 0 else None
+    )
+
+
+def _on_off(edt):
+    op_mode = int.from_bytes(edt, "big")
+    values = {0x41: "On", 0x42: "Off"}
+    return values.get(op_mode, "Invalid setting")
+
 
 # Check status of Echonnet Instance
 # ----------------- EPC SUPER FUNCTIONS -----------------------------
@@ -74,6 +84,7 @@ def _008A(edt):  # manufacturer
     if id in MANUFACTURERS.keys():
         return MANUFACTURERS[id]
     return id
+
 
 def _009A(edt):  # cumulative runtime
     if len(edt) > 1:
@@ -134,10 +145,8 @@ def _0288E7(edt):
 
 
 def _0288E8(edt):
-    r_phase = float(int.from_bytes(edt[0:2], "big",
-                                   signed=True)) / 10  # R Phase
-    t_phase = float(int.from_bytes(edt[2:4], "big",
-                                   signed=True)) / 10  # T Phase
+    r_phase = float(int.from_bytes(edt[0:2], "big", signed=True)) / 10  # R Phase
+    t_phase = float(int.from_bytes(edt[2:4], "big", signed=True)) / 10  # T Phase
     return {"r_phase_amps": r_phase, "t_phase_amps": t_phase}
 
 

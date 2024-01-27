@@ -331,12 +331,12 @@ EPC_CODE = {
             0xC4: "Special operation mode setting",
             0xC5: "Water amount level",
         },
-        0x3A: { # Ceiling fan class
+        0x3A: {  # Ceiling fan class
             0x80: "Operation status",
             0xF0: "Fan speed",
             0xF1: "Fan direction",
             0xF2: "Fan fluctuation",
-            0xFC: "Fan Buzzer"
+            0xFC: "Fan Buzzer",
         },
         0x42: {  # Electric heater class
             0x80: "Operation status",
@@ -725,6 +725,7 @@ EPC_CODE = {
             0x80: "Operation status",
             0xE0: "Temperature setting 1",
             0xE1: "Temperature setting 2",
+            0xD1: "The maximum settable level is the top step of temperature setting 2",
             0xE2: "Measured room temperature",
             0xE3: "Measured floor temperature",
             0xE4: "Zone change setting",
@@ -1114,7 +1115,7 @@ EPC_CODE = {
             0xE7: "Measured instantaneous amount of electricity",
             0xE8: "Connected devices",
         },
-        0xA6: { # Hybrid Water Heater
+        0xA6: {  # Hybrid Water Heater
             0xB0: "Automatic water heating setting",
             0xB2: "Water heating status",
             0xB3: "Heater status",
@@ -1124,8 +1125,8 @@ EPC_CODE = {
             0xB9: "Solar power generations utilization time",
             0xC3: "Hot water supply status",
             0xE1: "Measured amount of hot water remaining in tank",
-            0xE2: "Tank Capacity"
-        }
+            0xE2: "Tank Capacity",
+        },
     },
     0x03: {  # Cooking/housework-related device class group
         0xB2: {  # Electric hot water pot (Electric thermos) class
@@ -1312,7 +1313,7 @@ EPC_CODE = {
             0x80: "Operation status",
             0xE0: "Connected device",
         },
-        0xFF: { # Controller class
+        0xFF: {  # Controller class
             0x80: "Operation status",
             0xC0: "Controller ID",
             0xC1: "Number of devices connected",
@@ -1330,8 +1331,8 @@ EPC_CODE = {
             0xCD: "Fault Status of the device to be controlled",
             0xE0: "Address of installation location",
             0xCE: "Set property map for the device to be controlled",
-            0xCF: "Get property map for the device to be controlled"
-        } 
+            0xCF: "Get property map for the device to be controlled",
+        },
     },
     0x06: {  # AV-related device class group
         0x01: {  # Display class
