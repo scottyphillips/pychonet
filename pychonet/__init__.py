@@ -4,6 +4,12 @@ from pychonet.lib.eojx import EOJX_CLASS
 from .version import __version__
 from .EchonetInstance import EchonetInstance
 from .ElectricBlind import ElectricBlind
+from .ElectricShutter import ElectricShutter
+from .ElectricCurtain import ElectricCurtain
+from .ElectricRainSlidingDoor import ElectricRainSlidingDoor
+from .ElectricGate import ElectricGate
+from .ElectricWindow import ElectricWindow
+from .AutomaticEntranceDoor import AutomaticEntranceDoor
 from .ElectricLock import ElectricLock
 from .ElectricVehicleCharger import ElectricVehicleCharger
 from .GeneralLighting import GeneralLighting
@@ -40,6 +46,12 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x01}-{0x35}": HomeAirCleaner,
         f"{0x01}-{0x3A}": CeilingFan,
         f"{0x02}-{0x60}": ElectricBlind,
+        f"{0x02}-{0x61}": ElectricShutter,
+        f"{0x02}-{0x62}": ElectricCurtain,
+        f"{0x02}-{0x63}": ElectricRainSlidingDoor,
+        f"{0x02}-{0x64}": ElectricGate,
+        f"{0x02}-{0x65}": ElectricWindow,
+        f"{0x02}-{0x66}": AutomaticEntranceDoor,
         f"{0x02}-{0x6B}": ElectricWaterHeater,
         f"{0x02}-{0x6F}": ElectricLock,
         f"{0x02}-{0x72}": HotWaterGenerator,

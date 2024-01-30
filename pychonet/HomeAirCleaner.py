@@ -1,80 +1,65 @@
+from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
+from pychonet.lib.epc_functions import (
+    DICT_41_AUTO_8_SPEEDS,
+    DICT_41_ON_OFF,
+    DICT_41_YES_NO,
+    _int,
+    _swap_dict,
+)
 
-FAN_SPEED = {
-    "auto": 0x41,
-    "minimum": 0x31,
-    "low": 0x32,
-    "medium-low": 0x33,
-    "medium": 0x34,
-    "medium-high": 0x35,
-    "high": 0x36,
-    "very-high": 0x37,
-    "max": 0x38,
-}
+FAN_SPEED = _swap_dict(DICT_41_AUTO_8_SPEEDS)
 
-PHOTOCATALYST_STATUS = {"yes": 0x41, "no": 0x42}
+PHOTOCATALYST_STATUS = _swap_dict(DICT_41_YES_NO)
 
 
 # ----- Air Cleaner Class -------
 # filter change status notify
+@deprecated(reason="Scheduled for removal.")
 def _0135E1(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {
-        0x41: "yes",
-        0x42: "no",
-    }
-    return values.get(op_mode, "invalid_setting")
+    return _int(edt, DICT_41_YES_NO)
 
 
 # air volume 0x41 for auto
+@deprecated(reason="Scheduled for removal.")
 def _0135A0(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {
-        0x41: "auto",
-        0x31: "minimum",
-        0x32: "low",
-        0x33: "medium-low",
-        0x34: "medium",
-        0x35: "medium-high",
-        0x36: "high",
-        0x37: "very-high",
-        0x38: "max",
-    }
-    return values.get(op_mode, "invalid_setting")
+    return _int(edt, DICT_41_AUTO_8_SPEEDS)
 
 
 # cigarette sensor status
+@deprecated(reason="Scheduled for removal.")
 def _0135C1(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {0x41: "yes", 0x42: "no"}
-    return values.get(op_mode, "invalid_setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # Photocatalyst setting
+@deprecated(reason="Scheduled for removal.")
 def _0135C2(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {0x41: "on", 0x42: "off"}
-    return values.get(op_mode, "invalid_setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # air pollution status
+@deprecated(reason="Scheduled for removal.")
 def _0135C0(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {0x41: "pollution", 0x42: "fresh"}
-    return values.get(op_mode, "invalid_setting")
+    return _int(edt, {0x41: "pollution", 0x42: "fresh"})
 
 
 """Class for Air Cleaner Objects"""
 
 
 class HomeAirCleaner(EchonetInstance):
-
     EPC_FUNCTIONS = {
-        0xE1: _0135E1,
-        0xA0: _0135A0,
-        0xC0: _0135C0,
-        0xC1: _0135C1,
-        0xC2: _0135C1,
+        0xE1: [_int, DICT_41_YES_NO],
+        0xA0: [_int, DICT_41_AUTO_8_SPEEDS],
+        0xC0: [
+            _int,
+            {
+                0x41: "pollution",
+                0x42: "fresh",
+            },
+        ],
+        0xC1: [_int, DICT_41_YES_NO],
+        0xC2: [_int, DICT_41_ON_OFF],
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):

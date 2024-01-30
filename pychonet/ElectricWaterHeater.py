@@ -1,60 +1,67 @@
+from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import _int, _signed_int
+from pychonet.lib.epc_functions import (
+    DATA_STATE_OFF,
+    DATA_STATE_ON,
+    DICT_41_ON_OFF,
+    _int,
+    _hh_mm,
+)
 
 
 # 0xB0 - Automatic water heating setting
+@deprecated(reason="Scheduled for removal.")
 def _026BB0(edt):
-    op_mode = int.from_bytes(edt, "big")
-    AUTOMATIC_WATER_HEATING_STATES = {
-        0x41: "Automatic",
-        0x42: "Manual",
-        0x43: "Stop",
-    }
-    return AUTOMATIC_WATER_HEATING_STATES.get(op_mode, "Invalid setting")
+    return _int(
+        edt,
+        {
+            0x41: "Automatic",
+            0x42: "Manual",
+            0x43: "Stop",
+        },
+    )
 
 
 # 0xB1 - Automatic water temperature control setting
+@deprecated(reason="Scheduled for removal.")
 def _026BB1(edt):
-    op_mode = int.from_bytes(edt, "big")
-    AUTOMATIC_WATER_TEMP_CONTROL = {
-        0x41: "On",
-        0x42: "Off",
-    }
-    return AUTOMATIC_WATER_TEMP_CONTROL.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # 0xB2 - Water heating status
+@deprecated(reason="Scheduled for removal.")
 def _026BB2(edt):
-    op_mode = int.from_bytes(edt, "big")
-    WATER_HEATING_STATUS = {
-        0x41: "Heating",
-        0x42: "Not Heating",
-    }
-    return WATER_HEATING_STATUS.get(op_mode, "Invalid setting")
+    return _int(
+        edt,
+        {
+            0x41: "Heating",
+            0x42: "Not Heating",
+        },
+    )
 
 
 # 0xB5 Relative time setting value for manual water heating OFF
+@deprecated(reason="Scheduled for removal.")
 def _026BB5(edt):
-    hh = int.from_bytes(edt[0:1], "big")
-    mm = str(int.from_bytes(edt[1:2], "big")).zfill(2)
-    return f"{hh}:{mm}"
+    return _hh_mm(edt)
 
 
 # 0xB6 - Tank Operation mode setting
+@deprecated(reason="Scheduled for removal.")
 def _026BB6(edt):
-    op_mode = int.from_bytes(edt, "big")
-    WATER_HEATING_STATUS = {0x41: "Standard", 0x42: "Saving", 0x43: "Extra"}
-    return WATER_HEATING_STATUS.get(op_mode, "Invalid setting")
+    return _int(edt, {0x41: "Standard", 0x42: "Saving", 0x43: "Extra"})
 
 
 # 0xC0 - Daytime reheating permission setting
+@deprecated(reason="Scheduled for removal.")
 def _026BC0(edt):
-    op_mode = int.from_bytes(edt, "big")
-    AUX_SETTING_STATE = {
-        0x41: "Permitted",
-        0x42: "Not permitted",
-    }
-    return AUX_SETTING_STATE.get(op_mode, "Invalid setting")
+    return _int(
+        edt,
+        {
+            0x41: "Permitted",
+            0x42: "Not permitted",
+        },
+    )
 
 
 # 0xC2 - Alarm Status
@@ -84,20 +91,21 @@ def _026BB9(edt):
 
 
 # 0xC3 - Hot water supply status
+@deprecated(reason="Scheduled for removal.")
 def _026BC3(edt):
-    op_mode = int.from_bytes(edt, "big")
-    HOT_WATER_SUPPLY_STATUS = {
-        0x41: "Supplying hot water",
-        0x42: "Not supplying hot water",
-    }
-    return HOT_WATER_SUPPLY_STATUS.get(op_mode, "Invalid setting")
+    return _int(
+        edt,
+        {
+            0x41: "Supplying hot water",
+            0x42: "Not supplying hot water",
+        },
+    )
 
 
 # 0xC4 Relative time setting for keeping bath temperature
+@deprecated(reason="Scheduled for removal.")
 def _026BC4(edt):
-    hh = int.from_bytes(edt[0:1], "big")
-    mm = str(int.from_bytes(edt[1:2], "big")).zfill(2)
-    return f"{hh}:{mm}"
+    return _hh_mm(edt)
 
 
 # 0xE1 - Measured amount of hot water remaining in tank
@@ -106,83 +114,67 @@ def _026BC4(edt):
 
 
 # 0xE3 - Automatic bath water heater mode setting
+@deprecated(reason="Scheduled for removal.")
 def _026BE3(edt):
-    op_mode = int.from_bytes(edt, "big")
-    AUTOMATIC_SETTING = {
-        0x41: "On",
-        0x42: "Off",
-    }
-    return AUTOMATIC_SETTING.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # 0xE9 - Bathroom Priority setting
+@deprecated(reason="Scheduled for removal.")
 def _026BE9(edt):
-    op_mode = int.from_bytes(edt, "big")
-    PRIORITY_SETTING = {
-        0x41: "On",
-        0x42: "Off",
-    }
-    return PRIORITY_SETTING.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # 0xEA - Bath operation status monitor
+@deprecated(reason="Scheduled for removal.")
 def _026BEA(edt):
-    op_mode = int.from_bytes(edt, "big")
-    OPERATION_STATUS_MONITOR = {
-        0x41: "Filling hot water",
-        0x42: "Stopped",
-        0x43: "Keeping Temperature",
-    }
-    return OPERATION_STATUS_MONITOR.get(op_mode, "Invalid setting")
+    return _int(
+        edt,
+        {
+            0x41: "Filling hot water",
+            0x42: "Stopped",
+            0x43: "Keeping Temperature",
+        },
+    )
 
 
 # 0xE4 - Manual bath reheating function setting
+@deprecated(reason="Scheduled for removal.")
 def _026BE4(edt):
-    op_mode = int.from_bytes(edt, "big")
-    REHEAT_FUNCTON = {
-        0x41: "On",
-        0x42: "Off",
-    }
-    return REHEAT_FUNCTON.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # 0xE5 - Manual bath hot water addition function setting
+@deprecated(reason="Scheduled for removal.")
 def _026BE5(edt):
-    op_mode = int.from_bytes(edt, "big")
-    ADDITION_FUNCTION = {
-        0x41: "On",
-        0x42: "Off",
-    }
-    return ADDITION_FUNCTION.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # 0xE6 - Manual lukewarm water temperature lowering function setting
+@deprecated(reason="Scheduled for removal.")
 def _026BE6(edt):
-    op_mode = int.from_bytes(edt, "big")
-    LUKEWARM = {
-        0x41: "On",
-        0x42: "Off",
-    }
-    return LUKEWARM.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # 0xE7 - Bath Volume water setting one
 
 
 # 0xE8 - Bath Volume water setting two
+@deprecated(reason="Scheduled for removal.")
 def _026BE8(edt):
-    op_mode = int.from_bytes(edt, "big")
-    VOLUME = {
-        0x31: "Level 1",
-        0x32: "Level 2",
-        0x33: "Level 3",
-        0x34: "Level 4",
-        0x35: "Level 5",
-        0x36: "Level 6",
-        0x37: "Level 7",
-        0x38: "Level 8",
-    }
-    return VOLUME.get(op_mode, "Invalid setting")
+    return _int(
+        edt,
+        {
+            0x31: "Level 1",
+            0x32: "Level 2",
+            0x33: "Level 3",
+            0x34: "Level 4",
+            0x35: "Level 5",
+            0x36: "Level 6",
+            0x37: "Level 7",
+            0x38: "Level 8",
+        },
+    )
 
 
 # 0xEE - Bath Volume water setting three
@@ -193,33 +185,28 @@ def _026BE8(edt):
 
 
 # 0x90 - ON timer reservation setting
+@deprecated(reason="Scheduled for removal.")
 def _026B90(edt):
-    op_mode = int.from_bytes(edt, "big")
-    RESERVATION_SETTING = {
-        0x41: "On",
-        0x42: "Off",
-    }
-    return RESERVATION_SETTING.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_ON_OFF)
 
 
 # 0x91 - ON timer setting
+@deprecated(reason="Scheduled for removal.")
 def _026B91(edt):
-    hh = int.from_bytes(edt[0:1], "big")
-    mm = str(int.from_bytes(edt[1:2], "big")).zfill(2)
-    return {"time": f"{hh}:{mm}"}
+    return _hh_mm(edt)
+
 
 # 0xD6 - Sound Volume Setting
 
+
 # 0xD7 - Mute Setting
+@deprecated(reason="Scheduled for removal.")
 def _026BD7(edt):
-    op_mode = int.from_bytes(edt, "big")
-    MUTE_SETTING = {
-        0x41: "On",
-        0x42: "Off",
-    }
-    return MUTE_SETTING.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_ON_OFF)
+
 
 # 0xD8 - Remaining Hot Water volume
+
 
 # 0xD9 - Surplus electric energy prediction value
 def _026BD9(edt):
@@ -245,6 +232,7 @@ def _026BD9(edt):
         "predicted_values": predicted_values,
     }
 
+
 # 0xDB - Rated power consumptions of H/P unit in winter time
 # 0xDC - Rated power consumptions of H/P unit in between seasons
 # 0xDD - Rated power consumptions of H/P unit in summer time
@@ -252,71 +240,124 @@ def _026BD9(edt):
 
 # 0xCB - Expected electric energy at daytime heating shift time 1
 def _026BCB(edt):
-    return("not implemented")
+    return "not implemented"
+
 
 # 0xCC - Consumption of electric energy per hour 1
 def _026BCC(edt):
-    return("not implemented")
+    return "not implemented"
+
 
 # 0xCE - Expected electric energy at daytime heating shift time 2
 def _026BCE(edt):
-    return("not implemented")
+    return "not implemented"
+
 
 # 0xCF - Consumption of electric energy per hour 2
 def _026BCF(edt):
-    return("not implemented")
+    return "not implemented"
 
 
 class ElectricWaterHeater(EchonetInstance):
     EPC_FUNCTIONS = {
-        0xB0: _026BB0,
-        0xB1: _026BB1,
-        0xB2: _026BB2,
+        0xB0: [
+            _int,
+            {
+                0x41: "Automatic",
+                0x42: "Manual",
+                0x43: "Stop",
+            },
+        ],
+        0xB1: [_int, DICT_41_ON_OFF],
+        0xB2: [
+            _int,
+            {
+                0x41: "Heating",
+                0x42: "Not Heating",
+            },
+        ],
         0xB3: _int,
         0xB4: _int,
-        0xB5: _026BB5,
-        0xB6: _026BB6,
-        0xC0: _026BC0,
+        0xB5: _hh_mm,
+        0xB6: [
+            _int,
+            {
+                0x41: "Standard",
+                0x42: "Saving",
+                0x43: "Extra",
+            },
+        ],
+        0xC0: [
+            _int,
+            {
+                0x41: "Permitted",
+                0x42: "Not permitted",
+            },
+        ],
         0xC1: _int,
         0xC2: _026BC2,
-        0xC3: _026BC3,
-        0xC4: _026BC4,
+        0xC3: [
+            _int,
+            {
+                0x41: "Supplying hot water",
+                0x42: "Not supplying hot water",
+            },
+        ],
+        0xC4: _hh_mm,
         0xD1: _int,
         0xD3: _int,
         0xE0: _int,
         0xE1: _int,
         0xE2: _int,
-        0xE3: _026BE3,
-        0xE9: _026BE9,
-        0xEA: _026BEA,
-        0xE4: _026BE4,
-        0xE5: _026BE5,
-        0xE6: _026BE6,
+        0xE3: [_int, DICT_41_ON_OFF],
+        0xE9: [_int, DICT_41_ON_OFF],
+        0xEA: [
+            _int,
+            {
+                0x41: "Filling hot water",
+                0x42: "Stopped",
+                0x43: "Keeping Temperature",
+            },
+        ],
+        0xE4: [_int, DICT_41_ON_OFF],
+        0xE5: [_int, DICT_41_ON_OFF],
+        0xE6: [_int, DICT_41_ON_OFF],
         0xE7: _int,
-        0xE8: _026BE8,
+        0xE8: [
+            _int,
+            {
+                0x31: "Level 1",
+                0x32: "Level 2",
+                0x33: "Level 3",
+                0x34: "Level 4",
+                0x35: "Level 5",
+                0x36: "Level 6",
+                0x37: "Level 7",
+                0x38: "Level 8",
+            },
+        ],
         0xE9: _int,
         0xEE: _int,
         0xD4: _int,
         0xD5: _int,
-        0x90: _026B90,
-        0x91: _026B91,
+        0x90: [_int, DICT_41_ON_OFF],
+        0x91: _hh_mm,
         0xD6: _int,
-        0xD7: _026BD7,
+        0xD7: [_int, DICT_41_ON_OFF],
         0xD8: _int,
         0xD9: _026BD9,
         0xDB: _int,
         0xDC: _int,
         0xDD: _int,
         0xC7: _int,
-        0xC8: _int, # could change
+        0xC8: _int,  # could change
         0xC9: _int,
         0xCA: _int,
-        0xCB: _026BCB, #todo
-        0xCC: _026BCC, #todo
+        0xCB: _026BCB,  # todo
+        0xCC: _026BCC,  # todo
         0xCD: _int,
-        0xCE: _026BCB, #todo
-        0xCF: _026BCF #todo
-        
+        0xCE: _026BCB,  # todo
+        0xCF: _026BCF,  # todo
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):

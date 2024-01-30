@@ -1,131 +1,86 @@
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import _hh_mm
+from pychonet.lib.epc_functions import (
+    DICT_30_ON_OFF,
+    DICT_30_OPEN_CLOSED,
+    DICT_41_ON_OFF,
+    _hh_mm,
+    _int,
+)
 
-@staticmethod
-def _03BB80(payload):
-    return 'On' if payload == 0x30 else 'Off'
-
-@staticmethod
-def _03BBB0(payload):
-    return 'Open' if payload == 0x30 else 'Closed'
-
-@staticmethod
-def _03BBB1(payload):
-    if payload == 0x41:
-        return 'Rice cooking completed'
-    elif payload == 0x42:
-        return 'Rice cooking in progress'
-    elif payload == 0x43:
-        return 'Rice cooking paused'
-    elif payload == 0x44:
-        return 'Rice cooking aborted'
-    else:
-        return 'Unknown'
-
-@staticmethod
-def _03BBB2(payload):
-    return payload
-
-@staticmethod
-def _03BBE1(payload):
-    if payload == 0x41:
-        return 'Warmer on'
-    elif payload == 0x42:
-        return 'Warmer off'
-    else:
-        return 'Unknown warmer setting'
-
-@staticmethod
-def _03BBE5(payload):
-    if payload == 0x41:
-        return 'Inner pot installed'
-    elif payload == 0x42:
-        return 'Inner pot removed'
-    else:
-        return 'Unknown inner pot removal status'
-
-@staticmethod
-def _03BBE6(payload):
-    if payload == 0x41:
-        return 'Cover installed'
-    elif payload == 0x42:
-        return 'Cover removed'
-    else:
-        return 'Unknown cover removal status'
-
-@staticmethod
-def _03BB90(payload):
-    return payload
 
 class RiceCooker(EchonetInstance):
-    class_codes = {
-        'class_group_code': 0x03,
-        'class_code': 0xBB
-    }
+    class_codes = {"class_group_code": 0x03, "class_code": 0xBB}
 
     EPC_FUNCTIONS = {
-        0x80: _03BB80,
-        0xB0: _03BBB0,
-        0xB1: _03BBB1,
-        0xB2: _03BBB2,
-        0xE1: _03BBE1,
-        0xE5: _03BBE5,
-        0xE6: _03BBE6,
-        0x90: _03BB90,
+        0x80: [_int, DICT_30_ON_OFF],
+        0xB0: [_int, DICT_30_OPEN_CLOSED],
+        0xB1: [
+            _int,
+            {
+                0x41: "Rice cooking completed",
+                0x42: "Rice cooking in progress",
+                0x43: "Rice cooking paused",
+                0x44: "Rice cooking aborted",
+            },
+        ],
+        0xB2: [_int, {0x41: "Start/Restart", 0x42: "Pause"}],
+        0xE1: [_int, DICT_41_ON_OFF],
+        0xE5: [_int, {0x41: "Installed", 0x42: "Removed"}],
+        0xE6: [_int, {0x41: "Installed", 0x42: "Removed"}],
+        0x90: [_int, DICT_41_ON_OFF],
         0x91: _hh_mm,
         0x92: _hh_mm,
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):
-        self._eojgc = self.class_codes['class_group_code']
-        self._eojcc = self.class_codes['class_code']
+        self._eojgc = self.class_codes["class_group_code"]
+        self._eojcc = self.class_codes["class_code"]
         super().__init__(host, self._eojgc, self._eojcc, instance, api_connector)
 
-    def getOperationStatus(self):
-        return self.getMessage(0x80)
+    async def getOperationStatus(self):
+        return await self.getMessage(0x80)
 
-    def setOperationStatus(self, status):
-        self.setMessage(0x80, status)
+    async def setOperationStatus(self, status):
+        return await self.setMessage(0x80, status)
 
-    def getCoverStatus(self):
-        return self.getMessage(0xB0)
+    async def getCoverStatus(self):
+        return await self.getMessage(0xB0)
 
-    def getRiceCookingStatus(self):
-        return self.getMessage(0xB1)
+    async def getRiceCookingStatus(self):
+        return await self.getMessage(0xB1)
 
-    def getRiceCookingControlSetting(self):
-        return self.getMessage(0xB2)
+    async def getRiceCookingControlSetting(self):
+        return await self.getMessage(0xB2)
 
-    def setRiceCookingControlSetting(self, setting):
-        self.setMessage(0xB2, setting)
+    async def setRiceCookingControlSetting(self, setting):
+        return await self.setMessage(0xB2, setting)
 
-    def getWarmerSetting(self):
-        return self.getMessage(0xE1)
+    async def getWarmerSetting(self):
+        return await self.getMessage(0xE1)
 
-    def setWarmerSetting(self, setting):
-        self.setMessage(0xE1, setting)
+    async def setWarmerSetting(self, setting):
+        return await self.setMessage(0xE1, setting)
 
-    def getInnerPotRemovalStatus(self):
-        return self.getMessage(0xE5)
+    async def getInnerPotRemovalStatus(self):
+        return await self.getMessage(0xE5)
 
-    def getCoverRemovalStatus(self):
-        return self.getMessage(0xE6)
+    async def getCoverRemovalStatus(self):
+        return await self.getMessage(0xE6)
 
-    def getRiceCookingReservationSetting(self):
-        return self.getMessage(0x90)
+    async def getRiceCookingReservationSetting(self):
+        return await self.getMessage(0x90)
 
-    def setRiceCookingReservationSetting(self, setting):
-        self.setMessage(0x90, setting)
+    async def setRiceCookingReservationSetting(self, setting):
+        return await self.setMessage(0x90, setting)
 
-    def getRiceCookingReservationSettingTime(self):
-        return self.getMessage(0x91)
+    async def getRiceCookingReservationSettingTime(self):
+        return await self.getMessage(0x91)
 
-    def setRiceCookingReservationSettingTime(self, time):
-        self.setMessage(0x91, time)
+    async def setRiceCookingReservationSettingTime(self, time):
+        return await self.setMessage(0x91, time)
 
-    def getRiceCookingReservationSettingRelativeTime(self):
-        return self.getMessage(0x92)
+    async def getRiceCookingReservationSettingRelativeTime(self):
+        return await self.getMessage(0x92)
 
-    def setRiceCookingReservationSettingRelativeTime(self, time):
-        self.setMessage(0x92, time)
-
+    async def setRiceCookingReservationSettingRelativeTime(self, time):
+        return await self.setMessage(0x92, time)
