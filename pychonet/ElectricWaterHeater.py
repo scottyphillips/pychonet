@@ -1,8 +1,7 @@
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
-    DATA_STATE_OFF,
-    DATA_STATE_ON,
+    DICT_41_HEATING_NOT_HEATING,
     DICT_41_ON_OFF,
     _int,
     _hh_mm,
@@ -31,13 +30,7 @@ def _026BB1(edt):
 # 0xB2 - Water heating status
 @deprecated(reason="Scheduled for removal.")
 def _026BB2(edt):
-    return _int(
-        edt,
-        {
-            0x41: "Heating",
-            0x42: "Not Heating",
-        },
-    )
+    return _int(edt, DICT_41_HEATING_NOT_HEATING)
 
 
 # 0xB5 Relative time setting value for manual water heating OFF
@@ -97,7 +90,7 @@ def _026BC3(edt):
         edt,
         {
             0x41: "Supplying hot water",
-            0x42: "Not supplying hot water",
+            0x42: "Stopped",
         },
     )
 
@@ -269,13 +262,7 @@ class ElectricWaterHeater(EchonetInstance):
             },
         ],
         0xB1: [_int, DICT_41_ON_OFF],
-        0xB2: [
-            _int,
-            {
-                0x41: "Heating",
-                0x42: "Not Heating",
-            },
-        ],
+        0xB2: [_int, DICT_41_HEATING_NOT_HEATING],
         0xB3: _int,
         0xB4: _int,
         0xB5: _hh_mm,
@@ -300,7 +287,7 @@ class ElectricWaterHeater(EchonetInstance):
             _int,
             {
                 0x41: "Supplying hot water",
-                0x42: "Not supplying hot water",
+                0x42: "Stopped",
             },
         ],
         0xC4: _hh_mm,

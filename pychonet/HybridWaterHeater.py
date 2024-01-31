@@ -65,8 +65,8 @@ def _02A6C3(edt):
     return _int(
         edt,
         {
-            0x41: "supplying hot water",
-            0x42: "stopped",
+            0x41: "Supplying Hot Water",
+            0x42: "Stopped",
         },
     )
 
@@ -114,8 +114,8 @@ class HybridWaterHeater(EchonetInstance):
         0xC3: [
             _int,
             {
-                0x41: "supplying hot water",
-                0x42: "stopped",
+                0x41: "Supplying Hot Water",
+                0x42: "Stopped",
             },
         ],
         0xE1: _int,

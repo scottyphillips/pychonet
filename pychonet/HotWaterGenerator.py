@@ -138,9 +138,9 @@ class HotWaterGenerator(EchonetInstance):
         0xEF: [
             _int,
             {
-                0x41: "supplying hot water",
-                0x43: "keeping bath temperature",
-                0x42: "stopped",
+                0x41: "Supplying Hot Water",
+                0x43: "Keeping Bath Temperature",
+                0x42: "Stopped",
             },
         ],  # "Bath operation status monitor",
         0x90: [_int, DICT_41_ON_OFF],  # "ON timer reservation setting",
