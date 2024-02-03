@@ -55,3 +55,7 @@ v2.5.2, 25 Jan 2024 -- Remove `ENL_PRODUCT_CODE` from request getAllPropertyMap(
                     -- Filter only valid properties during GET/SET requests
                     -- Add ENL_DPM_CHANNEL_SIMPLEX_CUMULATIVE_ENG, ENL_DPM_CHANNEL_SIMPLEX_INSTANT_ENG
                     -- Improved notification for state "available"
+v2.6.0, 03 Feb 2024 -- Optimizing "available" notifications
+                    -- Add FloorHeater Class
+                    -- Include property values in the EPC_FUNCTIONS constant
+                    -- Add some cover classes that inherits the Electric Blind class
