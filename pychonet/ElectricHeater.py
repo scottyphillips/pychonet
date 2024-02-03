@@ -1,41 +1,40 @@
+import asyncio
+from types import _ReturnT_co
+from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import _int, _hh_mm, _signed_int
+from pychonet.lib.epc_functions import (
+    DATA_STATE_OFF,
+    DATA_STATE_ON,
+    DICT_41_AUTO_8_SPEEDS,
+    DICT_41_AUTO_NONAUTO,
+    DICT_41_ON_OFF,
+    _int,
+    _hh_mm,
+    _signed_int,
+)
+
 
 def _014290(data):
     # Logic to interpret data for EPC 0x90
-    if data == 0x41:
-        return 'Automatic'
-    elif data == 0x42:
-        return 'Manual'
-    else:
-        return 'Unknown'
+    return _int(data, DICT_41_AUTO_NONAUTO)
+
 
 def _0142A0(data):
     # Logic to interpret data for EPC 0xA0
-    if data == 0x41:
-        return 'Automatic air flow rate control used'
-    elif 0x31 <= data <= 0x38:
-        return f'Air flow rate: {data.decode()}'
-    else:
-        return 'Unknown'
+    return _int(data, DICT_41_AUTO_8_SPEEDS)
 
+
+@deprecated(reason="Scheduled for removal.")
 def _0142B1(data):
     # Logic to interpret data for EPC 0xB1
-    if data == 0x41:
-        return 'On'
-    elif data == 0x42:
-        return 'Off'
-    else:
-        return 'Unknown'
+    return _int(data, DICT_41_ON_OFF)
 
+
+@deprecated(reason="Scheduled for removal.")
 def _014294(data):
     # Logic to interpret data for EPC 0xB1
-    if data == 0x41:
-        return 'On'
-    elif data == 0x42:
-        return 'Off'
-    else:
-        return 'Unknown'
+    return _int(data, DICT_41_ON_OFF)
+
 
 class ElectricHeater(EchonetInstance):
     EOJGC = 0x01
@@ -43,15 +42,15 @@ class ElectricHeater(EchonetInstance):
 
     EPC_FUNCTIONS = {
         0x80: _int,
-        0xB1: _0142B1,
+        0xB1: [_int, DICT_41_AUTO_NONAUTO],
         0xB3: _int,
         0xBB: _signed_int,
         0xBC: _int,
-        0xA0: _0142A0,
-        0x90: _014290,
+        0xA0: [_int, DICT_41_AUTO_8_SPEEDS],
+        0x90: [_int, DICT_41_ON_OFF],
         0x91: _hh_mm,
         0x92: _hh_mm,
-        0x94: _014294,
+        0x94: [_int, DICT_41_ON_OFF],
         0x95: _hh_mm,
         0x96: _hh_mm,
     }
@@ -62,49 +61,49 @@ class ElectricHeater(EchonetInstance):
         super().__init__(host, self._eojgc, self._eojcc, instance, api_connector)
 
     @property
-    def operation_status(self):
-        return self.getMessage(0x80)
+    async def operation_status(self):
+        return await self.getMessage(0x80)
 
     @operation_status.setter
-    def operation_status(self, value):
-        self.setMessage(0x80, value)
+    async def operation_status(self, value):
+        await self.setMessage(0x80, value)
 
     @property
-    def automatic_temperature_control_setting(self):
-        return self.getMessage(0xB1)
+    async def automatic_temperature_control_setting(self):
+        return await self.getMessage(0xB1)
 
     @automatic_temperature_control_setting.setter
-    def automatic_temperature_control_setting(self, value):
-        self.setMessage(0xB1, value)
+    async def automatic_temperature_control_setting(self, value):
+        await self.setMessage(0xB1, value)
 
     @property
-    def temperature_setting(self):
-        return self.getMessage(0xB3)
+    async def temperature_setting(self):
+        return await self.getMessage(0xB3)
 
     @temperature_setting.setter
-    def temperature_setting(self, value):
-        self.setMessage(0xB3, value)
+    async def temperature_setting(self, value):
+        await self.setMessage(0xB3, value)
 
     @property
-    def measured_room_temperature(self):
-        return self.getMessage(0xBB)
+    async def measured_room_temperature(self):
+        return await self.getMessage(0xBB)
 
     @measured_room_temperature.setter
-    def measured_room_temperature(self, value):
-        self.setMessage(0xBB, value)
+    async def measured_room_temperature(self, value):
+        await self.setMessage(0xBB, value)
 
     @property
-    def remotely_set_temperature(self):
-        return self.getMessage(0xBC)
+    async def remotely_set_temperature(self):
+        return await self.getMessage(0xBC)
 
     @remotely_set_temperature.setter
-    def remotely_set_temperature(self, value):
-        self.setMessage(0xBC, value)
+    async def remotely_set_temperature(self, value):
+        await self.setMessage(0xBC, value)
 
     @property
-    def air_flow_rate_setting(self):
-        return self.getMessage(0xA0)
+    async def air_flow_rate_setting(self):
+        return await self.getMessage(0xA0)
 
     @air_flow_rate_setting.setter
-    def air_flow_rate_setting(self, value):
-        self.setMessage(0xA0, value)
+    async def air_flow_rate_setting(self, value):
+        await self.setMessage(0xA0, value)

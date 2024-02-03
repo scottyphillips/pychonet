@@ -1,148 +1,139 @@
 from pychonet import EchonetInstance
-from pychonet.lib.epc_functions import _hh_mm, _int
+from pychonet.lib.epc_functions import (
+    DATA_STATE_OFF,
+    DATA_STATE_ON,
+    DICT_41_AUTO_NONAUTO,
+    DICT_41_ON_OFF,
+    _hh_mm,
+    _int,
+    _signed_int,
+)
 
-@staticmethod
-def _0143BB(payload):
-    return str(payload)
-
-@staticmethod
-def _0143B1(payload):
-    return str(payload)
-
-@staticmethod
-def _014390(payload):
-    return str(payload)
-
-@staticmethod
-def _014394(payload):
-    return str(payload)
-
-@staticmethod
-def _0143C0(payload):
-    if payload == 0x41:
-        return 'Extension ON'
-    elif payload == 0x42:
-        return 'Extension OFF'
-    else:
-        return 'Unknown'
-
-@staticmethod
-def _0143C2(payload):
-    if payload == 0x41:
-        return 'Ion emission ON'
-    elif payload == 0x42:
-        return 'Ion emission OFF'
-    else:
-        return 'Unknown'
-
-@staticmethod
-def _0143C3(payload):
-    return str(payload)
-
-@staticmethod
-def _0143C4(payload):
-    return str(payload)
 
 class FanHeater(EchonetInstance):
-    class_codes = {
-        'class_group_code': 0x01,
-        'class_code': 0x43
-    }
+    class_codes = {"class_group_code": 0x01, "class_code": 0x43}
 
     EPC_FUNCTIONS = {
         0xB3: _int,
-        0xBB: _0143BB,
-        0xB1: _0143B1,
-        0x90: _014390,
+        0xBB: _signed_int,
+        0xB1: [_int, DICT_41_AUTO_NONAUTO],
+        0x90: [
+            _int,
+            {
+                0x41: DATA_STATE_ON,
+                0x42: DATA_STATE_OFF,
+                0x43: "Timer-based ON",
+                0x44: "Relative time ON",
+            },
+        ],
         0x91: _hh_mm,
         0x92: _hh_mm,
-        0x94: _014394,
+        0x94: [
+            _int,
+            {
+                0x41: DATA_STATE_ON,
+                0x42: DATA_STATE_OFF,
+                0x43: "Timer-based ON",
+                0x44: "Relative time ON",
+            },
+        ],
         0x95: _hh_mm,
         0x96: _hh_mm,
-        0xC0: _0143C0,
+        0xC0: [_int, DICT_41_ON_OFF],
         0xC1: _hh_mm,
-        0xC2: _0143C2,
-        0xC3: _0143C3,
-        0xC4: _0143C4,
+        0xC2: [_int, DICT_41_ON_OFF],
+        # 0xC3: #Specifies ion emission method implemented in humidifier by bit map,
+        # Bit 0: negative ion method mounting
+        # Bit 1: cluster ion method mounting
+        0xC4: [
+            _int,
+            {
+                0x40: "Empty",
+                0x41: "Minimum",
+                0x42: "Low",
+                0x43: "Middium",
+                0x44: "High",
+                0x45: "Maximum",
+            },
+        ],
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):
-        self._eojgc = self.class_codes['class_group_code']
-        self._eojcc = self.class_codes['class_code']
+        self._eojgc = self.class_codes["class_group_code"]
+        self._eojcc = self.class_codes["class_code"]
         super().__init__(host, self._eojgc, self._eojcc, instance, api_connector)
 
-    def getTemperatureSettingValue(self):
+    async def getTemperatureSettingValue(self):
         return self.getMessage(0xB3)
 
-    def setTemperatureSettingValue(self, value):
+    async def setTemperatureSettingValue(self, value):
         self.setMessage(0xB3, value)
 
-    def getMeasuredTemperature(self):
+    async def getMeasuredTemperature(self):
         return self.getMessage(0xBB)
 
-    def getAutomaticTemperatureControlSetting(self):
+    async def getAutomaticTemperatureControlSetting(self):
         return self.getMessage(0xB1)
 
-    def setAutomaticTemperatureControlSetting(self, setting):
+    async def setAutomaticTemperatureControlSetting(self, setting):
         self.setMessage(0xB1, setting)
 
-    def getOnTimerReservationSetting(self):
+    async def getOnTimerReservationSetting(self):
         return self.getMessage(0x90)
 
-    def setOnTimerReservationSetting(self, setting):
+    async def setOnTimerReservationSetting(self, setting):
         self.setMessage(0x90, setting)
 
-    def getOnTimerSettingValue(self):
+    async def getOnTimerSettingValue(self):
         return self.getMessage(0x91)
 
-    def setOnTimerSettingValue(self, value):
+    async def setOnTimerSettingValue(self, value):
         self.setMessage(0x91, value)
 
-    def getOnTimerSettingRelativeTime(self):
+    async def getOnTimerSettingRelativeTime(self):
         return self.getMessage(0x92)
 
-    def setOnTimerSettingRelativeTime(self, value):
+    async def setOnTimerSettingRelativeTime(self, value):
         self.setMessage(0x92, value)
 
-    def getOffTimerReservationSetting(self):
+    async def getOffTimerReservationSetting(self):
         return self.getMessage(0x94)
 
-    def setOffTimerReservationSetting(self, setting):
+    async def setOffTimerReservationSetting(self, setting):
         self.setMessage(0x94, setting)
 
-    def getOffTimerSettingValue(self):
+    async def getOffTimerSettingValue(self):
         return self.getMessage(0x95)
 
-    def setOffTimerSettingValue(self, value):
+    async def setOffTimerSettingValue(self, value):
         self.setMessage(0x95, value)
 
-    def getOffTimerSettingRelativeTime(self):
+    async def getOffTimerSettingRelativeTime(self):
         return self.getMessage(0x96)
 
-    def setOffTimerSettingRelativeTime(self, value):
+    async def setOffTimerSettingRelativeTime(self, value):
         self.setMessage(0x96, value)
 
-    def getExtensionalOperationSetting(self):
+    async def getExtensionalOperationSetting(self):
         return self.getMessage(0xC0)
 
-    def setExtensionalOperationSetting(self, setting):
+    async def setExtensionalOperationSetting(self, setting):
         self.setMessage(0xC0, setting)
 
-    def getExtensionalOperationTimerTimeSettingValue(self):
+    async def getExtensionalOperationTimerTimeSettingValue(self):
         return self.getMessage(0xC1)
 
-    def setExtensionalOperationTimerTimeSettingValue(self, value):
+    async def setExtensionalOperationTimerTimeSettingValue(self, value):
         self.setMessage(0xC1, value)
 
-    def getIonEmissionSetting(self):
+    async def getIonEmissionSetting(self):
         return self.getMessage(0xC2)
 
-    def setIonEmissionSetting(self, setting):
+    async def setIonEmissionSetting(self, setting):
         self.setMessage(0xC2, setting)
 
-    def getImplementedIonEmissionMethod(self):
+    async def getImplementedIonEmissionMethod(self):
         return self.getMessage(0xC3)
 
-    def getOilAmountLevel(self):
+    async def getOilAmountLevel(self):
         return self.getMessage(0xC4)
-

@@ -1,17 +1,16 @@
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import _int, _signed_int
 
+
 def _0280E2(edt):
-      # return array x 48 unsigned long big-endian
-    op_mode = int.from_bytes(edt, "big")
-    values = {0x01: 0.1, 0x02: 0.01}
-    return values.get(op_mode, "invalid_setting")
+    # return array x 48 unsigned long big-endian
+    return _int(edt, {0x01: 0.1, 0x02: 0.01})
 
 
 class ElectricEnergyMeter(EchonetInstance):
     EPC_FUNCTIONS = {
         0xE0: _int,  # 0xE0: "Cumulative amounts of electric energy measurement value",
-        0xE2: _0280E2   # 0xE2: "Cumulative amounts of electric energy unit",
+        0xE2: _0280E2,  # 0xE2: "Cumulative amounts of electric energy unit",
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):

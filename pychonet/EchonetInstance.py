@@ -167,15 +167,32 @@ class EchonetInstance:
                 elif epc in list(
                     self.EPC_FUNCTIONS.keys()
                 ):  # check the class-specific EPC function table.
-                    returned_json_data.update(
-                        {
-                            epc: self.EPC_FUNCTIONS[epc](
-                                self._api._state[self._host]["instances"][self._eojgc][
-                                    self._eojcc
-                                ][self._eojci][epc]
+                    raw_data = self._api._state[self._host]["instances"][self._eojgc][
+                        self._eojcc
+                    ][self._eojci][epc]
+                    if type(self.EPC_FUNCTIONS[epc]) == list:
+                        if list(self.EPC_FUNCTIONS[epc]) == 3:
+                            data = self.EPC_FUNCTIONS[epc][0](
+                                raw_data,
+                                self.EPC_FUNCTIONS[epc][1],
+                                self.EPC_FUNCTIONS[epc][2],
                             )
-                        }
-                    )
+                        else:
+                            data = self.EPC_FUNCTIONS[epc][0](
+                                raw_data, self.EPC_FUNCTIONS[epc][1]
+                            )
+                    else:
+                        data = self.EPC_FUNCTIONS[epc](raw_data)
+                    returned_json_data.update({epc: data})
+                    # returned_json_data.update(
+                    #     {
+                    #         epc: self.EPC_FUNCTIONS[epc](
+                    #             self._api._state[self._host]["instances"][self._eojgc][
+                    #                 self._eojcc
+                    #             ][self._eojci][epc]
+                    #         )
+                    #     }
+                    # )
                     continue
                 elif epc in list(
                     EPC_CODE[self._eojgc][self._eojcc].keys()

@@ -1,5 +1,11 @@
+from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import _int, _signed_int
+from pychonet.lib.epc_functions import (
+    DICT_41_AUTO_8_SPEEDS,
+    _int,
+    _signed_int,
+    _swap_dict,
+)
 
 MODES = {
     "auto": 0x41,
@@ -10,24 +16,11 @@ MODES = {
     "other": 0x40,
     "off": 0xFF,
 }
+DICT_41_MODES = _swap_dict(MODES)
 
-FAN_SPEED = {
-    "auto": 0x41,
-    "minimum": 0x31,
-    "low": 0x32,
-    "medium-low": 0x33,
-    "medium": 0x34,
-    "medium-high": 0x35,
-    "high": 0x36,
-    "very-high": 0x37,
-    "max": 0x38,
-}
+FAN_SPEED = _swap_dict(DICT_41_AUTO_8_SPEEDS)
 
-SILENT_MODE = {
-    "normal": 0x41,
-    "high-speed": 0x42,
-    "silent": 0x43
-}
+SILENT_MODE = {"normal": 0x41, "high-speed": 0x42, "silent": 0x43}
 
 AIRFLOW_HORIZ = {
     "rc-right": 0x41,
@@ -88,126 +81,175 @@ ENL_HVAC_HUMIDIFIER_VALUE = 0xC4
 # ----- Home Air conditioner functions -------
 
 
+@deprecated(reason="Scheduled for removal.")
 def _0130A0(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {
-        0x41: "auto",
-        0x31: "minimum",
-        0x32: "low",
-        0x33: "medium-low",
-        0x34: "medium",
-        0x35: "medium-high",
-        0x36: "high",
-        0x37: "very-high",
-        0x38: "max",
-    }
-    return values.get(op_mode, "Invalid setting")
+    return _int(edt, DICT_41_AUTO_8_SPEEDS)
 
 
 # Automatic control of air flow direction setting
+@deprecated(reason="Scheduled for removal.")
 def _0130A1(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {0x41: "auto", 0x42: "non-auto", 0x43: "auto-vert", 0x44: "auto-horiz"}
-    return values.get(op_mode, "Invalid setting")
+    return _int(
+        edt, {0x41: "auto", 0x42: "non-auto", 0x43: "auto-vert", 0x44: "auto-horiz"}
+    )
 
 
+@deprecated(reason="Scheduled for removal.")
 def _0130AA(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {
-        0x40: "Normal operation",
-        0x41: "Defrosting",
-        0x42: "Preheating",
-        0x43: "Heat removal",
-    }
-    return values.get(op_mode, "invalid_setting")
+    return _int(
+        edt,
+        {
+            0x40: "Normal operation",
+            0x41: "Defrosting",
+            0x42: "Preheating",
+            0x43: "Heat removal",
+        },
+    )
 
 
 # Automatic swing of air flow direction setting
+@deprecated(reason="Scheduled for removal.")
 def _0130A3(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {0x31: "not-used", 0x41: "vert", 0x42: "horiz", 0x43: "vert-horiz"}
-    return values.get(op_mode, "invalid_setting")
+    return _int(
+        edt, {0x31: "not-used", 0x41: "vert", 0x42: "horiz", 0x43: "vert-horiz"}
+    )
 
 
 # Air flow direction (vertical) setting
+@deprecated(reason="Scheduled for removal.")
 def _0130A4(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {
-        0x41: "upper",
-        0x44: "upper-central",
-        0x43: "central",
-        0x45: "lower-central",
-        0x42: "lower",
-    }
-    return values.get(op_mode, "invalid_setting")
+    return _int(
+        edt,
+        {
+            0x41: "upper",
+            0x44: "upper-central",
+            0x43: "central",
+            0x45: "lower-central",
+            0x42: "lower",
+        },
+    )
 
 
 # Air flow direction (horiziontal) setting
+@deprecated(reason="Scheduled for removal.")
 def _0130A5(edt):
     # complies with version 2.01 Release a (page 3-88)
-    op_mode = int.from_bytes(edt, "big")
-    values = {
-        0x41: "rc-right",
-        0x42: "left-lc",
-        0x43: "lc-center-rc",
-        0x44: "left-lc-rc-right",
-        0x51: "right",
-        0x52: "rc",
-        0x54: "center",
-        0x55: "center-right",
-        0x56: "center-rc",
-        0x57: "center-rc-right",
-        0x58: "lc",
-        0x59: "lc-right",
-        0x5A: "lc-rc",
-        0x60: "left",
-        0x61: "left-right",
-        0x62: "left-rc",
-        0x63: "left-rc-right",
-        0x64: "left-center",
-        0x65: "left-center-right",
-        0x66: "left-center-rc",
-        0x67: "left-center-rc-right",
-        0x69: "left-lc-right",
-        0x6A: "left-lc-rc",
-    }
-    return values.get(op_mode, "invalid_setting")
+    return _int(
+        edt,
+        {
+            0x41: "rc-right",
+            0x42: "left-lc",
+            0x43: "lc-center-rc",
+            0x44: "left-lc-rc-right",
+            0x51: "right",
+            0x52: "rc",
+            0x54: "center",
+            0x55: "center-right",
+            0x56: "center-rc",
+            0x57: "center-rc-right",
+            0x58: "lc",
+            0x59: "lc-right",
+            0x5A: "lc-rc",
+            0x60: "left",
+            0x61: "left-right",
+            0x62: "left-rc",
+            0x63: "left-rc-right",
+            0x64: "left-center",
+            0x65: "left-center-right",
+            0x66: "left-center-rc",
+            0x67: "left-center-rc-right",
+            0x69: "left-lc-right",
+            0x6A: "left-lc-rc",
+        },
+    )
 
 
 # Operation mode
+@deprecated(reason="Scheduled for removal.")
 def _0130B0(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {
-        0x41: "auto",
-        0x42: "cool",
-        0x43: "heat",
-        0x44: "dry",
-        0x45: "fan_only",
-        0x40: "other",
-    }
-    return values.get(op_mode, "invalid_setting")
+    return _int(edt, DICT_41_MODES)
+
 
 # Silent mode
+@deprecated(reason="Scheduled for removal.")
 def _0130B2(edt):
-    op_mode = int.from_bytes(edt, "big")
-    values = {
-        0x41: "normal",
-        0x42: "high-speed",
-        0x43: "silent",
-    }
-    return values.get(op_mode, "invalid_setting")
+    return _int(
+        edt,
+        {
+            0x41: "normal",
+            0x42: "high-speed",
+            0x43: "silent",
+        },
+    )
+
 
 class HomeAirConditioner(EchonetInstance):
-
     EPC_FUNCTIONS = {
-        0xA0: _0130A0,
-        0xA1: _0130A1,
-        0xA3: _0130A3,
-        0xA4: _0130A4,
-        0xA5: _0130A5,
-        0xAA: _0130AA,
-        0xB0: _0130B0,
-        0xB2: _0130B2,
+        0xA0: [_int, DICT_41_AUTO_8_SPEEDS],
+        0xA1: [
+            _int,
+            {0x41: "auto", 0x42: "non-auto", 0x43: "auto-vert", 0x44: "auto-horiz"},
+        ],
+        0xA3: [
+            _int,
+            {0x31: "not-used", 0x41: "vert", 0x42: "horiz", 0x43: "vert-horiz"},
+        ],
+        0xA4: [
+            _int,
+            {
+                0x41: "upper",
+                0x44: "upper-central",
+                0x43: "central",
+                0x45: "lower-central",
+                0x42: "lower",
+            },
+        ],
+        0xA5: [
+            _int,
+            {
+                0x41: "rc-right",
+                0x42: "left-lc",
+                0x43: "lc-center-rc",
+                0x44: "left-lc-rc-right",
+                0x51: "right",
+                0x52: "rc",
+                0x54: "center",
+                0x55: "center-right",
+                0x56: "center-rc",
+                0x57: "center-rc-right",
+                0x58: "lc",
+                0x59: "lc-right",
+                0x5A: "lc-rc",
+                0x60: "left",
+                0x61: "left-right",
+                0x62: "left-rc",
+                0x63: "left-rc-right",
+                0x64: "left-center",
+                0x65: "left-center-right",
+                0x66: "left-center-rc",
+                0x67: "left-center-rc-right",
+                0x69: "left-lc-right",
+                0x6A: "left-lc-rc",
+            },
+        ],
+        0xAA: [
+            _int,
+            {
+                0x40: "Normal operation",
+                0x41: "Defrosting",
+                0x42: "Preheating",
+                0x43: "Heat removal",
+            },
+        ],
+        0xB0: [_int, DICT_41_MODES],
+        0xB2: [
+            _int,
+            {
+                0x41: "normal",
+                0x42: "high-speed",
+                0x43: "silent",
+            },
+        ],
         0xBA: _int,
         0xB3: _signed_int,
         0xB4: _signed_int,
@@ -236,8 +278,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A integer representing the configured temperature.
     """
 
-    def getOperationalTemperature(self):
-        return self.getMessage(ENL_HVAC_SET_TEMP)
+    async def getOperationalTemperature(self):
+        return await self.getMessage(ENL_HVAC_SET_TEMP)
 
     """
     getOperationalHumidity get the humidity that has been set in the HVAC
@@ -245,8 +287,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A integer representing the configured humidity.
     """
 
-    def getOperationalHumidity(self):
-        return self.getMessage(ENL_HVAC_SET_HUMIDITY)
+    async def getOperationalHumidity(self):
+        return await self.getMessage(ENL_HVAC_SET_HUMIDITY)
 
     """
     getRoomHumidity get the HVAC's room humidity.
@@ -254,8 +296,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A integer representing the room humidity.
     """
 
-    def getRoomHumidity(self):
-        return self.getMessage(ENL_HVAC_ROOM_HUMIDITY)
+    async def getRoomHumidity(self):
+        return await self.getMessage(ENL_HVAC_ROOM_HUMIDITY)
 
     """
     getRoomTemperature get the HVAC's room temperature.
@@ -263,8 +305,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A integer representing the room temperature.
     """
 
-    def getRoomTemperature(self):
-        return self.getMessage(ENL_HVAC_ROOM_TEMP)
+    async def getRoomTemperature(self):
+        return await self.getMessage(ENL_HVAC_ROOM_TEMP)
 
     """
     getOutdoorTemperature get the outdoor temperature that has been set in the HVAC
@@ -272,8 +314,8 @@ class HomeAirConditioner(EchonetInstance):
     return: An integer representing the configured outdoor temperature.
     """
 
-    def getOutdoorTemperature(self):
-        return self.getMessage(ENL_HVAC_OUT_TEMP)
+    async def getOutdoorTemperature(self):
+        return await self.getMessage(ENL_HVAC_OUT_TEMP)
 
     """
     setOperationalTemperature get the temperature that has been set in the HVAC
@@ -281,8 +323,8 @@ class HomeAirConditioner(EchonetInstance):
     param temperature: A integer representing the desired temperature.
     """
 
-    def setOperationalTemperature(self, temperature):
-        return self.setMessage(ENL_HVAC_SET_TEMP, int(temperature))
+    async def setOperationalTemperature(self, temperature):
+        return await self.setMessage(ENL_HVAC_SET_TEMP, int(temperature))
 
     """
     setOperationalHumidity get the temperature that has been set in the HVAC
@@ -290,13 +332,13 @@ class HomeAirConditioner(EchonetInstance):
     param humidity: A integer representing the desired humidity.
     """
 
-    def setOperationalHumidity(self, humidity):
-        return self.setMessage(ENL_HVAC_SET_HUMIDITY, int(humidity))
+    async def setOperationalHumidity(self, humidity):
+        return await self.setMessage(ENL_HVAC_SET_HUMIDITY, int(humidity))
 
-    def setHeaterHumidifier(self, state, humidity):
+    async def setHeaterHumidifier(self, state, humidity):
         if not state:
-            return self.setMessage(ENL_HVAC_HUMIDIFIER_STATE, 0x42)
-        return self.setMessages(
+            return await self.setMessage(ENL_HVAC_HUMIDIFIER_STATE, 0x42)
+        return await self.setMessages(
             [
                 {"EPC": ENL_HVAC_HUMIDIFIER_STATE, "PDC": 0x01, "EDT": 0x41},
                 {"EPC": ENL_HVAC_HUMIDIFIER_VALUE, "PDC": 0x01, "EDT": humidity},
@@ -309,8 +351,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured mode.
     """
 
-    def getMode(self):
-        return self.getMessage(ENL_HVAC_MODE)
+    async def getMode(self):
+        return await self.getMessage(ENL_HVAC_MODE)
 
     """
     setMode set the desired mode (e.g Heating, Cooling, Fan etc)
@@ -320,10 +362,10 @@ class HomeAirConditioner(EchonetInstance):
     param mode: A string representing the desired mode.
     """
 
-    def setMode(self, mode):
+    async def setMode(self, mode):
         if mode == "off":
-            return self.setMessage(ENL_STATUS, 0x31)
-        return self.setMessages(
+            return await self.setMessage(ENL_STATUS, 0x31)
+        return await self.setMessages(
             [
                 {"EPC": ENL_STATUS, "PDC": 0x01, "EDT": 0x30},
                 {"EPC": ENL_HVAC_MODE, "PDC": 0x01, "EDT": MODES[mode]},
@@ -337,8 +379,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the fan speed
     """
 
-    def getFanSpeed(self):  # 0xA0
-        return self.getMessage(ENL_FANSPEED)
+    async def getFanSpeed(self):  # 0xA0
+        return await self.getMessage(ENL_FANSPEED)
 
     """
     setFanSpeed set the desired fan speed (e.g Low, Medium, High etc)
@@ -346,8 +388,8 @@ class HomeAirConditioner(EchonetInstance):
     param fans_speed: A string representing the fan speed
     """
 
-    def setFanSpeed(self, fan_speed):
-        return self.setMessage(ENL_FANSPEED, FAN_SPEED[fan_speed])
+    async def setFanSpeed(self, fan_speed):
+        return await self.setMessage(ENL_FANSPEED, FAN_SPEED[fan_speed])
 
     """
     setSwingMode sets the automatic swing mode function
@@ -356,8 +398,8 @@ class HomeAirConditioner(EchonetInstance):
                        e.g: 'not-used', 'vert', 'horiz', 'vert-horiz'
     """
 
-    def setSwingMode(self, swing_mode):
-        return self.setMessage(ENL_SWING_MODE, SWING_MODE[swing_mode])
+    async def setSwingMode(self, swing_mode):
+        return await self.setMessage(ENL_SWING_MODE, SWING_MODE[swing_mode])
 
     """
     getSwingMode gets the swing mode that has been set in the HVAC
@@ -365,8 +407,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured swing mode.
     """
 
-    def getSwingMode(self):  # 0xA3
-        return self.getMessage(ENL_SWING_MODE)
+    async def getSwingMode(self):  # 0xA3
+        return await self.getMessage(ENL_SWING_MODE)
 
     """
     setAutoDirection sets the automatic direction mode function
@@ -375,8 +417,8 @@ class HomeAirConditioner(EchonetInstance):
                            e.g: 'auto', 'non-auto', 'auto-horiz', 'auto-vert'
     """
 
-    def setAutoDirection(self, auto_direction):
-        return self.setMessage(ENL_AUTO_DIRECTION, AUTO_DIRECTION[auto_direction])
+    async def setAutoDirection(self, auto_direction):
+        return await self.setMessage(ENL_AUTO_DIRECTION, AUTO_DIRECTION[auto_direction])
 
     """
     getAutoDirection get the direction mode that has been set in the HVAC
@@ -384,8 +426,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing the configured temperature.
     """
 
-    def getAutoDirection(self):  # 0xA1
-        return self.getMessage(ENL_AUTO_DIRECTION)
+    async def getAutoDirection(self):  # 0xA1
+        return await self.getMessage(ENL_AUTO_DIRECTION)
 
     """
     setAirflowVert sets the vertical vane setting
@@ -395,8 +437,8 @@ class HomeAirConditioner(EchonetInstance):
                          'lower-central', 'lower'
     """
 
-    def setAirflowVert(self, airflow_vert):
-        return self.setMessage(ENL_AIR_VERT, AIRFLOW_VERT[airflow_vert])
+    async def setAirflowVert(self, airflow_vert):
+        return await self.setMessage(ENL_AIR_VERT, AIRFLOW_VERT[airflow_vert])
 
     """
     getAirflowVert get the vertical vane setting that has been set in the HVAC
@@ -404,8 +446,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing vertical airflow setting
     """
 
-    def getAirflowVert(self):  # 0xA4
-        return self.getMessage(ENL_AIR_VERT)
+    async def getAirflowVert(self):  # 0xA4
+        return await self.getMessage(ENL_AIR_VERT)
 
     """
     setAirflowHoriz sets the horizontal vane setting
@@ -414,8 +456,8 @@ class HomeAirConditioner(EchonetInstance):
                           e.g: 'left', 'lc', 'center', 'rc', 'right'
     """
 
-    def setAirflowHoriz(self, airflow_horiz):
-        return self.setMessage(ENL_AIR_HORZ, AIRFLOW_HORIZ[airflow_horiz])
+    async def setAirflowHoriz(self, airflow_horiz):
+        return await self.setMessage(ENL_AIR_HORZ, AIRFLOW_HORIZ[airflow_horiz])
 
     """
     getAirflowHoriz get the horizontal vane setting that has been set in the HVAC
@@ -423,8 +465,8 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing vertical airflow setting e.g: 'left', 'lc', 'center', 'rc', 'right'
     """
 
-    def getAirflowHoriz(self):  # 0xA5
-        return self.getMessage(ENL_AIR_HORZ)
+    async def getAirflowHoriz(self):  # 0xA5
+        return await self.getMessage(ENL_AIR_HORZ)
 
     """
     setFanMode sets the Fan normal/high-speed/silent operation
@@ -433,8 +475,8 @@ class HomeAirConditioner(EchonetInstance):
                           e.g: 'normal', 'high-speed', 'silent'
     """
 
-    def setSilentMode(self, mode):  # 0xB2
-        return self.setMessage(ENL_HVAC_SILENT_MODE, SILENT_MODE[mode])
+    async def setSilentMode(self, mode):  # 0xB2
+        return await self.setMessage(ENL_HVAC_SILENT_MODE, SILENT_MODE[mode])
 
     """
     getFanMode get the Fan normal/high-speed/silent operation
@@ -442,5 +484,5 @@ class HomeAirConditioner(EchonetInstance):
     return: A string representing airflow mode setting e.g: 'normal', 'high-speed', 'silent'
     """
 
-    def getSilentMode(self):  # 0xB2
-        return self.getMessage(ENL_HVAC_SILENT_MODE)
+    async def getSilentMode(self):  # 0xB2
+        return await self.getMessage(ENL_HVAC_SILENT_MODE)
