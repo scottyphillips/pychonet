@@ -227,19 +227,25 @@ class ECHONETAPIClient:
         payload = None
         # Is node profile
         is_node_profile = deojgc == 0x0E and deojcc == 0xF0
+        map_epcs = {ENL_STATMAP, ENL_GETMAP, ENL_SETMAP}
         # Check OPC Code
         try:
             if not is_node_profile:
                 if esv == GET:
-                    check_map = self._state[host]["instances"][deojgc][deojcc][
-                        deojci
-                    ].get(ENL_GETMAP, [])
+                    check_map = set(
+                        self._state[host]["instances"][deojgc][deojcc][deojci].get(
+                            ENL_GETMAP, []
+                        )
+                    )
+                    check_map |= map_epcs
                 elif esv == SETC:
-                    check_map = self._state[host]["instances"][deojgc][deojcc][
-                        deojci
-                    ].get(ENL_SETMAP, [])
+                    check_map = set(
+                        self._state[host]["instances"][deojgc][deojcc][deojci].get(
+                            ENL_SETMAP, []
+                        )
+                    )
                 else:
-                    check_map = []
+                    check_map = {}
                 if len(check_map):
                     checked_opc = []
                     for values in opc:
@@ -315,6 +321,7 @@ class ECHONETAPIClient:
                                 f"OPC count in results is {res_opc_count}/{opc_count} from IP {host}."
                             )
                         if res_opc_count < opc_count:
+                            self._waiting[host] -= 1
                             raise EchonetMaxOpcError(res_opc_count)
 
                     # transaction sucessful remove from list
@@ -324,6 +331,7 @@ class ECHONETAPIClient:
                         del self._failure_list[tx_tid]
                     not_timeout = True
                     break
+            self._waiting[host] -= 1
             if not is_success:
                 if self._message_list.get(tx_tid) is not None:
                     del self._message_list[tx_tid]
@@ -335,8 +343,8 @@ class ECHONETAPIClient:
                     if key.startswith(host):
                         for update_func in self._update_callbacks[key]:
                             await update_func(False)
-
-        self._waiting[host] -= 1
+        else:
+            self._waiting[host] -= 1
         return is_success
 
     async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
