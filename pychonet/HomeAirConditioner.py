@@ -150,6 +150,10 @@ def _0130A5(edt):
             0x58: "lc",
             0x59: "lc-right",
             0x5A: "lc-rc",
+            0x5B: "lc-rc-right",
+            0x5C: "lc-center",
+            0x5D: "lc-center-right",
+            0x5F: "lc-center-rc-right",
             0x60: "left",
             0x61: "left-right",
             0x62: "left-rc",
@@ -160,6 +164,10 @@ def _0130A5(edt):
             0x67: "left-center-rc-right",
             0x69: "left-lc-right",
             0x6A: "left-lc-rc",
+            0x6C: "left-lc-center",
+            0x6D: "left-lc-center-right",
+            0x6E: "left-lc-center-rc",
+            0x6F: "left-lc-center-rc-right",
         },
     )
 
