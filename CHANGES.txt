@@ -61,3 +61,4 @@ v2.6.0, 03 Feb 2024 -- Optimizing "available" notifications
                     -- Add some cover classes that inherits the Electric Blind class
 v2.6.1, 06 Feb 2024 -- [HomeAirConditioner] Add missing value for horizontal air flows
                     -- Notify all entities in the device with available notifications via push notifications
+v2.6.2, 07 Feb 2024 -- Bugfix: A case that property maps could not be retrieved
