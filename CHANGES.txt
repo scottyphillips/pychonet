@@ -59,3 +59,5 @@ v2.6.0, 03 Feb 2024 -- Optimizing "available" notifications
                     -- Add FloorHeater Class
                     -- Include property values in the EPC_FUNCTIONS constant
                     -- Add some cover classes that inherits the Electric Blind class
+v2.6.1, 06 Feb 2024 -- [HomeAirConditioner] Add missing value for horizontal air flows
+                    -- Notify all entities in the device with available notifications via push notifications
