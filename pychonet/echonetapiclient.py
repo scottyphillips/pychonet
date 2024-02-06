@@ -186,15 +186,24 @@ class ECHONETAPIClient:
             self._state[host]["discovered"] = True
 
         # Markup "available"
+        _to_available = False
         if host in self._state:
             if not self._state[host].get("available"):
-                updated = True
+                _to_available = True
                 self._state[host]["available"] = True
 
-        # Call update callback functions
-        if updated and key in self._update_callbacks:
-            for update_func in self._update_callbacks[key]:
-                await update_func(isPush)
+        if _to_available:
+            # Call update callback functions
+            # key is f"{host}-{deojgc}-{deojcc}-{deojci}"
+            for _key in self._update_callbacks:
+                if _key.startswith(host):
+                    for update_func in self._update_callbacks[_key]:
+                        await update_func(False)
+        else:
+            # Call update callback functions
+            if updated and key in self._update_callbacks:
+                for update_func in self._update_callbacks[key]:
+                    await update_func(isPush)
 
         # if we get duplicate packets that have already been processed then dont worry about the message list.
         # but still process them regardless.
