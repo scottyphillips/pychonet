@@ -1,4 +1,3 @@
-from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
     DICT_41_HEATING_NOT_HEATING,
@@ -9,52 +8,11 @@ from pychonet.lib.epc_functions import (
 
 
 # 0xB0 - Automatic water heating setting
-@deprecated(reason="Scheduled for removal.")
-def _026BB0(edt):
-    return _int(
-        edt,
-        {
-            0x41: "Automatic",
-            0x42: "Manual",
-            0x43: "Stop",
-        },
-    )
-
-
 # 0xB1 - Automatic water temperature control setting
-@deprecated(reason="Scheduled for removal.")
-def _026BB1(edt):
-    return _int(edt, DICT_41_ON_OFF)
-
-
 # 0xB2 - Water heating status
-@deprecated(reason="Scheduled for removal.")
-def _026BB2(edt):
-    return _int(edt, DICT_41_HEATING_NOT_HEATING)
-
-
 # 0xB5 Relative time setting value for manual water heating OFF
-@deprecated(reason="Scheduled for removal.")
-def _026BB5(edt):
-    return _hh_mm(edt)
-
-
 # 0xB6 - Tank Operation mode setting
-@deprecated(reason="Scheduled for removal.")
-def _026BB6(edt):
-    return _int(edt, {0x41: "Standard", 0x42: "Saving", 0x43: "Extra"})
-
-
 # 0xC0 - Daytime reheating permission setting
-@deprecated(reason="Scheduled for removal.")
-def _026BC0(edt):
-    return _int(
-        edt,
-        {
-            0x41: "Permitted",
-            0x42: "Not permitted",
-        },
-    )
 
 
 # 0xC2 - Alarm Status
@@ -84,124 +42,28 @@ def _026BB9(edt):
 
 
 # 0xC3 - Hot water supply status
-@deprecated(reason="Scheduled for removal.")
-def _026BC3(edt):
-    return _int(
-        edt,
-        {
-            0x41: "Supplying hot water",
-            0x42: "Stopped",
-        },
-    )
-
-
 # 0xC4 Relative time setting for keeping bath temperature
-@deprecated(reason="Scheduled for removal.")
-def _026BC4(edt):
-    return _hh_mm(edt)
-
-
 # 0xE1 - Measured amount of hot water remaining in tank
-
 # 0xE2 - Tank Capacity
-
-
 # 0xE3 - Automatic bath water heater mode setting
-@deprecated(reason="Scheduled for removal.")
-def _026BE3(edt):
-    return _int(edt, DICT_41_ON_OFF)
-
-
 # 0xE9 - Bathroom Priority setting
-@deprecated(reason="Scheduled for removal.")
-def _026BE9(edt):
-    return _int(edt, DICT_41_ON_OFF)
-
-
 # 0xEA - Bath operation status monitor
-@deprecated(reason="Scheduled for removal.")
-def _026BEA(edt):
-    return _int(
-        edt,
-        {
-            0x41: "Filling hot water",
-            0x42: "Stopped",
-            0x43: "Keeping Temperature",
-        },
-    )
-
-
 # 0xE4 - Manual bath reheating function setting
-@deprecated(reason="Scheduled for removal.")
-def _026BE4(edt):
-    return _int(edt, DICT_41_ON_OFF)
-
-
 # 0xE5 - Manual bath hot water addition function setting
-@deprecated(reason="Scheduled for removal.")
-def _026BE5(edt):
-    return _int(edt, DICT_41_ON_OFF)
-
-
 # 0xE6 - Manual lukewarm water temperature lowering function setting
-@deprecated(reason="Scheduled for removal.")
-def _026BE6(edt):
-    return _int(edt, DICT_41_ON_OFF)
-
-
 # 0xE7 - Bath Volume water setting one
-
-
 # 0xE8 - Bath Volume water setting two
-@deprecated(reason="Scheduled for removal.")
-def _026BE8(edt):
-    return _int(
-        edt,
-        {
-            0x31: "Level 1",
-            0x32: "Level 2",
-            0x33: "Level 3",
-            0x34: "Level 4",
-            0x35: "Level 5",
-            0x36: "Level 6",
-            0x37: "Level 7",
-            0x38: "Level 8",
-        },
-    )
-
-
 # 0xEE - Bath Volume water setting three
-
 # 0xD4 - Bath Volume water setting four
-
 # 0xD5 - Bath Volume water setting four maximum settable level
-
-
 # 0x90 - ON timer reservation setting
-@deprecated(reason="Scheduled for removal.")
-def _026B90(edt):
-    return _int(edt, DICT_41_ON_OFF)
-
-
 # 0x91 - ON timer setting
-@deprecated(reason="Scheduled for removal.")
-def _026B91(edt):
-    return _hh_mm(edt)
-
-
 # 0xD6 - Sound Volume Setting
-
-
 # 0xD7 - Mute Setting
-@deprecated(reason="Scheduled for removal.")
-def _026BD7(edt):
-    return _int(edt, DICT_41_ON_OFF)
-
-
 # 0xD8 - Remaining Hot Water volume
-
-
 # 0xD9 - Surplus electric energy prediction value
+
+
 def _026BD9(edt):
     starting_MM = str(int.from_bytes(edt[0:1], "big")).zfill(2)
     starting_DD = str(int.from_bytes(edt[1:2], "big")).zfill(2)
@@ -233,22 +95,62 @@ def _026BD9(edt):
 
 # 0xCB - Expected electric energy at daytime heating shift time 1
 def _026BCB(edt):
-    return "not implemented"
+    # 0x00000000-0xFFFFFFFD (0-4,294,967,293 W)
+    # 10:00, 13:00, 15:00, 17:00
+    # unsigned long x 4 16 byts Wh
+    if len(edt) == 16:
+        v1 = int.from_bytes(edt[0:4], "big")
+        v2 = int.from_bytes(edt[4:8], "big")
+        v3 = int.from_bytes(edt[8:12], "big")
+        v4 = int.from_bytes(edt[12:16], "big")
+    else:
+        v1 = v2 = v3 = v4 = None
+    return {"10:00": v1, "13:00": v2, "15:00": v3, "17:00": v4}
 
 
 # 0xCC - Consumption of electric energy per hour 1
 def _026BCC(edt):
-    return "not implemented"
+    # 0x0000-0xFFFD (0-65,533 W)
+    # When shifting at 10:00, 13:00, 15:00, and 17:00
+    # 0x0000: cleared
+    # unsigned short x 4 8 bytes Wh
+    if len(edt == 8):
+        v1 = int.from_bytes(edt[0:2], "big")
+        v2 = int.from_bytes(edt[2:4], "big")
+        v3 = int.from_bytes(edt[4:6], "big")
+        v4 = int.from_bytes(edt[6:8], "big")
+    else:
+        v1 = v2 = v3 = v4 = None
+    return {"10:00": v1, "13:00": v2, "15:00": v3, "17:00": v4}
 
 
 # 0xCE - Expected electric energy at daytime heating shift time 2
 def _026BCE(edt):
-    return "not implemented"
+    # 0x00000000-0xFFFFFFFD (0-4,294,967,293 W)
+    # 13:00, 15:00, 17:00
+    # unsigned long x 3 12 bytes Wh
+    if len(edt) == 12:
+        v1 = int.from_bytes(edt[0:4], "big")
+        v2 = int.from_bytes(edt[4:8], "big")
+        v3 = int.from_bytes(edt[8:12], "big")
+    else:
+        v1 = v2 = v3 = None
+    return {"13:00": v1, "15:00": v2, "17:00": v3}
 
 
 # 0xCF - Consumption of electric energy per hour 2
 def _026BCF(edt):
-    return "not implemented"
+    # 0x0000-0xFFFD (0-65,533W)
+    # When shifting at 13:00, 15:00, and 17:00
+    # 0x0000: cleared
+    # unsigned short x 3 6 bytes Wh
+    if len(edt) == 6:
+        v1 = int.from_bytes(edt[0:2], "big")
+        v2 = int.from_bytes(edt[2:4], "big")
+        v3 = int.from_bytes(edt[4:6], "big")
+    else:
+        v1 = v2 = v3 = None
+    return {"13:00": v1, "15:00": v2, "17:00": v3}
 
 
 class ElectricWaterHeater(EchonetInstance):
@@ -336,15 +238,52 @@ class ElectricWaterHeater(EchonetInstance):
         0xDB: _int,
         0xDC: _int,
         0xDD: _int,
-        0xC7: _int,
-        0xC8: _int,  # could change
+        0xC7: [_int, {0x01: "yes", 0x00: "no"}],
+        0xC8: [
+            _int,
+            {
+                0x14: "20:00",
+                0x15: "21:00",
+                0x16: "22:00",
+                0x17: "23:00",
+                0x18: "24:00",
+                0x01: "01:00",
+            },
+        ],
         0xC9: _int,
-        0xCA: _int,
-        0xCB: _026BCB,  # todo
-        0xCC: _026BCC,  # todo
-        0xCD: _int,
-        0xCE: _026BCB,  # todo
-        0xCF: _026BCF,  # todo
+        0xCA: [
+            _int,
+            {
+                0x09: "9:00",
+                0x0A: "10:00",
+                0x0B: "11:00",
+                0x0C: "12:00",
+                0x0D: "13:00",
+                0x0E: "14:00",
+                0x0F: "15:00",
+                0x10: "16:00",
+                0x11: "17:00",
+                0x00: "cleared",
+            },
+        ],
+        0xCB: _026BCB,
+        0xCC: _026BCC,
+        0xCD: [
+            _int,
+            {
+                0x0A: "10:00",
+                0x0B: "11:00",
+                0x0C: "12:00",
+                0x0D: "13:00",
+                0x0E: "14:00",
+                0x0F: "15:00",
+                0x10: "16:00",
+                0x11: "17:00",
+                0x00: "cleared",
+            },
+        ],
+        0xCE: _026BCE,
+        0xCF: _026BCF,
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):
