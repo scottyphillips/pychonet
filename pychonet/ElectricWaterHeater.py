@@ -32,15 +32,6 @@ def _026BC2(edt):
     return alarm_status
 
 
-# 0xB9 - Solar power generations utilization time
-def _026BB9(edt):
-    start_hh = int.from_bytes(edt[0:1], "big")
-    start_mm = str(int.from_bytes(edt[1:2], "big")).zfill(2)
-    end_hh = int.from_bytes(edt[2:3], "big")
-    end_mm = str(int.from_bytes(edt[3:4], "big")).zfill(2)
-    return {"start_time": f"{start_hh}:{start_mm}", "end_time": f"{end_hh}:{end_mm}"}
-
-
 # 0xC3 - Hot water supply status
 # 0xC4 Relative time setting for keeping bath temperature
 # 0xE1 - Measured amount of hot water remaining in tank
@@ -225,7 +216,6 @@ class ElectricWaterHeater(EchonetInstance):
                 0x38: "Level 8",
             },
         ],
-        0xE9: _int,
         0xEE: _int,
         0xD4: _int,
         0xD5: _int,
