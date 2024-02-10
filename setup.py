@@ -12,6 +12,7 @@ setup(
     author="Scott Phillips",
     author_email="scotty.phillips@hotmail.com",
     packages=["pychonet", "pychonet.lib"],
+    install_requires=["deprecated"],
     url="http://pypi.python.org/pypi/pychonet/",
     license="LICENSE.txt",
     description="A library for interfacing via the ECHONETlite protocol.",
