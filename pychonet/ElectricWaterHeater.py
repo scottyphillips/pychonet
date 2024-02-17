@@ -105,7 +105,7 @@ def _026BCC(edt):
     # When shifting at 10:00, 13:00, 15:00, and 17:00
     # 0x0000: cleared
     # unsigned short x 4 8 bytes Wh
-    if len(edt == 8):
+    if len(edt) == 8:
         v1 = int.from_bytes(edt[0:2], "big")
         v2 = int.from_bytes(edt[2:4], "big")
         v3 = int.from_bytes(edt[4:6], "big")
