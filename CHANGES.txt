@@ -65,3 +65,4 @@ v2.6.2, 07 Feb 2024 -- Bugfix: A case that property maps could not be retrieved
 v2.6.3, 09 Feb 2024 -- Completed ElectricWaterHeater implementation
 v2.6.4, 14 Feb 2024 -- Fix #70 Set dependent module to deprecated
                     -- Complement EPC_CODE of Electric water heater
+v2.6.5, 19 Feb 2024 -- Fix syntax error in ElectricWaterHeater _026BCC()
