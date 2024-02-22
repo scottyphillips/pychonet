@@ -157,6 +157,7 @@ EPC_SUPER_FUNCTIONS = {
     0x85: _int,
     0x8A: _008A,
     0x8C: _null_padded_optional_string,
+    0x97: _hh_mm,
     0x9A: _009A,
     0x9D: _009X,
     0x9E: _009X,
