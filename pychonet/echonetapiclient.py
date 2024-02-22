@@ -226,11 +226,11 @@ class ECHONETAPIClient:
         no_res = True if esv is SETI else False
         payload = None
         # Is node profile
-        is_node_profile = deojgc == 0x0E and deojcc == 0xF0
+        is_discover = deojgc == 0x0E and deojcc == 0xF0
         map_epcs = {ENL_STATMAP, ENL_GETMAP, ENL_SETMAP}
         # Check OPC Code
         try:
-            if not is_node_profile:
+            if not is_discover:
                 if esv == GET:
                     check_map = set(
                         self._state[host]["instances"][deojgc][deojcc][deojci].get(
@@ -313,7 +313,7 @@ class ECHONETAPIClient:
                 # if tx_tid is not in message list then the message listener has received the message
                 if self._message_list.get(tx_tid) is None:
                     # Check OPC count in results
-                    if not is_node_profile and tx_tid in self._opc_counts:
+                    if not is_discover and tx_tid in self._opc_counts:
                         res_opc_count = self._opc_counts[tx_tid]
                         del self._opc_counts[tx_tid]
                         if self._debug_flag:
@@ -335,7 +335,7 @@ class ECHONETAPIClient:
             if not is_success:
                 if self._message_list.get(tx_tid) is not None:
                     del self._message_list[tx_tid]
-            if self._state[host]["available"] != not_timeout:
+            if not is_discover and self._state[host]["available"] != not_timeout:
                 self._state[host]["available"] = not_timeout
                 # Call update callback functions
                 # key is f"{host}-{deojgc}-{deojcc}-{deojci}"
