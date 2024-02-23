@@ -66,3 +66,6 @@ v2.6.3, 09 Feb 2024 -- Completed ElectricWaterHeater implementation
 v2.6.4, 14 Feb 2024 -- Fix #70 Set dependent module to deprecated
                     -- Complement EPC_CODE of Electric water heater
 v2.6.5, 19 Feb 2024 -- Fix syntax error in ElectricWaterHeater _026BCC()
+v2.6.6, 23 Feb 2024 -- Add 0x97: _hh_mm to EPC_SUPER_FUNCTIONS
+                    -- Don't call update callback functions in discover()
+                    -- Property value in the EPC_SUPER_FUNCTIONS constant
