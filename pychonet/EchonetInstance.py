@@ -15,6 +15,22 @@ from pychonet.lib.const import (
 from pychonet.lib.epc import EPC_CODE, EPC_SUPER
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 
+
+def call_epc_function(epc_function, edt):
+    if type(epc_function) == list:
+        if list(epc_function) == 3:
+            data = epc_function[0](
+                edt,
+                epc_function[1],
+                epc_function[2],
+            )
+        else:
+            data = epc_function[0](edt, epc_function[1])
+    else:
+        data = epc_function(edt)
+    return data
+
+
 """
 Superclass for Echonet instance objects.
 """
@@ -145,10 +161,11 @@ class EchonetInstance:
                 ):  # check if function is defined in the superset
                     returned_json_data.update(
                         {
-                            epc: EPC_SUPER_FUNCTIONS[epc](
+                            epc: call_epc_function(
+                                EPC_SUPER_FUNCTIONS[epc],
                                 self._api._state[self._host]["instances"][self._eojgc][
                                     self._eojcc
-                                ][self._eojci][epc]
+                                ][self._eojci][epc],
                             )
                         }
                     )
@@ -167,23 +184,16 @@ class EchonetInstance:
                 elif epc in list(
                     self.EPC_FUNCTIONS.keys()
                 ):  # check the class-specific EPC function table.
-                    raw_data = self._api._state[self._host]["instances"][self._eojgc][
-                        self._eojcc
-                    ][self._eojci][epc]
-                    if type(self.EPC_FUNCTIONS[epc]) == list:
-                        if list(self.EPC_FUNCTIONS[epc]) == 3:
-                            data = self.EPC_FUNCTIONS[epc][0](
-                                raw_data,
-                                self.EPC_FUNCTIONS[epc][1],
-                                self.EPC_FUNCTIONS[epc][2],
+                    returned_json_data.update(
+                        {
+                            epc: call_epc_function(
+                                self.EPC_FUNCTIONS[epc],
+                                self._api._state[self._host]["instances"][self._eojgc][
+                                    self._eojcc
+                                ][self._eojci][epc],
                             )
-                        else:
-                            data = self.EPC_FUNCTIONS[epc][0](
-                                raw_data, self.EPC_FUNCTIONS[epc][1]
-                            )
-                    else:
-                        data = self.EPC_FUNCTIONS[epc](raw_data)
-                    returned_json_data.update({epc: data})
+                        }
+                    )
                     # returned_json_data.update(
                     #     {
                     #         epc: self.EPC_FUNCTIONS[epc](

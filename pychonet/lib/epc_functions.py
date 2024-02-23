@@ -151,7 +151,7 @@ def _009A(edt):  # cumulative runtime
 
 
 EPC_SUPER_FUNCTIONS = {
-    0x80: _0080,
+    0x80: [_int, DICT_30_ON_OFF],
     0x83: _0083,
     0x84: _int,
     0x85: _int,
