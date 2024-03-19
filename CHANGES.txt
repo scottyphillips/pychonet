@@ -69,3 +69,4 @@ v2.6.5, 19 Feb 2024 -- Fix syntax error in ElectricWaterHeater _026BCC()
 v2.6.6, 23 Feb 2024 -- Add 0x97: _hh_mm to EPC_SUPER_FUNCTIONS
                     -- Don't call update callback functions in discover()
                     -- Property value in the EPC_SUPER_FUNCTIONS constant
+v2.6.7, 19 Mar 2024 -- Eliminate the possibility of communication loss
