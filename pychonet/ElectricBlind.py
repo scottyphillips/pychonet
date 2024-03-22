@@ -2,17 +2,52 @@ from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
     DATA_STATE_CLOSE,
+    DATA_STATE_CLOSING,
+    DATA_STATE_FULLY_OPEN,
     DATA_STATE_OPEN,
+    DATA_STATE_OPENING,
     DATA_STATE_STOP,
+    DICT_41_LOW_MID_HIGH,
+    DICT_41_ON_OFF,
+    DICT_41_UNLOCK_LOCK,
+    DICT_41_YES_NO,
     _int,
 )
 
 ENL_OPENSTATE = 0xE0
+ENL_OPENING_LEVEL = 0xE1
+ENL_BLIND_ANGLE = 0xE2
+ENL_OPENCLOSE_STATUS = 0xEA
 
 DICT_41_OPEN_CLOSE_STOP = {
     0x41: DATA_STATE_OPEN,
     0x42: DATA_STATE_CLOSE,
     0x43: DATA_STATE_STOP,
+}
+
+DICT_41_COVER_STATE = {
+    0x41: DATA_STATE_FULLY_OPEN,
+    0x42: DATA_STATE_CLOSE,
+    0x43: DATA_STATE_OPENING,
+    0x44: DATA_STATE_CLOSING,
+    0x45: DATA_STATE_STOP,
+}
+
+DICT_41_COVER_STOP_BY = {
+    0x41: "Degree-of-setting position: Open",
+    0x42: "Operation time setting value: Open",
+    0x43: "Operation time setting value: Close",
+    0x44: "Local setting position",
+    0x45: "User setting 1",
+    0x46: "User setting 2",
+    0x47: "User setting 3",
+    0x48: "User setting 4",
+    0x49: "User setting 5",
+    0x4A: "User setting 6",
+    0x4B: "User setting 7",
+    0x4C: "User setting 8",
+    0x4D: "User setting 9",
+    0x4E: "User setting 10",
 }
 
 
@@ -51,6 +86,21 @@ class ElectricBlind(EchonetInstance):
 
     EPC_FUNCTIONS = {
         0xE0: [_int, DICT_41_OPEN_CLOSE_STOP],
+        0xC2: [_int, DICT_41_YES_NO],
+        0xC3: [_int, DICT_41_YES_NO],
+        0xD0: [_int, DICT_41_LOW_MID_HIGH],
+        0xD1: [_int, DICT_41_LOW_MID_HIGH],
+        0xD2: _int,
+        0xD4: [_int, DICT_41_ON_OFF],
+        0xE1: _int,
+        0xE2: _int,
+        0xE3: [_int, DICT_41_LOW_MID_HIGH],
+        0xE5: [_int, DICT_41_UNLOCK_LOCK],
+        0xE8: [_int, DICT_41_ON_OFF],
+        0xE9: [_int, DICT_41_COVER_STOP_BY],
+        0xEA: [_int, DICT_41_COVER_STATE],
+        0xEE: [_int, DICT_41_LOW_MID_HIGH],
+        0xEF: [_int, DICT_41_LOW_MID_HIGH],
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):

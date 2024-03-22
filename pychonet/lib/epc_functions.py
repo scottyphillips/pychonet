@@ -9,6 +9,9 @@ DATA_STATE_UNLOCK = "unlocked"
 DATA_STATE_OPEN = "open"
 DATA_STATE_CLOSE = "closed"
 DATA_STATE_STOP = "stop"
+DATA_STATE_FULLY_OPEN = "fullyopen"
+DATA_STATE_OPENING = "opening"
+DATA_STATE_CLOSING = "closing"
 
 # Like switch type
 DICT_41_ON_OFF = {0x41: DATA_STATE_ON, 0x42: DATA_STATE_OFF}
@@ -35,6 +38,12 @@ DICT_41_AUTO_8_SPEEDS = {
     0x36: "high",
     0x37: "very-high",
     0x38: "max",
+}
+
+DICT_41_LOW_MID_HIGH = {
+    0x41: "low",
+    0x42: "medium",
+    0x43: "high",
 }
 
 
