@@ -31,6 +31,7 @@ from .ElectricEnergyMeter import ElectricEnergyMeter
 from .WaterFlowMeter import WaterFlowMeter
 from .CeilingFan import CeilingFan
 from .ElectricWaterHeater import ElectricWaterHeater
+from .Refrigerator import Refrigerator
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
@@ -69,6 +70,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x91}": SingleFunctionLighting,
         f"{0x02}-{0xA3}": LightingSystem,
         f"{0x02}-{0xA6}": HybridWaterHeater,
+        f"{0x03}-{0xB7}": Refrigerator,
         None: None,
     }
     instance_object = instances.get(instance, None)

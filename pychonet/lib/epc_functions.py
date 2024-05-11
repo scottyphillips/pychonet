@@ -46,6 +46,18 @@ DICT_41_LOW_MID_HIGH = {
     0x43: "high",
 }
 
+DICT_41_NORMAL_QUICK_STANDBY = {
+    0x41: "normal",
+    0x42: "quick",
+    0x43: "standby",
+}
+
+DICT_41_ENABLED_DISABLED_TEMPDISABLED = {
+    0x41: "enabled",
+    0x42: "disabled",
+    0x43: "temporarily_disabled",
+}
+
 
 def _swap_dict(d: dict):
     return {v: k for k, v in d.items()}
