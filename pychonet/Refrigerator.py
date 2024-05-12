@@ -1,5 +1,6 @@
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
+    DICT_41_ENABLED_DISABLED,
     DICT_41_ENABLED_DISABLED_TEMPDISABLED,
     DICT_41_OPEN_CLOSED,
     DICT_41_ON_OFF,
@@ -22,16 +23,16 @@ def _03B7E0(edt):
     ice = _int(edt[2:3])
     vegetable = _int(edt[3:4])
     multi_refrigerating = _int(edt[4:5])
-    reserved_forfuture_use = _int(edt[5:8])
+    # reserved_forfuture_use = _int(edt[5:8])
     return {
         "refrigerator": refrigerator if refrigerator else None,
         "freezer": freezer if freezer else None,
         "ice": ice if ice else None,
         "vegetable": vegetable if vegetable else None,
         "multi_refrigerating": multi_refrigerating if multi_refrigerating else None,
-        "reserved_forfuture_use": reserved_forfuture_use
-        if reserved_forfuture_use
-        else None,
+        # "reserved_forfuture_use": reserved_forfuture_use
+        # if reserved_forfuture_use
+        # else None,
     }
 
 
@@ -86,11 +87,8 @@ class Refrigerator(EchonetInstance):
             DICT_41_NORMAL_QUICK_STANDBY,
         ],  # "Quick refrigeration function setting",
         0xA4: [_int, DICT_41_ENABLED_DISABLED_TEMPDISABLED],  # "Icemaker setting",
-        0xA5: [
-            _int,
-            DICT_41_ENABLED_DISABLED_TEMPDISABLED,
-        ],  # "Icemaker operation status",
-        0xA6: [_int, DICT_41_ENABLED_DISABLED_TEMPDISABLED],  # "Icemaker tank status",
+        0xA5: [_int, DICT_41_ENABLED_DISABLED],  # "Icemaker operation status",
+        0xA6: [_int, DICT_41_ENABLED_DISABLED],  # "Icemaker tank status",
         0xA8: [
             _int,
             DICT_41_ON_OFF,
