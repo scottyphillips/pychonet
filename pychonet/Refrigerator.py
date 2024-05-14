@@ -1,5 +1,6 @@
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
+    DICT_41_EMPTY_OR_NOT,
     DICT_41_ENABLED_DISABLED,
     DICT_41_ENABLED_DISABLED_TEMPDISABLED,
     DICT_41_OPEN_CLOSED,
