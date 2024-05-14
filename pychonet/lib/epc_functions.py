@@ -23,6 +23,7 @@ DICT_41_ENABLED_DISABLED = {0x41: "enabled", 0x42: "disabled"}
 DICT_41_AVAILABLE_NOT_AVAILABLE = {0x41: "available", 0x42: "not available"}
 DICT_41_HEATING_NOT_HEATING = {0x41: "heating", 0x42: "not heating"}
 DICT_41_PERMITTED_PROHIBITED = {0x41: "permitted", 0x42: "prohibited"}
+DICT_41_EMPTY_OR_NOT = {0x41: "not empty", 0x42: "empty"}
 DICT_30_TRUE_FALSE = {0x30: True, 0x31: False}
 DICT_30_ON_OFF = {0x30: DATA_STATE_ON, 0x31: DATA_STATE_OFF}
 DICT_30_OPEN_CLOSED = {0x30: DATA_STATE_OPEN, 0x31: DATA_STATE_CLOSE}

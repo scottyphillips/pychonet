@@ -88,7 +88,7 @@ class Refrigerator(EchonetInstance):
         ],  # "Quick refrigeration function setting",
         0xA4: [_int, DICT_41_ENABLED_DISABLED_TEMPDISABLED],  # "Icemaker setting",
         0xA5: [_int, DICT_41_ENABLED_DISABLED],  # "Icemaker operation status",
-        0xA6: [_int, DICT_41_ENABLED_DISABLED],  # "Icemaker tank status",
+        0xA6: [_int, DICT_41_EMPTY_OR_NOT],  # "Icemaker tank status",
         0xA8: [
             _int,
             DICT_41_ON_OFF,
