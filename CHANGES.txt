@@ -71,3 +71,4 @@ v2.6.6, 23 Feb 2024 -- Add 0x97: _hh_mm to EPC_SUPER_FUNCTIONS
                     -- Property value in the EPC_SUPER_FUNCTIONS constant
 v2.6.7, 19 Mar 2024 -- Eliminate the possibility of communication loss
 V2.6.8, 22 Mar 2024 -- Maintenance of ElectricBlind Class
+V2.6.9, 15 May 2024 -- Supports Refrigerator (0x03-0xB7)
