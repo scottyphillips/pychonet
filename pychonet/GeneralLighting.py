@@ -51,7 +51,8 @@ def _0290B1(edt):
 
 class GeneralLighting(EchonetInstance):
     EPC_FUNCTIONS = {
-        0xB1: [
+        0xB0: _int,  # Illuminance level
+        0xB1: [  # Light color setting
             _int,
             {
                 0x40: "other",
@@ -61,6 +62,25 @@ class GeneralLighting(EchonetInstance):
                 0x44: "daylight_color",
             },
         ],
+        # 0xB2: "Illuminance level step setting",
+        # 0xB3: "Light color step setting",
+        # 0xB4: "Maximum specifiable values",
+        # 0xB5: "Maximum value of settable level for night lighting",
+        # 0xB6: "Lighting mode setting",
+        # 0xB7: "Illuminance level setting for main lighting",
+        # 0xB8: "Illuminance level step setting for main lighting",
+        # 0xB9: "Illuminance level setting for night lighting",
+        # 0xBA: "Illuminance level step setting for night lighting",
+        # 0xBB: "Light color setting for main lighting",
+        # 0xBC: "Light color level step setting for main lighting",
+        # 0xBD: "Light color setting for night lighting",
+        # 0xBE: "Light color level step setting for night lighting",
+        # 0xBF: "Lighting mode status in auto mode",
+        # 0xC0: "RGB setting for color lighting",
+        # 0x90: "ON timer reservation setting",
+        # 0x91: "ON timer setting",
+        # 0x94: "OFF timer reservation setting",
+        # 0x95: "OFF timer setting",
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):

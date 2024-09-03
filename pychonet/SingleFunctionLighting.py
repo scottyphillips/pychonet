@@ -1,17 +1,22 @@
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.GeneralLighting import ENL_BRIGHTNESS
+from pychonet.lib.epc_functions import _int
 
 # ----- Single function lighting class -------
 
 
 # TODO - implemenet FUNCTIONS
-# 	0xB0: 'Illuminance level setting',
+#   0xB0: 'Illuminance level setting',
 
 
 """Class for Single Function Lighting Objects"""
 
 
 class SingleFunctionLighting(EchonetInstance):
+    EPC_FUNCTIONS = {
+        0xB0: _int,  # Illuminance level setting
+    }
+
     def __init__(self, host, api_connector=None, instance=0x1):
         self._eojgc = 0x02  # Housing/facility-related device group
         self._eojcc = 0x91  # Single Function Lighting class
