@@ -11,6 +11,9 @@ class ElectricEnergyMeter(EchonetInstance):
     EPC_FUNCTIONS = {
         0xE0: _int,  # 0xE0: "Cumulative amounts of electric energy measurement value",
         0xE2: _0280E2,  # 0xE2: "Cumulative amounts of electric energy unit",
+        # TODO - implemenet FUNCTIONS
+        # 0xE3: "Cumulative amounts of electric energy measurement log 1",
+        # 0xE4: "Cumulative amounts of electric energy measurement log 2",
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):
