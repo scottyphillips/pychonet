@@ -1,6 +1,11 @@
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import DICT_30_TRUE_FALSE
+from pychonet.lib.epc_functions import (
+    DATA_STATE_OFF,
+    DATA_STATE_ON,
+    DICT_30_ON_OFF,
+    DICT_30_TRUE_FALSE,
+)
 from pychonet.lib.epc_functions import _int, _swap_dict
 
 ENL_FANSPEED_PERCENT = 0xF0
@@ -8,6 +13,9 @@ ENL_FAN_DIRECTION = 0xF1
 ENL_FAN_OSCILLATION = 0xF2
 ENL_BUZZER = 0xFC
 ENL_FAN_POWER = 0x80
+ENL_FAN_LIGHT_STATUS = 0xF3
+ENL_FAN_LIGHT_BRIGHTNESS = 0xF5
+ENL_FAN_LIGHT_COLOR_TEMP = 0xF6
 
 DICT_FAN_DIRECTION = {0x41: "forward", 0x42: "reverse"}
 
@@ -51,7 +59,14 @@ class CeilingFan(EchonetInstance):
         0xF1: [_int, DICT_FAN_DIRECTION],
         0xF2: [_int, DICT_30_TRUE_FALSE],
         0xFC: [_int, DICT_30_TRUE_FALSE],
+        0xF3: [_int, DICT_30_ON_OFF],
+        0xF4: [_int, {0x42: "normal", 0x43: "night"}],
+        0xF5: _int,
+        0xF6: _int,
+        0xF7: [_int, {0x01: "low", 0x32: "medium", 0x64: "high"}],
     }
+    SPEED_COUNT = 10
+    LIGHT_ON_OFF = _swap_dict(DICT_30_ON_OFF)
 
     def __init__(self, host, api_connector=None, instance=0x1):
         self._eojgc = 0x01  # Air conditioner-related device group
@@ -148,3 +163,61 @@ class CeilingFan(EchonetInstance):
 
     async def getFanOscillation(self):  # 0xF2
         return await self.getMessage(ENL_FAN_OSCILLATION)
+
+    """
+    Light On sets the node to ON.
+
+    """
+
+    async def light_on(self):  # EPC 0xF3
+        return await self.setMessage(
+            ENL_FAN_LIGHT_STATUS, self.LIGHT_ON_OFF[DATA_STATE_ON]
+        )
+
+    """
+    Light Off sets the node to OFF.
+
+    """
+
+    async def light_off(self):  # EPC 0xF3
+        return await self.setMessage(
+            ENL_FAN_LIGHT_STATUS, self.LIGHT_ON_OFF[DATA_STATE_OFF]
+        )
+
+    """
+    getBrightness get the brightness that has been set in the light
+
+    return: A string representing the configured brightness.
+    """
+
+    def getBrightness(self):
+        return self.getMessage(ENL_FAN_LIGHT_BRIGHTNESS)  # ['brightness']
+
+    """
+    setBrightness set the brightness of the light
+
+    param temperature: A string representing the desired brightness.
+    """
+
+    def setBrightness(self, brightness):
+        return self.setMessage(ENL_FAN_LIGHT_BRIGHTNESS, int(brightness))
+
+    """
+    getColorTemp get the color temperature that has been set in the light
+
+    return: A string representing the configured color temperature.
+    """
+
+    def getColorTemperature(self):
+        # return self.getMessage(ENL_FAN_LIGHT_COLOR_TEMP)  # ['color_temperature']
+        # calculate some helper
+        return self.getMessage(ENL_FAN_LIGHT_COLOR_TEMP)
+
+    """
+    setColorTemperature set the temperature of the light
+
+    param temperature: A string representing the desired temperature.
+    """
+
+    def setColorTemperature(self, color_temperature):
+        return self.setMessage(ENL_FAN_LIGHT_COLOR_TEMP, color_temperature)
