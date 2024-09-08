@@ -1,8 +1,10 @@
 from pychonet.EchonetInstance import EchonetInstance
+from pychonet.GeneralLighting import ENL_BRIGHTNESS
 from pychonet.lib.epc_functions import _int
 
 ENL_SCENE = 0xC0
 ENL_SCENE_MAX = 0xC1
+
 
 class LightingSystem(EchonetInstance):
     EPC_FUNCTIONS = {
@@ -17,3 +19,21 @@ class LightingSystem(EchonetInstance):
         EchonetInstance.__init__(
             self, host, self._eojgc, self._eojcc, instance, api_connector
         )
+
+    """
+    getBrightness get the brightness that has been set in the light
+
+    return: A string representing the configured brightness.
+    """
+
+    def getBrightness(self):
+        return self.getMessage(ENL_BRIGHTNESS)  # ['brightness']
+
+    """
+    setBrightness set the temperature of the light
+
+    param temperature: A string representing the desired temperature.
+    """
+
+    def setBrightness(self, brightness):
+        return self.setMessage(ENL_BRIGHTNESS, int(brightness))
