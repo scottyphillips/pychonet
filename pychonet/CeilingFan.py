@@ -1,11 +1,7 @@
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import (
-    DATA_STATE_OFF,
-    DATA_STATE_ON,
-    DICT_30_ON_OFF,
-    DICT_30_TRUE_FALSE,
-)
+from pychonet.lib.const import ENL_OFF, ENL_ON, ENL_STATUS
+from pychonet.lib.epc_functions import DICT_30_ON_OFF, DICT_30_TRUE_FALSE
 from pychonet.lib.epc_functions import _int, _swap_dict
 
 ENL_FANSPEED_PERCENT = 0xF0
@@ -66,7 +62,6 @@ class CeilingFan(EchonetInstance):
         0xF7: [_int, {0x01: "low", 0x32: "medium", 0x64: "high"}],
     }
     SPEED_COUNT = 10
-    LIGHT_ON_OFF = _swap_dict(DICT_30_ON_OFF)
 
     def __init__(self, host, api_connector=None, instance=0x1):
         self._eojgc = 0x01  # Air conditioner-related device group
@@ -76,22 +71,51 @@ class CeilingFan(EchonetInstance):
         )
 
     """
+    setMessage is used to fire ECHONET set messages to set Node information
+    Assumes one OPC is sent per message.
+
+    :param tx_epc: EPC byte code for the request.
+    :param tx_edt: EDT data relevant to the request.
+    :return: True if sucessful, false if request message failed
+    """
+
+    async def setMessage(self, epc, edt, pdc=0x01):
+        response = await self.setMessages(
+            [
+                {"EPC": ENL_STATUS, "PDC": 0x01, "EDT": ENL_ON},
+                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": ENL_ON},
+                {"EPC": epc, "PDC": pdc, "EDT": edt},
+            ]
+        )
+        if not response:
+            return False
+        return True
+
+    """
+    On sets the node to ON.
+
+    """
+
+    async def on(self):  # EPC 0x80
+        return await super().setMessage(ENL_STATUS, ENL_ON)
+
+    """
+    Off sets the node to OFF.
+
+    """
+
+    async def off(self):  # EPC 0x80
+        return await super().setMessage(ENL_STATUS, ENL_OFF)
+
+    """
     setFanSpeedPercent set the desired fan speed in percentage. Will be rounded to the nearest 10% value. 
 
     param fans_speed: An int representing the fan speed.
     """
 
     async def setFanSpeedPercent(self, fan_speed_percent):
-        return await self.setMessages(
-            [
-                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
-                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
-                {
-                    "EPC": ENL_FANSPEED_PERCENT,
-                    "PDC": 0x01,
-                    "EDT": round(fan_speed_percent / 10) + 0x30,
-                },
-            ]
+        return await self.setMessage(
+            ENL_FANSPEED_PERCENT, round(fan_speed_percent / 10) + 0x30
         )
 
     """
@@ -112,17 +136,7 @@ class CeilingFan(EchonetInstance):
     """
 
     async def setFanDirection(self, fan_direction):
-        return await self.setMessages(
-            [
-                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
-                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
-                {
-                    "EPC": ENL_FAN_DIRECTION,
-                    "PDC": 0x01,
-                    "EDT": FAN_DIRECTION[fan_direction],
-                },
-            ]
-        )
+        return await self.setMessage(ENL_FAN_DIRECTION, FAN_DIRECTION[fan_direction])
 
     """
     getFanDirection gets the current fan direction
@@ -142,16 +156,8 @@ class CeilingFan(EchonetInstance):
     """
 
     async def setFanOscillation(self, fan_oscillation):
-        return await self.setMessages(
-            [
-                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
-                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
-                {
-                    "EPC": ENL_FAN_OSCILLATION,
-                    "PDC": 0x01,
-                    "EDT": FAN_OSCILLATION[fan_oscillation],
-                },
-            ]
+        return await self.setMessage(
+            ENL_FAN_OSCILLATION, FAN_OSCILLATION[fan_oscillation]
         )
 
     """
@@ -170,17 +176,7 @@ class CeilingFan(EchonetInstance):
     """
 
     async def light_on(self):  # EPC 0xF3
-        return await self.setMessages(
-            [
-                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
-                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
-                {
-                    "EPC": ENL_FAN_LIGHT_STATUS,
-                    "PDC": 0x01,
-                    "EDT": self.LIGHT_ON_OFF[DATA_STATE_ON],
-                },
-            ]
-        )
+        return await self.setMessage(ENL_FAN_LIGHT_STATUS, ENL_ON)
 
     """
     Light Off sets the node to OFF.
@@ -188,9 +184,7 @@ class CeilingFan(EchonetInstance):
     """
 
     async def light_off(self):  # EPC 0xF3
-        return await self.setMessage(
-            ENL_FAN_LIGHT_STATUS, self.LIGHT_ON_OFF[DATA_STATE_OFF]
-        )
+        return await super().setMessage(ENL_FAN_LIGHT_STATUS, ENL_OFF)
 
     """
     getBrightness get the brightness that has been set in the light
@@ -208,17 +202,7 @@ class CeilingFan(EchonetInstance):
     """
 
     async def setBrightness(self, brightness):
-        return await self.setMessages(
-            [
-                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
-                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
-                {
-                    "EPC": ENL_FAN_LIGHT_BRIGHTNESS,
-                    "PDC": 0x01,
-                    "EDT": int(brightness),
-                },
-            ]
-        )
+        return await self.setMessage(ENL_FAN_LIGHT_BRIGHTNESS, int(brightness))
 
     """
     getColorTemp get the color temperature that has been set in the light
@@ -238,14 +222,4 @@ class CeilingFan(EchonetInstance):
     """
 
     async def setColorTemperature(self, color_temperature):
-        return await self.setMessages(
-            [
-                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
-                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
-                {
-                    "EPC": ENL_FAN_LIGHT_COLOR_TEMP,
-                    "PDC": 0x01,
-                    "EDT": int(color_temperature),
-                },
-            ]
-        )
+        return await self.setMessage(ENL_FAN_LIGHT_COLOR_TEMP, int(color_temperature))
