@@ -170,8 +170,16 @@ class CeilingFan(EchonetInstance):
     """
 
     async def light_on(self):  # EPC 0xF3
-        return await self.setMessage(
-            ENL_FAN_LIGHT_STATUS, self.LIGHT_ON_OFF[DATA_STATE_ON]
+        return await self.setMessages(
+            [
+                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
+                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
+                {
+                    "EPC": ENL_FAN_LIGHT_STATUS,
+                    "PDC": 0x01,
+                    "EDT": self.LIGHT_ON_OFF[DATA_STATE_ON],
+                },
+            ]
         )
 
     """
@@ -190,8 +198,8 @@ class CeilingFan(EchonetInstance):
     return: A string representing the configured brightness.
     """
 
-    def getBrightness(self):
-        return self.getMessage(ENL_FAN_LIGHT_BRIGHTNESS)  # ['brightness']
+    async def getBrightness(self):
+        return await self.getMessage(ENL_FAN_LIGHT_BRIGHTNESS)  # ['brightness']
 
     """
     setBrightness set the brightness of the light
@@ -199,8 +207,18 @@ class CeilingFan(EchonetInstance):
     param temperature: A string representing the desired brightness.
     """
 
-    def setBrightness(self, brightness):
-        return self.setMessage(ENL_FAN_LIGHT_BRIGHTNESS, int(brightness))
+    async def setBrightness(self, brightness):
+        return await self.setMessages(
+            [
+                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
+                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
+                {
+                    "EPC": ENL_FAN_LIGHT_BRIGHTNESS,
+                    "PDC": 0x01,
+                    "EDT": int(brightness),
+                },
+            ]
+        )
 
     """
     getColorTemp get the color temperature that has been set in the light
@@ -208,10 +226,10 @@ class CeilingFan(EchonetInstance):
     return: A string representing the configured color temperature.
     """
 
-    def getColorTemperature(self):
+    async def getColorTemperature(self):
         # return self.getMessage(ENL_FAN_LIGHT_COLOR_TEMP)  # ['color_temperature']
         # calculate some helper
-        return self.getMessage(ENL_FAN_LIGHT_COLOR_TEMP)
+        return await self.getMessage(ENL_FAN_LIGHT_COLOR_TEMP)
 
     """
     setColorTemperature set the temperature of the light
@@ -219,5 +237,15 @@ class CeilingFan(EchonetInstance):
     param temperature: A string representing the desired temperature.
     """
 
-    def setColorTemperature(self, color_temperature):
-        return self.setMessage(ENL_FAN_LIGHT_COLOR_TEMP, color_temperature)
+    async def setColorTemperature(self, color_temperature):
+        return await self.setMessages(
+            [
+                {"EPC": ENL_FAN_POWER, "PDC": 0x01, "EDT": 0x30},
+                {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": 0x30},
+                {
+                    "EPC": ENL_FAN_LIGHT_COLOR_TEMP,
+                    "PDC": 0x01,
+                    "EDT": int(color_temperature),
+                },
+            ]
+        )
