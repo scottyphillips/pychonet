@@ -141,10 +141,12 @@ class GeneralLighting(EchonetInstance):
         opc = list()
 
         if status is not None:
-            opc += {"EPC": ENL_STATUS, "PDC": 0x01, "EDT": int(status)}
+            opc.append({"EPC": ENL_STATUS, "PDC": 0x01, "EDT": int(status)})
         if brightness is not None:
-            opc += {"EPC": ENL_BRIGHTNESS, "PDC": 0x01, "EDT": int(brightness)}
+            opc.append({"EPC": ENL_BRIGHTNESS, "PDC": 0x01, "EDT": int(brightness)})
         if color_temperature is not None:
-            opc += {"EPC": ENL_COLOR_TEMP, "PDC": 0x01, "EDT": int(color_temperature)}
+            opc.append(
+                {"EPC": ENL_COLOR_TEMP, "PDC": 0x01, "EDT": int(color_temperature)}
+            )
 
         return await self.setMessages(opc)

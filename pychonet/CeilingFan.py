@@ -1,5 +1,7 @@
+from typing import Dict
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
+from pychonet.GeneralLighting import ENL_BRIGHTNESS, ENL_COLOR_TEMP
 from pychonet.lib.const import ENL_OFF, ENL_ON, ENL_STATUS
 from pychonet.lib.epc_functions import DICT_30_ON_OFF, DICT_30_TRUE_FALSE
 from pychonet.lib.epc_functions import _int, _swap_dict
@@ -223,3 +225,37 @@ class CeilingFan(EchonetInstance):
 
     async def setColorTemperature(self, color_temperature):
         return await self.setMessage(ENL_FAN_LIGHT_COLOR_TEMP, int(color_temperature))
+
+    """
+    setLightStates set the light states
+
+    param status: A Dict any light states
+    """
+
+    async def setLightStates(self, states: Dict):
+        status = states.get("status")
+        brightness = states.get("brightness")
+        color_temperature = states.get("color_temperature")
+
+        opc = [
+            {"EPC": 0x93, "PDC": 0x01, "EDT": 0x41},  # Set from local network
+            {"EPC": ENL_STATUS, "PDC": 0x01, "EDT": ENL_ON},
+            {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": ENL_ON},
+        ]
+
+        if status is not None:
+            opc.append({"EPC": ENL_FAN_LIGHT_STATUS, "PDC": 0x01, "EDT": int(status)})
+        if brightness is not None:
+            opc.append(
+                {"EPC": ENL_FAN_LIGHT_BRIGHTNESS, "PDC": 0x01, "EDT": int(brightness)}
+            )
+        if color_temperature is not None:
+            opc.append(
+                {
+                    "EPC": ENL_FAN_LIGHT_COLOR_TEMP,
+                    "PDC": 0x01,
+                    "EDT": int(color_temperature),
+                }
+            )
+
+        return await self.setMessages(opc)
