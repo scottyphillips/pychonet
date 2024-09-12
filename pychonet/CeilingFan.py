@@ -256,10 +256,16 @@ class CeilingFan(EchonetInstance):
             ENL_FAN_LIGHT_BRIGHTNESS: "brightness",  # 0xF5
             ENL_FAN_LIGHT_COLOR_TEMP: "color_temperature",  # 0xF6
             ENL_FAN_LIGHT_NIGHT_BRIGHTNESS: "effect",  # 0xF7
-            ENL_BUZZER: None,  # 0xFC
+            # ENL_BUZZER: None,  # 0xFC
         }
 
-        night_mode = self._epc_data.get(ENL_FAN_LIGHT_MODE) == 0x43
+        if states.get("effect", "normal") in [
+            "night_low",
+            "night_medium",
+            "night_high",
+        ]:
+            self._epc_data[ENL_FAN_LIGHT_MODE] = 0x43.to_bytes(1)
+        night_mode = int.from_bytes(self._epc_data.get(ENL_FAN_LIGHT_MODE)) == 0x43
 
         opc = list()
         for epc, name in epc_codes.items():
@@ -289,6 +295,7 @@ class CeilingFan(EchonetInstance):
                             "EDT": int.from_bytes(self._epc_data.get(epc)),
                         }
                     )
+        opc.append({"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": ENL_ON})
 
         return await self.setMessages(opc)
 
