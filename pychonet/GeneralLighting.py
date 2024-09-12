@@ -84,7 +84,7 @@ class GeneralLighting(EchonetInstance):
         # 0x95: "OFF timer setting",
     }
 
-    def __init__(self, host, api_connector=None, instance=0x1):
+    def __init__(self, host, api_connector, instance=0x1):
         self._eojgc = 0x02  # Housing/facility-related device group
         self._eojcc = 0x90  # General Lighting class
         EchonetInstance.__init__(
@@ -134,19 +134,16 @@ class GeneralLighting(EchonetInstance):
     """
 
     async def setLightStates(self, states: Dict):
-        status = states.get("status")
-        brightness = states.get("brightness")
-        color_temperature = states.get("color_temperature")
+        epc_codes = {
+            ENL_STATUS: "status",
+            ENL_BRIGHTNESS: "brightness",
+            ENL_COLOR_TEMP: "color_temperature",
+        }
 
         opc = list()
-
-        if status is not None:
-            opc.append({"EPC": ENL_STATUS, "PDC": 0x01, "EDT": int(status)})
-        if brightness is not None:
-            opc.append({"EPC": ENL_BRIGHTNESS, "PDC": 0x01, "EDT": int(brightness)})
-        if color_temperature is not None:
-            opc.append(
-                {"EPC": ENL_COLOR_TEMP, "PDC": 0x01, "EDT": int(color_temperature)}
-            )
+        for epc, name in epc_codes.items():
+            value = states.get(name)
+            if value:
+                opc.append({"EPC": epc, "PDC": 0x01, "EDT": int(value)})
 
         return await self.setMessages(opc)
