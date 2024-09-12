@@ -2,24 +2,33 @@ from typing import Dict
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.GeneralLighting import ENL_BRIGHTNESS, ENL_COLOR_TEMP
-from pychonet.lib.const import ENL_OFF, ENL_ON, ENL_STATUS
+from pychonet.lib.const import ENL_OFF, ENL_ON, ENL_SETMAP, ENL_STATUS
 from pychonet.lib.epc_functions import DICT_30_ON_OFF, DICT_30_TRUE_FALSE
 from pychonet.lib.epc_functions import _int, _swap_dict
 
 ENL_FANSPEED_PERCENT = 0xF0
 ENL_FAN_DIRECTION = 0xF1
 ENL_FAN_OSCILLATION = 0xF2
-ENL_BUZZER = 0xFC
-ENL_FAN_POWER = 0x80
 ENL_FAN_LIGHT_STATUS = 0xF3
+ENL_FAN_LIGHT_MODE = 0xF4
 ENL_FAN_LIGHT_BRIGHTNESS = 0xF5
 ENL_FAN_LIGHT_COLOR_TEMP = 0xF6
+ENL_FAN_LIGHT_NIGHT_BRIGHTNESS = 0xF7
+ENL_BUZZER = 0xFC
 
 DICT_FAN_DIRECTION = {0x41: "forward", 0x42: "reverse"}
+DICT_FAN_LIGHT_EFFECTS = {
+    0x00: "normal",
+    0x01: "night_low",
+    0x32: "night_medium",
+    0x64: "night_high",
+}
 
 FAN_DIRECTION = _swap_dict(DICT_FAN_DIRECTION)
 
 FAN_OSCILLATION = _swap_dict(DICT_30_TRUE_FALSE)
+
+FAN_LIGHT_EFFECTS = _swap_dict(DICT_FAN_LIGHT_EFFECTS)
 
 
 # ----- Ceiling Fan Class -------
@@ -71,6 +80,10 @@ class CeilingFan(EchonetInstance):
         EchonetInstance.__init__(
             self, host, self._eojgc, self._eojcc, instance, api_connector
         )
+
+        self._epc_data = self._api._state[self._host]["instances"][self._eojgc][
+            self._eojcc
+        ][self._eojci]
 
     """
     setMessage is used to fire ECHONET set messages to set Node information
@@ -178,7 +191,7 @@ class CeilingFan(EchonetInstance):
     """
 
     async def light_on(self):  # EPC 0xF3
-        return await self.setMessage(ENL_FAN_LIGHT_STATUS, ENL_ON)
+        return await self.setLightStates({"status": ENL_ON})
 
     """
     Light Off sets the node to OFF.
@@ -204,7 +217,7 @@ class CeilingFan(EchonetInstance):
     """
 
     async def setBrightness(self, brightness):
-        return await self.setMessage(ENL_FAN_LIGHT_BRIGHTNESS, int(brightness))
+        return await self.setLightStates({"brightness": int(brightness)})
 
     """
     getColorTemp get the color temperature that has been set in the light
@@ -224,7 +237,7 @@ class CeilingFan(EchonetInstance):
     """
 
     async def setColorTemperature(self, color_temperature):
-        return await self.setMessage(ENL_FAN_LIGHT_COLOR_TEMP, int(color_temperature))
+        return await self.setLightStates({"color_temperature": int(color_temperature)})
 
     """
     setLightStates set the light states
@@ -233,29 +246,68 @@ class CeilingFan(EchonetInstance):
     """
 
     async def setLightStates(self, states: Dict):
-        status = states.get("status")
-        brightness = states.get("brightness")
-        color_temperature = states.get("color_temperature")
+        epc_codes = {
+            ENL_STATUS: None,  # 0x80
+            ENL_FANSPEED_PERCENT: None,  # 0xF0
+            ENL_FAN_DIRECTION: None,  # 0xF1
+            ENL_FAN_OSCILLATION: None,  # 0xF2
+            ENL_FAN_LIGHT_STATUS: "status",  # 0xF3
+            ENL_FAN_LIGHT_MODE: None,  # 0xF4
+            ENL_FAN_LIGHT_BRIGHTNESS: "brightness",  # 0xF5
+            ENL_FAN_LIGHT_COLOR_TEMP: "color_temperature",  # 0xF6
+            ENL_FAN_LIGHT_NIGHT_BRIGHTNESS: "effect",  # 0xF7
+            ENL_BUZZER: None,  # 0xFC
+        }
 
-        opc = [
-            {"EPC": 0x93, "PDC": 0x01, "EDT": 0x41},  # Set from local network
-            {"EPC": ENL_STATUS, "PDC": 0x01, "EDT": ENL_ON},
-            {"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": ENL_ON},
-        ]
+        night_mode = self._epc_data.get(ENL_FAN_LIGHT_MODE) == 0x43
 
-        if status is not None:
-            opc.append({"EPC": ENL_FAN_LIGHT_STATUS, "PDC": 0x01, "EDT": int(status)})
-        if brightness is not None:
-            opc.append(
-                {"EPC": ENL_FAN_LIGHT_BRIGHTNESS, "PDC": 0x01, "EDT": int(brightness)}
-            )
-        if color_temperature is not None:
-            opc.append(
-                {
-                    "EPC": ENL_FAN_LIGHT_COLOR_TEMP,
-                    "PDC": 0x01,
-                    "EDT": int(color_temperature),
-                }
-            )
+        opc = list()
+        for epc, name in epc_codes.items():
+            if name:
+                value = states.get(name)
+                if value:
+                    if night_mode and epc == ENL_FAN_LIGHT_NIGHT_BRIGHTNESS:
+                        data = FAN_LIGHT_EFFECTS.get(value, 0)
+                        if data > 0:
+                            opc.append({"EPC": epc, "PDC": 0x01, "EDT": data})
+                    else:
+                        opc.append({"EPC": epc, "PDC": 0x01, "EDT": int(value)})
+                elif epc in self._epc_data:
+                    opc.append(
+                        {
+                            "EPC": epc,
+                            "PDC": 0x01,
+                            "EDT": int.from_bytes(self._epc_data.get(epc)),
+                        }
+                    )
+            else:
+                if epc in self._epc_data:
+                    opc.append(
+                        {
+                            "EPC": epc,
+                            "PDC": 0x01,
+                            "EDT": int.from_bytes(self._epc_data.get(epc)),
+                        }
+                    )
 
         return await self.setMessages(opc)
+
+    def getEffectList(self):
+        if (
+            ENL_FAN_LIGHT_MODE in self._epc_data[ENL_SETMAP]
+            and ENL_FAN_LIGHT_NIGHT_BRIGHTNESS in self._epc_data[ENL_SETMAP]
+        ):
+            return list(DICT_FAN_LIGHT_EFFECTS.values())
+        return None
+
+    def getEffect(self):
+        if (
+            ENL_FAN_LIGHT_MODE in self._epc_data
+            and ENL_FAN_LIGHT_NIGHT_BRIGHTNESS in self._epc_data
+        ):
+            if self._epc_data[ENL_FAN_LIGHT_MODE] == 0x42:
+                return "normal"
+
+            return DICT_FAN_LIGHT_EFFECTS.get(
+                self._epc_data.get(ENL_FAN_LIGHT_NIGHT_BRIGHTNESS, 0), "normal"
+            )
