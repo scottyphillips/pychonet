@@ -256,15 +256,14 @@ class CeilingFan(EchonetInstance):
             ENL_FAN_LIGHT_BRIGHTNESS: "brightness",  # 0xF5
             ENL_FAN_LIGHT_COLOR_TEMP: "color_temperature",  # 0xF6
             ENL_FAN_LIGHT_NIGHT_BRIGHTNESS: "effect",  # 0xF7
-            # ENL_BUZZER: None,  # 0xFC
         }
 
-        if states.get("effect", "normal") in [
-            "night_low",
-            "night_medium",
-            "night_high",
-        ]:
-            self._epc_data[ENL_FAN_LIGHT_MODE] = 0x43.to_bytes(1)
+        if "effect" in states:
+            if states["effect"] in ["night_low", "night_medium", "night_high"]:
+                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x43.to_bytes(1)
+            else:
+                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x42.to_bytes(1)
+
         night_mode = int.from_bytes(self._epc_data.get(ENL_FAN_LIGHT_MODE)) == 0x43
 
         opc = list()
@@ -279,13 +278,14 @@ class CeilingFan(EchonetInstance):
                     else:
                         opc.append({"EPC": epc, "PDC": 0x01, "EDT": int(value)})
                 elif epc in self._epc_data:
-                    opc.append(
-                        {
-                            "EPC": epc,
-                            "PDC": 0x01,
-                            "EDT": int.from_bytes(self._epc_data.get(epc)),
-                        }
-                    )
+                    if night_mode or epc != ENL_FAN_LIGHT_NIGHT_BRIGHTNESS:
+                        opc.append(
+                            {
+                                "EPC": epc,
+                                "PDC": 0x01,
+                                "EDT": int.from_bytes(self._epc_data.get(epc)),
+                            }
+                        )
             else:
                 if epc in self._epc_data:
                     opc.append(
