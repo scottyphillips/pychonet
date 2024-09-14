@@ -2,7 +2,7 @@ from typing import Dict
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.GeneralLighting import ENL_BRIGHTNESS, ENL_COLOR_TEMP
-from pychonet.lib.const import ENL_OFF, ENL_ON, ENL_SETMAP, ENL_STATUS
+from pychonet.lib.const import EFFECT_OFF, ENL_OFF, ENL_ON, ENL_SETMAP, ENL_STATUS
 from pychonet.lib.epc_functions import DICT_30_ON_OFF, DICT_30_TRUE_FALSE
 from pychonet.lib.epc_functions import _int, _swap_dict
 
@@ -18,7 +18,7 @@ ENL_BUZZER = 0xFC
 
 DICT_FAN_DIRECTION = {0x41: "forward", 0x42: "reverse"}
 DICT_FAN_LIGHT_EFFECTS = {
-    0x00: "normal",
+    0x00: EFFECT_OFF,
     0x01: "night_low",
     0x32: "night_medium",
     0x64: "night_high",
@@ -34,7 +34,7 @@ FAN_LIGHT_EFFECTS = _swap_dict(DICT_FAN_LIGHT_EFFECTS)
 # ----- Ceiling Fan Class -------
 # Fan speed in percentage
 def _013AF0(edt):
-    op_mode = int.from_bytes(edt, "big")
+    op_mode = _int(edt)
     fan_speed_percentage = int((op_mode - 0x30) * 0x0A)
     return fan_speed_percentage
 
@@ -80,10 +80,6 @@ class CeilingFan(EchonetInstance):
         EchonetInstance.__init__(
             self, host, self._eojgc, self._eojcc, instance, api_connector
         )
-
-        self._epc_data = self._api._state[self._host]["instances"][self._eojgc][
-            self._eojcc
-        ][self._eojci]
 
     """
     setMessage is used to fire ECHONET set messages to set Node information
@@ -264,7 +260,7 @@ class CeilingFan(EchonetInstance):
             else:
                 self._epc_data[ENL_FAN_LIGHT_MODE] = 0x42.to_bytes(1)
 
-        night_mode = int.from_bytes(self._epc_data.get(ENL_FAN_LIGHT_MODE)) == 0x43
+        night_mode = _int(self._epc_data.get(ENL_FAN_LIGHT_MODE)) == 0x43
 
         opc = list()
         for epc, name in epc_codes.items():
@@ -283,7 +279,7 @@ class CeilingFan(EchonetInstance):
                             {
                                 "EPC": epc,
                                 "PDC": 0x01,
-                                "EDT": int.from_bytes(self._epc_data.get(epc)),
+                                "EDT": _int(self._epc_data.get(epc)),
                             }
                         )
             else:
@@ -292,7 +288,7 @@ class CeilingFan(EchonetInstance):
                         {
                             "EPC": epc,
                             "PDC": 0x01,
-                            "EDT": int.from_bytes(self._epc_data.get(epc)),
+                            "EDT": _int(self._epc_data.get(epc)),
                         }
                     )
         opc.append({"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": ENL_ON})
@@ -300,6 +296,11 @@ class CeilingFan(EchonetInstance):
         return await self.setMessages(opc)
 
     def getEffectList(self):
+        """Get Effect List
+
+        Returns:
+            list|None: Effect list or None
+        """
         if (
             ENL_FAN_LIGHT_MODE in self._epc_data[ENL_SETMAP]
             and ENL_FAN_LIGHT_NIGHT_BRIGHTNESS in self._epc_data[ENL_SETMAP]
@@ -308,13 +309,19 @@ class CeilingFan(EchonetInstance):
         return None
 
     def getEffect(self):
+        """Get Current Effect
+
+        Returns:
+            string: Value of current effect
+        """
         if (
             ENL_FAN_LIGHT_MODE in self._epc_data
             and ENL_FAN_LIGHT_NIGHT_BRIGHTNESS in self._epc_data
         ):
             if self._epc_data[ENL_FAN_LIGHT_MODE] == 0x42:
-                return "normal"
+                return EFFECT_OFF
 
             return DICT_FAN_LIGHT_EFFECTS.get(
-                self._epc_data.get(ENL_FAN_LIGHT_NIGHT_BRIGHTNESS, 0), "normal"
+                _int(self._epc_data.get(ENL_FAN_LIGHT_NIGHT_BRIGHTNESS)), EFFECT_OFF
             )
+        return EFFECT_OFF

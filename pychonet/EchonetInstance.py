@@ -53,6 +53,9 @@ class EchonetInstance:
         self._eojcc = eojcc
         self._eojci = instance
         self._api = api_connector
+        self._epc_data = self._api._state[self._host]["instances"][self._eojgc][
+            self._eojcc
+        ][self._eojci]
 
         # TODO self instntiate the API connector for backwards compatability with the older libary
 
