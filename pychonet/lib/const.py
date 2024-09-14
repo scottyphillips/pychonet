@@ -1,4 +1,5 @@
 from pychonet.version import __version__ as VERSION
+
 # Echonetlite message format:
 #
 # - EDT0     |Property value data             |01 ..|01 01 30 01
@@ -29,7 +30,7 @@ EHD2 = {
 # ------------------------------------------------------------------
 # ESV
 # ------------------------------------------------------------------
-GETC = 0x60 # Deprecated, for backward compatibility
+GETC = 0x60  # Deprecated, for backward compatibility
 SETI = 0x60
 SETC = 0x61
 GET = 0x62
@@ -343,3 +344,5 @@ ENL_CUMULATIVE_RUNTIME = 0x9A
 ENL_STATMAP = 0x9D
 ENL_SETMAP = 0x9E
 ENL_GETMAP = 0x9F
+
+EFFECT_OFF = "off"
