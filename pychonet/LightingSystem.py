@@ -73,7 +73,7 @@ class LightingSystem(EchonetInstance):
         """
         if (max_num := self._epc_data.get(ENL_SCENE_MAX)) != None:
             effect_list = [EFFECT_OFF]
-            for i in range(1, _int(max_num)):
+            for i in range(1, _int(max_num) + 1):
                 effect_list.append("scene " + str(i))
             return effect_list
         return None
