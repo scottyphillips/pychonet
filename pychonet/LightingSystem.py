@@ -1,7 +1,7 @@
 from typing import Dict
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.GeneralLighting import ENL_BRIGHTNESS
-from pychonet.lib.const import ENL_STATUS
+from pychonet.lib.const import EFFECT_OFF, ENL_STATUS
 from pychonet.lib.epc_functions import _int
 
 ENL_SCENE = 0xC0
@@ -49,6 +49,7 @@ class LightingSystem(EchonetInstance):
     async def setLightStates(self, states: Dict):
         status = states.get("status")
         brightness = states.get("brightness")
+        effect = states.get("effect")
 
         opc = list()
 
@@ -56,5 +57,33 @@ class LightingSystem(EchonetInstance):
             opc.append({"EPC": ENL_STATUS, "PDC": 0x01, "EDT": int(status)})
         if brightness is not None:
             opc.append({"EPC": ENL_BRIGHTNESS, "PDC": 0x01, "EDT": int(brightness)})
-
+        if effect is not None:
+            if effect == EFFECT_OFF:
+                scean_num = 0
+            else:
+                scean_num = effect.split()[1]
+            opc.append({"EPC": ENL_SCENE, "PDC": 0x01, "EDT": int(scean_num)})
         return await self.setMessages(opc)
+
+    def getEffectList(self):
+        """Get Effect List
+
+        Returns:
+            list|None: Effect list or None
+        """
+        if (max_num := self._epc_data.get(ENL_SCENE_MAX)) != None:
+            effect_list = [EFFECT_OFF]
+            for i in range(1, _int(max_num)):
+                effect_list.append("scene " + str(i))
+            return effect_list
+        return None
+
+    def getEffect(self):
+        """Get Current Effect
+
+        Returns:
+            string: Value of current effect
+        """
+        if scean_num := self._epc_data.get(ENL_SCENE):
+            return "scene " + str(_int(scean_num))
+        return EFFECT_OFF
