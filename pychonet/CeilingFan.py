@@ -322,7 +322,7 @@ class CeilingFan(EchonetInstance):
             ENL_FAN_LIGHT_MODE in self._epc_data
             and ENL_FAN_LIGHT_NIGHT_BRIGHTNESS in self._epc_data
         ):
-            if self._epc_data[ENL_FAN_LIGHT_MODE] == 0x42:
+            if _int(self._epc_data[ENL_FAN_LIGHT_MODE]) == 0x42:
                 return EFFECT_OFF
 
             return DICT_FAN_LIGHT_EFFECTS.get(
