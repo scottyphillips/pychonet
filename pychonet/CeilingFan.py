@@ -242,6 +242,8 @@ class CeilingFan(EchonetInstance):
     """
 
     async def setLightStates(self, states: Dict):
+        # Not specified, but implemented based on user reports
+        # see https://github.com/scottyphillips/echonetlite_homeassistant/issues/142#issuecomment-2344285168
         epc_codes = {
             ENL_STATUS: None,  # 0x80
             ENL_FANSPEED_PERCENT: None,  # 0xF0
@@ -251,50 +253,52 @@ class CeilingFan(EchonetInstance):
             ENL_FAN_LIGHT_MODE: None,  # 0xF4
             ENL_FAN_LIGHT_BRIGHTNESS: "brightness",  # 0xF5
             ENL_FAN_LIGHT_COLOR_TEMP: "color_temperature",  # 0xF6
-            ENL_FAN_LIGHT_NIGHT_BRIGHTNESS: "effect",  # 0xF7
         }
-
-        if "effect" in states:
-            if states["effect"] in ["night_low", "night_medium", "night_high"]:
-                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x43.to_bytes(1)
-            else:
-                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x42.to_bytes(1)
-
-        night_mode = (
-            _int(self._epc_data.get(ENL_FAN_LIGHT_MODE, 0x0.to_bytes(1))) == 0x43
-        )
 
         opc = list()
         for epc, name in epc_codes.items():
             if name:
-                value = states.get(name)
-                if value:
-                    if epc == ENL_FAN_LIGHT_NIGHT_BRIGHTNESS:
-                        if night_mode:
-                            data = FAN_LIGHT_EFFECTS.get(value, 0)
-                            if data > 0:
-                                opc.append({"EPC": epc, "PDC": 0x01, "EDT": data})
-                    else:
-                        opc.append({"EPC": epc, "PDC": 0x01, "EDT": int(value)})
-                elif epc in self._epc_data:
-                    if night_mode or epc != ENL_FAN_LIGHT_NIGHT_BRIGHTNESS:
-                        # In night mode or normal mode and not epc == ENL_FAN_LIGHT_NIGHT_BRIGHTNESS
-                        opc.append(
-                            {
-                                "EPC": epc,
-                                "PDC": 0x01,
-                                "EDT": _int(self._epc_data.get(epc)),
-                            }
-                        )
+                if value := states.get(name):
+                    opc.append({"EPC": epc, "PDC": 0x01, "EDT": int(value)})
+                    continue
+            if epc in self._epc_data:
+                opc.append(
+                    {"EPC": epc, "PDC": 0x01, "EDT": _int(self._epc_data.get(epc))}
+                )
+
+        # Check effect for F7 Nightlight Brightness
+        effect_value = None  # or "night_low", "night_medium", "night_high"
+        if "effect" in states:
+            if states["effect"] in ["night_low", "night_medium", "night_high"]:
+                effect_value = states["effect"]
+                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x43.to_bytes(1)
             else:
-                if epc in self._epc_data:
-                    opc.append(
-                        {
-                            "EPC": epc,
-                            "PDC": 0x01,
-                            "EDT": _int(self._epc_data.get(epc)),
-                        }
+                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x42.to_bytes(1)
+
+        # Add F7 Nightlight Brightness
+        night_mode = (
+            _int(self._epc_data.get(ENL_FAN_LIGHT_MODE, 0x0.to_bytes(1))) == 0x43
+        )
+        if night_mode:
+            night_brightness_int = (
+                FAN_LIGHT_EFFECTS[effect_value]
+                if effect_value
+                else _int(
+                    self._epc_data.get(
+                        ENL_FAN_LIGHT_NIGHT_BRIGHTNESS,
+                        FAN_LIGHT_EFFECTS["night_high"].to_bytes(1),
                     )
+                )
+            )
+            opc.append(
+                {
+                    "EPC": ENL_FAN_LIGHT_NIGHT_BRIGHTNESS,
+                    "PDC": 0x01,
+                    "EDT": night_brightness_int,
+                }
+            )
+
+        # Add 0xFC Buzzer
         opc.append({"EPC": ENL_BUZZER, "PDC": 0x01, "EDT": ENL_ON})
 
         return await self.setMessages(opc)
@@ -322,10 +326,13 @@ class CeilingFan(EchonetInstance):
             ENL_FAN_LIGHT_MODE in self._epc_data
             and ENL_FAN_LIGHT_NIGHT_BRIGHTNESS in self._epc_data
         ):
-            if _int(self._epc_data[ENL_FAN_LIGHT_MODE]) == 0x42:
+            if _int(self._epc_data[ENL_FAN_LIGHT_MODE]) != 0x43:
                 return EFFECT_OFF
 
             return DICT_FAN_LIGHT_EFFECTS.get(
-                _int(self._epc_data.get(ENL_FAN_LIGHT_NIGHT_BRIGHTNESS)), EFFECT_OFF
+                _int(
+                    self._epc_data.get(ENL_FAN_LIGHT_NIGHT_BRIGHTNESS, 0x0.to_bytes(1))
+                ),
+                EFFECT_OFF,
             )
         return EFFECT_OFF
