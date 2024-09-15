@@ -65,12 +65,12 @@ class CeilingFan(EchonetInstance):
         0xF0: _013AF0,
         0xF1: [_int, DICT_FAN_DIRECTION],
         0xF2: [_int, DICT_30_TRUE_FALSE],
-        0xFC: [_int, DICT_30_TRUE_FALSE],
         0xF3: [_int, DICT_30_ON_OFF],
         0xF4: [_int, {0x42: "normal", 0x43: "night"}],
         0xF5: _int,
         0xF6: _int,
         0xF7: [_int, {0x01: "low", 0x32: "medium", 0x64: "high"}],
+        0xFC: [_int, DICT_30_TRUE_FALSE],
     }
     SPEED_COUNT = 10
 
@@ -255,6 +255,18 @@ class CeilingFan(EchonetInstance):
             ENL_FAN_LIGHT_COLOR_TEMP: "color_temperature",  # 0xF6
         }
 
+        # Check effect for F7 Nightlight Brightness
+        effect_value = None  # or "night_low", "night_medium", "night_high"
+        if "effect" in states:
+            if states["effect"] in ["night_low", "night_medium", "night_high"]:
+                effect_value = states["effect"]
+                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x43.to_bytes(1)
+            else:
+                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x42.to_bytes(1)
+        night_mode = (
+            _int(self._epc_data.get(ENL_FAN_LIGHT_MODE, 0x0.to_bytes(1))) == 0x43
+        )
+
         opc = list()
         for epc, name in epc_codes.items():
             if name:
@@ -266,19 +278,7 @@ class CeilingFan(EchonetInstance):
                     {"EPC": epc, "PDC": 0x01, "EDT": _int(self._epc_data.get(epc))}
                 )
 
-        # Check effect for F7 Nightlight Brightness
-        effect_value = None  # or "night_low", "night_medium", "night_high"
-        if "effect" in states:
-            if states["effect"] in ["night_low", "night_medium", "night_high"]:
-                effect_value = states["effect"]
-                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x43.to_bytes(1)
-            else:
-                self._epc_data[ENL_FAN_LIGHT_MODE] = 0x42.to_bytes(1)
-
         # Add F7 Nightlight Brightness
-        night_mode = (
-            _int(self._epc_data.get(ENL_FAN_LIGHT_MODE, 0x0.to_bytes(1))) == 0x43
-        )
         if night_mode:
             night_brightness_int = (
                 FAN_LIGHT_EFFECTS[effect_value]
