@@ -73,3 +73,5 @@ v2.6.7, 19 Mar 2024 -- Eliminate the possibility of communication loss
 v2.6.8, 22 Mar 2024 -- Maintenance of ElectricBlind Class
 v2.6.9, 15 May 2024 -- Supports Refrigerator (0x03-0xB7)
 v2.6.10, 4 Sep 2024 -- Add the minimum required EPC_FUNCTIONS (GeneralLighting, SingleFunctionLighting)
+v2.6.11, 17 Sep 2024 -- Support brightness in LightingSystem
+                     -- CeilingFan Light support and modifications to existing Light classes by @nao-pon in #73
