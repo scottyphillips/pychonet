@@ -337,6 +337,11 @@ EPC_CODE = {
             0xF1: "Fan direction",
             0xF2: "Fan fluctuation",
             0xFC: "Fan Buzzer",
+            0xF3: "Light Power",
+            0xF4: "Light Mode",
+            0xF5: "Light Brightness",
+            0xF6: "Light Color",
+            0xF7: "Nightlight Brightness",
         },
         0x42: {  # Electric heater class
             0x80: "Operation status",

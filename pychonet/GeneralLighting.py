@@ -1,3 +1,4 @@
+from typing import Dict
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import _int
@@ -83,7 +84,7 @@ class GeneralLighting(EchonetInstance):
         # 0x95: "OFF timer setting",
     }
 
-    def __init__(self, host, api_connector=None, instance=0x1):
+    def __init__(self, host, api_connector, instance=0x1):
         self._eojgc = 0x02  # Housing/facility-related device group
         self._eojcc = 0x90  # General Lighting class
         EchonetInstance.__init__(
@@ -96,8 +97,8 @@ class GeneralLighting(EchonetInstance):
     return: A string representing the configured brightness.
     """
 
-    def getBrightness(self):
-        return self.getMessage(ENL_BRIGHTNESS)  # ['brightness']
+    async def getBrightness(self):
+        return await self.getMessage(ENL_BRIGHTNESS)  # ['brightness']
 
     """
     setBrightness set the temperature of the light
@@ -105,8 +106,8 @@ class GeneralLighting(EchonetInstance):
     param temperature: A string representing the desired temperature.
     """
 
-    def setBrightness(self, brightness):
-        return self.setMessage(ENL_BRIGHTNESS, int(brightness))
+    async def setBrightness(self, brightness):
+        return await self.setMessage(ENL_BRIGHTNESS, int(brightness))
 
     """
     getColorTemp get the color temperature that has been set in the light
@@ -114,8 +115,8 @@ class GeneralLighting(EchonetInstance):
     return: A string representing the configured color temperature. # 68 67 66 64 65 coolest to warmest
     """
 
-    def getColorTemperature(self):
-        return self.getMessage(ENL_COLOR_TEMP)  # ['color_temperature']
+    async def getColorTemperature(self):
+        return await self.getMessage(ENL_COLOR_TEMP)  # ['color_temperature']
 
     """
     setColorTemperature set the temperature of the light
@@ -123,5 +124,26 @@ class GeneralLighting(EchonetInstance):
     param temperature: A string representing the desired temperature. # 68 67 66 64 65 coolest to warmest
     """
 
-    def setColorTemperature(self, color_temperature):
-        return self.setMessage(ENL_COLOR_TEMP, color_temperature)
+    async def setColorTemperature(self, color_temperature):
+        return await self.setMessage(ENL_COLOR_TEMP, color_temperature)
+
+    """
+    setLightStates set the light states
+
+    param status: A Dict any light states
+    """
+
+    async def setLightStates(self, states: Dict):
+        epc_codes = {
+            ENL_STATUS: "status",
+            ENL_BRIGHTNESS: "brightness",
+            ENL_COLOR_TEMP: "color_temperature",
+        }
+
+        opc = list()
+        for epc, name in epc_codes.items():
+            value = states.get(name)
+            if value:
+                opc.append({"EPC": epc, "PDC": 0x01, "EDT": int(value)})
+
+        return await self.setMessages(opc)
