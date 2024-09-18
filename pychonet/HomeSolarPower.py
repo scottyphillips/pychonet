@@ -34,6 +34,19 @@ def _0279D1(edt):
 
 class HomeSolarPower(EchonetInstance):
     EPC_FUNCTIONS = {
+        0xA0: _int,  # "Output power control setting 1",
+        0xA1: _int,  # "Output power control setting 2",
+        # 0xA2: "Function to control purchase surplus electricity setting",
+        # 0xB0: "Output power controlling schedule",
+        # 0xB1: "Next access date and time",
+        # 0xB2: "Function to control the type of surplus electricity purchase",
+        # 0xB3: "Output power change time setting value",
+        # 0xB4: "Upper limit clip setting value",
+        # 0xC0: "Operation power factor setting value",
+        # 0xC1: "FIT contract type",
+        # 0xC2: "Self-consumption type",
+        # 0xC3: "Capacity approved by equipment",
+        # 0xC4: "Conversion coefficient",
         0xD0: [
             _int,
             {
