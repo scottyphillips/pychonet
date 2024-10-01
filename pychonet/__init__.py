@@ -2,36 +2,37 @@ from pychonet.echonetapiclient import ECHONETAPIClient  # noqa
 from pychonet.lib.eojx import EOJX_CLASS
 
 from .version import __version__
+from .AutomaticEntranceDoor import AutomaticEntranceDoor
+from .BathroomDryer import BathroomDryer
+from .CeilingFan import CeilingFan
+from .DistributionPanelMeter import DistributionPanelMeter
 from .EchonetInstance import EchonetInstance
 from .ElectricBlind import ElectricBlind
-from .ElectricShutter import ElectricShutter
 from .ElectricCurtain import ElectricCurtain
-from .ElectricRainSlidingDoor import ElectricRainSlidingDoor
+from .ElectricEnergyMeter import ElectricEnergyMeter
 from .ElectricGate import ElectricGate
-from .ElectricWindow import ElectricWindow
-from .AutomaticEntranceDoor import AutomaticEntranceDoor
 from .ElectricLock import ElectricLock
+from .ElectricRainSlidingDoor import ElectricRainSlidingDoor
+from .ElectricShutter import ElectricShutter
 from .ElectricVehicleCharger import ElectricVehicleCharger
-from .GeneralLighting import GeneralLighting
-from .SingleFunctionLighting import SingleFunctionLighting
-from .LightingSystem import LightingSystem
-from .HomeAirCleaner import HomeAirCleaner
-from .HomeAirConditioner import HomeAirConditioner
-from .HomeSolarPower import HomeSolarPower
-from .StorageBattery import StorageBattery
-from .TemperatureSensor import TemperatureSensor
-from .DistributionPanelMeter import DistributionPanelMeter
-from .LowVoltageSmartElectricEnergyMeter import LowVoltageSmartElectricEnergyMeter
-from .HybridWaterHeater import HybridWaterHeater
-from .HotWaterGenerator import HotWaterGenerator
+from .ElectricWaterHeater import ElectricWaterHeater
+from .ElectricWindow import ElectricWindow
 from .FloorHeater import FloorHeater
 from .FuelCell import FuelCell
 from .GasMeter import GasMeter
-from .ElectricEnergyMeter import ElectricEnergyMeter
-from .WaterFlowMeter import WaterFlowMeter
-from .CeilingFan import CeilingFan
-from .ElectricWaterHeater import ElectricWaterHeater
+from .GeneralLighting import GeneralLighting
+from .HomeAirCleaner import HomeAirCleaner
+from .HomeAirConditioner import HomeAirConditioner
+from .HomeSolarPower import HomeSolarPower
+from .HotWaterGenerator import HotWaterGenerator
+from .HybridWaterHeater import HybridWaterHeater
+from .LightingSystem import LightingSystem
+from .LowVoltageSmartElectricEnergyMeter import LowVoltageSmartElectricEnergyMeter
 from .Refrigerator import Refrigerator
+from .SingleFunctionLighting import SingleFunctionLighting
+from .StorageBattery import StorageBattery
+from .TemperatureSensor import TemperatureSensor
+from .WaterFlowMeter import WaterFlowMeter
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
@@ -56,6 +57,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x6B}": ElectricWaterHeater,
         f"{0x02}-{0x6F}": ElectricLock,
         f"{0x02}-{0x72}": HotWaterGenerator,
+        f"{0x02}-{0x73}": BathroomDryer,
         f"{0x02}-{0x79}": HomeSolarPower,
         f"{0x02}-{0x7B}": FloorHeater,
         f"{0x02}-{0x7C}": FuelCell,

@@ -17,6 +17,7 @@ DATA_STATE_CLOSING = "closing"
 DICT_41_ON_OFF = {0x41: DATA_STATE_ON, 0x42: DATA_STATE_OFF}
 DICT_41_YES_NO = {0x41: "yes", 0x42: "no"}
 DICT_41_AUTO_NONAUTO = {0x41: "auto", 0x42: "non-auto"}
+DICT_41_AUTO_STANDARD = {0x41: "auto", 0x42: "standard"}
 DICT_41_UNLOCK_LOCK = {0x42: DATA_STATE_UNLOCK, 0x41: DATA_STATE_LOCK}
 DICT_41_OPEN_CLOSED = {0x41: DATA_STATE_OPEN, 0x42: DATA_STATE_CLOSE}
 DICT_41_ENABLED_DISABLED = {0x41: "enabled", 0x42: "disabled"}
@@ -57,6 +58,18 @@ DICT_41_ENABLED_DISABLED_TEMPDISABLED = {
     0x41: "enabled",
     0x42: "disabled",
     0x43: "temporarily_disabled",
+}
+
+DICT_41_AUTO_8_LEVELS = {
+    0x41: "auto",
+    0x31: "level-1",
+    0x32: "level-2",
+    0x33: "level-3",
+    0x34: "level-4",
+    0x35: "level-5",
+    0x36: "level-6",
+    0x37: "level-7",
+    0x38: "level-8",
 }
 
 
