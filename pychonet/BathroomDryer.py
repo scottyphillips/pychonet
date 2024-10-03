@@ -3,8 +3,8 @@ from pychonet.lib.epc_functions import (
     DICT_41_AUTO_8_LEVELS,
     DICT_41_AUTO_STANDARD,
     DICT_41_ON_OFF,
-    DICT_41_YES_NO,
     _int,
+    _hh_mm,
     _signed_int,
 )
 
@@ -60,13 +60,25 @@ class BathroomDryer(EchonetInstance):
         0xC2: [_int, DICT_41_AUTO_8_LEVELS],  # "Ventilation air flow rate setting",
         0xCF: [_int, DICT_41_ON_OFF],  # "Filter cleaning reminder sign setting",
         0xE0: [_int, DICT_41_ON_OFF],  # "Human body detection status",
-        # 0x90: "“ON timer-based reservation” setting 1",
-        # 0xE1: "“ON timer-based reservation” setting 2",
-        # 0x91: "ON timer setting (time)",
-        # 0x92: "ON timer setting (relative time)",
-        # 0x94: "“OFF timer-based reservation” setting",
-        # 0x95: "OFF timer setting (time)",
-        # 0x96: "OFF timer setting (relative time)",
+        0x90: [_int, DICT_41_ON_OFF],  # "“ON timer-based reservation” setting 1",
+        0xE1: [
+            _int,
+            {
+                0x10: "ventilationReservation",
+                0x20: "prewarmingReservation",
+                0x30: "heatingReservation",
+                0x40: "dryingReservation",
+                0x50: "circulationReservation",
+                0x60: "mistSaunaReservation",
+                0x61: "waterMistReservation",
+                0x00: "noReservation",
+            },
+        ],  # "“ON timer-based reservation” setting 2",
+        0x91: _hh_mm,  # "ON timer setting (time)",
+        0x92: _hh_mm,  # "ON timer setting (relative time)",
+        0x94: [_int, DICT_41_ON_OFF],  # "“OFF timer-based reservation” setting",
+        0x95: _hh_mm,  # "OFF timer setting (time)",
+        0x96: _hh_mm,  # "OFF timer setting (relative time)",
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):
