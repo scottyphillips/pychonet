@@ -689,6 +689,8 @@ EPC_CODE = {
             0xB3: "Bathroom heater operation setting",
             0xB4: "Bathroom dryer operation setting",
             0xB5: "Cool air circulator operation setting",
+            0xB6: "Mist sauna operation setting",
+            0xB7: "Water mist operation setting",
             0xBA: "Measured relative bathroom humidity",
             0xBB: "Measured bathroom temperature",
             0xC2: "Ventilation air flow rate setting",
