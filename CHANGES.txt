@@ -76,3 +76,4 @@ v2.6.10, 4 Sep 2024 -- Add the minimum required EPC_FUNCTIONS (GeneralLighting, 
 v2.6.11, 17 Sep 2024 -- Support brightness in LightingSystem
                      -- CeilingFan Light support and modifications to existing Light classes by @nao-pon in #73
 v2.6.12, 18 Sep 2024 -- Implemented 0xA0 and 0xA1 in Home solar power generation
+V2.6.13, 4 Oct 2024 -- Add Bathroom dryer class
