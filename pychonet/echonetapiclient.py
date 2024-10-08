@@ -312,7 +312,7 @@ class ECHONETAPIClient:
                     # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
                     await asyncio.sleep(0.1)
                     # if tx_tid is not in message list then the message listener has received the message
-                    if not self._message_list.get(tx_tid):
+                    if self._message_list.get(tx_tid) is None:
                         # Check OPC count in results
                         if not is_discover and tx_tid in self._opc_counts:
                             res_opc_count = self._opc_counts[tx_tid]
