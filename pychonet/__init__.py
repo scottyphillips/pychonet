@@ -27,6 +27,7 @@ from .HomeSolarPower import HomeSolarPower
 from .HotWaterGenerator import HotWaterGenerator
 from .HybridWaterHeater import HybridWaterHeater
 from .LightingSystem import LightingSystem
+from .MultipleInputPCS import MultipleInputPCS
 from .LowVoltageSmartElectricEnergyMeter import LowVoltageSmartElectricEnergyMeter
 from .Refrigerator import Refrigerator
 from .SingleFunctionLighting import SingleFunctionLighting
@@ -71,6 +72,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x90}": GeneralLighting,
         f"{0x02}-{0x91}": SingleFunctionLighting,
         f"{0x02}-{0xA3}": LightingSystem,
+        f"{0x02}-{0xA5}": MultipleInputPCS,
         f"{0x02}-{0xA6}": HybridWaterHeater,
         f"{0x03}-{0xB7}": Refrigerator,
         None: None,
