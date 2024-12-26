@@ -3,14 +3,23 @@ import socket
 import struct
 from collections import deque
 
-class UDPServer():
-    def __init__(self, upload_speed=0, download_speed=0, recv_max_size=256 * 1024, local_ip=None):
+
+class UDPServer:
+    def __init__(
+        self, upload_speed=0, download_speed=0, recv_max_size=256 * 1024, local_ip=None
+    ):
         self._upload_speed = upload_speed
         self._download_speed = download_speed
         self._recv_max_size = recv_max_size
 
         # Get Local IP address
-        self._ip = local_ip or [(s.connect(('224.0.23.0', 3610)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
+        self._ip = (
+            local_ip
+            or [
+                (s.connect(("224.0.23.0", 3610)), s.getsockname()[0], s.close())
+                for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]
+            ][0][1]
+        )
 
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
         self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -34,12 +43,15 @@ class UDPServer():
             local_ip, *_ = temp_sock.getsockname()
             self.register_multicast(local_ip)
 
-
     def register_multicast(self, local_ip):
-        if (local_ip not in self._multicast_ips):
+        if local_ip not in self._multicast_ips:
             self._multicast_ips.add(local_ip)
-            self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(local_ip))
-            mreq = struct.pack("=4s4s", socket.inet_aton("224.0.23.0"), socket.inet_aton(local_ip))
+            self._sock.setsockopt(
+                socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(local_ip)
+            )
+            mreq = struct.pack(
+                "=4s4s", socket.inet_aton("224.0.23.0"), socket.inet_aton(local_ip)
+            )
             self._sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
     # region Interface
@@ -47,7 +59,6 @@ class UDPServer():
         self.loop = loop
 
         self._sock.bind((host, port))
-
 
         self._connection_made()
 
