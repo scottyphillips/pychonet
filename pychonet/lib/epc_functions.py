@@ -72,6 +72,17 @@ DICT_41_AUTO_8_LEVELS = {
     0x38: "level-8",
 }
 
+DICT_31_8_LEVELS = {
+    0x31: "level-1",
+    0x32: "level-2",
+    0x33: "level-3",
+    0x34: "level-4",
+    0x35: "level-5",
+    0x36: "level-6",
+    0x37: "level-7",
+    0x38: "level-8",
+}
+
 
 def _swap_dict(d: dict):
     return {v: k for k, v in d.items()}
