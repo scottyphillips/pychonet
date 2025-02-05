@@ -94,7 +94,7 @@ class UDPServer:
 
         try:
             data, addr = self._sock.recvfrom(self._recv_max_size)
-        except (BlockingIOError, InterruptedError):
+        except (BlockingIOError, InterruptedError, OSError):
             self.loop.add_reader(fd, self._sock_recv, fut, True)
         except Exception as e:
             fut.set_exception(e)
@@ -118,7 +118,7 @@ class UDPServer:
 
         try:
             bytes_sent = self._sock.sendto(data, addr)
-        except (BlockingIOError, InterruptedError):
+        except (BlockingIOError, InterruptedError, OSError):
             self.loop.add_writer(fd, self._sock_send, data, addr, fut, True)
         except Exception as e:
             fut.set_exception(e)
