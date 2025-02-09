@@ -611,6 +611,7 @@ EPC_CODE = {
             0xD6: "Volume setting",
             0xD7: "Mute setting",
             0xD8: "Remaining hot water volume",
+            0xD9: "Surplus electric energy power prediction value",
             0xDB: "Rated power consumption of H/P unit in wintertime",
             0xDC: "Rated power consumption of H/P unit in in-between seasons",
             0xDD: "Rated power consumption of H/P unit in summertime",
