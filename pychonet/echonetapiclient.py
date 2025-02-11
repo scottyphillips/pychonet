@@ -1,4 +1,5 @@
 import asyncio
+from typing import Callable
 
 from pychonet.lib.const import (
     ENL_GETMAP,
@@ -29,7 +30,7 @@ from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 class ECHONETAPIClient:
     def __init__(self, server):
         self._server = server
-        self._logger = print
+        self._logger: Callable = print
         self._server.subscribe(self.echonetMessageReceived)
         self._state = {}
         self._next_tx_tid = 0x0000
@@ -39,7 +40,7 @@ class ECHONETAPIClient:
         self._message_timeout = MESSAGE_TIMEOUT
         self._debug_flag = False
         self._update_callbacks = {}
-        self._discover_callback = None
+        self._discover_callback: Callable | None = None
         self._waiting = {}
 
     async def echonetMessageReceived(self, raw_data, addr):
