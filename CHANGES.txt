@@ -78,3 +78,5 @@ v2.6.11, 17 Sep 2024 -- Support brightness in LightingSystem
 v2.6.12, 18 Sep 2024 -- Implemented 0xA0 and 0xA1 in Home solar power generation
 v2.6.13, 4 Oct 2024 -- Add Bathroom dryer class
 v2.6.14, 2 Feb 2025 -- Add MultipleInputPCS class
+v2.6.15, 24 Feb 2025 -- Add error handling of OSError by @nao-pon in https://github.com/scottyphillips/pychonet/pull/79
+                     -- Add Visitor sensor class by @nao-pon in https://github.com/scottyphillips/pychonet/pull/78
