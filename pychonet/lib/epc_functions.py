@@ -173,6 +173,30 @@ def _0083(edt, host=None):  # UID
     return None
 
 
+def _0089(edt):
+    if edt is not None and len(edt) == 2:
+        err_dict = {
+            0x00: "No fault",
+            0x01: "Faults that can be recovered from by turning off the power switch and turning it on again or withdrawing and re-inserting the power plug.",
+            0x02: "Faults that can be recovered from by pressing the reset button.",
+            0x03: "Faults that can be recovered from by changing the way the device is mounted or opening/closing a lid or door.",
+            0x04: "Faults that can be recovered from by supplying fuel, water, air, etc.",
+            0x05: "Faults that can be recovered from by cleaning the device (filter etc.)",
+            0x06: "Faults that can be recovered from by changing the battery or cell.",
+            0x07: "Recover operation no required",
+            0x08: "Unknown (reserved for future use)",
+            0x09: "User-definable domain",
+        }
+        errcode = int.from_bytes(edt[0:1], "big")
+        err = err_dict.get(
+            int.from_bytes(edt[1:2], "big"), "Faults that require repair"
+        )
+    else:
+        err = None
+        errcode = None
+    return {"fault classification": err, "error code": errcode}
+
+
 def _008A(edt):  # manufacturer
     id = int.from_bytes(edt, "big")
     if id in MANUFACTURERS.keys():
@@ -201,6 +225,8 @@ EPC_SUPER_FUNCTIONS = {
     0x83: _0083,
     0x84: _int,
     0x85: _int,
+    0x88: [_int, DICT_41_ON_OFF],
+    0x89: _0089,
     0x8A: _008A,
     0x8C: _null_padded_optional_string,
     0x97: _hh_mm,
