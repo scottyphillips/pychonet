@@ -40,6 +40,7 @@ class ECHONETAPIClient:
         self._message_timeout = MESSAGE_TIMEOUT
         self._debug_flag = False
         self._update_callbacks = {}
+        self._receive_callbacks = {}
         self._discover_callback: Callable | None = None
         self._waiting = {}
 
@@ -200,11 +201,23 @@ class ECHONETAPIClient:
                 if _key.startswith(host):
                     for update_func in self._update_callbacks[_key]:
                         await update_func(False)
+
+            # Call receive callback functions
+            for _key in self._receive_callbacks:
+                if _key.startswith(host):
+                    for receive_func in self._receive_callbacks[_key]:
+                        await receive_func(False)
+            
         else:
             # Call update callback functions
             if updated and key in self._update_callbacks:
                 for update_func in self._update_callbacks[key]:
                     await update_func(isPush)
+
+            # Call receive callback functions
+            if key in self._receive_callbacks:
+                for receive_func in self._receive_callbacks[key]:
+                    await receive_func(isPush)
 
         # if we get duplicate packets that have already been processed then dont worry about the message list.
         # but still process them regardless.
@@ -421,6 +434,12 @@ class ECHONETAPIClient:
         if key not in self._update_callbacks:
             self._update_callbacks[key] = []
         self._update_callbacks[key].append(fn)
+
+    def register_async_receive_callbacks(self, host, eojgc, eojcc, eojci, fn):
+        key = f"{host}-{eojgc}-{eojcc}-{eojci}"
+        if key not in self._receive_callbacks:
+            self._receive_callbacks[key] = []
+        self._receive_callbacks[key].append(fn)
 
 
 class EchonetMaxOpcError(Exception):
