@@ -82,3 +82,4 @@ v2.6.15, 24 Feb 2025 -- Add error handling of OSError by @nao-pon in https://git
                      -- Add Visitor sensor class by @nao-pon in https://github.com/scottyphillips/pychonet/pull/78
 v2.6.16, 18 Aug 2025 -- Add fault sensors of super class
 v2.6.17, 29 Aug 2025 -- Allow retrieving values for unknown EPC codes #76
+v2.6.18, 1 Sep 2025 --  [HomeAirConditioner] Implemented some of the unimplemented properties
