@@ -1,7 +1,10 @@
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
+    DICT_41_AUTO_8_LEVELS,
     DICT_41_AUTO_8_SPEEDS,
+    DICT_41_AUTO_NONAUTO,
+    DICT_41_ON_OFF,
     _int,
     _signed_int,
     _swap_dict,
@@ -193,15 +196,15 @@ def _0130B2(edt):
 
 class HomeAirConditioner(EchonetInstance):
     EPC_FUNCTIONS = {
-        0xA0: [_int, DICT_41_AUTO_8_SPEEDS],
+        0xA0: [_int, DICT_41_AUTO_8_SPEEDS],  # "Air flow rate setting"
         0xA1: [
             _int,
             {0x41: "auto", 0x42: "non-auto", 0x43: "auto-vert", 0x44: "auto-horiz"},
-        ],
+        ],  # "Automatic control of air flow direction setting"
         0xA3: [
             _int,
             {0x31: "not-used", 0x41: "vert", 0x42: "horiz", 0x43: "vert-horiz"},
-        ],
+        ],  # "Automatic swing of air flow setting"
         0xA4: [
             _int,
             {
@@ -211,7 +214,7 @@ class HomeAirConditioner(EchonetInstance):
                 0x45: "lower-central",
                 0x42: "lower",
             },
-        ],
+        ],  # "Air flow direction (vertical) setting"
         0xA5: [
             _int,
             {
@@ -247,7 +250,7 @@ class HomeAirConditioner(EchonetInstance):
                 0x6E: "left-lc-center-rc",
                 0x6F: "left-lc-center-rc-right",
             },
-        ],
+        ],  # "Air flow direction (horizontal) setting"
         0xAA: [
             _int,
             {
@@ -256,8 +259,10 @@ class HomeAirConditioner(EchonetInstance):
                 0x42: "Preheating",
                 0x43: "Heat removal",
             },
-        ],
-        0xB0: [_int, DICT_41_MODES],
+        ],  # "Special state"
+        # 0xAA: "Non-priority state"
+        0xB0: [_int, DICT_41_MODES],  # "Operation mode setting"
+        0xB1: [_int, DICT_41_AUTO_NONAUTO],  # "Automatic temperature control setting"
         0xB2: [
             _int,
             {
@@ -265,12 +270,44 @@ class HomeAirConditioner(EchonetInstance):
                 0x42: "high-speed",
                 0x43: "silent",
             },
-        ],
-        0xBA: _int,
-        0xB3: _signed_int,
-        0xB4: _signed_int,
-        0xBB: _signed_int,
-        0xBE: _signed_int,
+        ],  # "Normal/high-speed/silent operation setting"
+        0xB3: _signed_int,  # "Set temperature value"
+        0xB4: _signed_int,  # "Set value of relative humidity in dehumidifying mode"
+        # 0xB5: "Set temperature value in cooling mode",
+        # 0xB6: "Set temperature value in heating mode",
+        # 0xB7: "Set temperature value in dehumidifying mode",
+        # 0xB8: "Rated power consumption",
+        # 0xB9: "Measured value of current consumption",
+        0xBA: _int,  # "Measured value of room relative humidity"
+        0xBB: _signed_int,  # "Measured value of room temperature"
+        # 0xBC: "Set temperature value of user remote control"
+        # 0xBD: "Measured cooled air temperature"
+        0xBE: _signed_int,  # "Measured outdoor air temperature"
+        # 0xBF: "Relative temperature setting"
+        0xC0: [_int, DICT_41_ON_OFF],  # "Ventilation function setting"
+        0xC1: [_int, DICT_41_AUTO_8_LEVELS],  # "Humidifier function setting"
+        0xC2: [_int, DICT_41_AUTO_8_LEVELS],  # "Ventilation air flow rate setting"
+        # 0xC4: "Degree of humidification setting"
+        # 0xC6: "Mounted air cleaning method"
+        # 0xC7: "Air purifier function setting"
+        # 0xC8: "Mounted air refresh method"
+        # 0xC9: "Air refresher function setting"
+        # 0xCA: "Mounted self-cleaning method"
+        # 0xCB: "Self-cleaning function setting"
+        0xCC: [
+            _int,
+            {
+                0x40: "No setting",
+                0x41: "clothes dryer",
+                0x42: "condensation suppressor",
+                0x43: "mite and mold control",
+                0x44: "active defrosting",
+                0x45: "Unknown",
+            },
+        ],  # "Special function setting"
+        # 0xCD: "Operation status of components"
+        # 0xCE: "Thermostat setting override function"
+        0xCF: [_int, DICT_41_ON_OFF],  # "Air purification mode setting"
     }
 
     """
