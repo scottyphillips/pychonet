@@ -126,7 +126,32 @@ class ECHONETAPIClient:
             else:  # process each EPC in order
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
-                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
+                    #self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
+                    #comment out origin line above
+                    #use int to avoid using bytes/str
+                    try:
+                        seojgc_i = int(seojgc)
+                        seojcc_i = int(seojcc)
+                        seojci_i = int(seojci)
+                        epc_i    = int(epc)
+                    except Exception:
+                        #bytes in some versions?；here we use int
+                        def _to_int(x):
+                            if isinstance(x, (bytes, bytearray)) and len(x) == 1:
+                                return x[0]
+                            return int(x)
+                        seojgc_i = _to_int(seojgc)
+                        seojcc_i = _to_int(seojcc)
+                        seojci_i = _to_int(seojci)
+                        epc_i    = _to_int(epc)
+            
+                    host_state = self._state.setdefault(host, {})
+                    instances  = host_state.setdefault("instances", {})
+                    layer_gc   = instances.setdefault(seojgc_i, {})
+                    layer_cc   = layer_gc.setdefault(seojcc_i, {})
+                    layer_ci   = layer_cc.setdefault(seojci_i, {})
+                    layer_ci[epc_i] = map  
+                    #end of edit
                 elif epc in (ENL_UID, ENL_MANUFACTURER, ENL_PRODUCT_CODE):
                     try:
                         self._state[host]["instances"][seojgc][seojcc][seojci][
