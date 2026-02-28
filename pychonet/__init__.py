@@ -1,3 +1,4 @@
+
 from pychonet.echonetapiclient import ECHONETAPIClient  # noqa
 from pychonet.lib.eojx import EOJX_CLASS
 
@@ -19,6 +20,7 @@ from .ElectricWaterHeater import ElectricWaterHeater
 from .ElectricWindow import ElectricWindow
 from .FloorHeater import FloorHeater
 from .FuelCell import FuelCell
+from .FirstAidSensor import FirstAidSensor
 from .GasMeter import GasMeter
 from .GeneralLighting import GeneralLighting
 from .HomeAirCleaner import HomeAirCleaner
@@ -35,7 +37,8 @@ from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
 from .WaterFlowMeter import WaterFlowMeter
 from .Electricthermos import ElectricThermos
-
+from .CrimeSensor import CrimeSensor
+from .EmergencyButton import EmergencyButton
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -45,6 +48,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
 
     """Factory Method"""
     instances = {
+        f"{0x00}-{0x03}": FirstAidSensor,
         f"{0x00}-{0x11}": TemperatureSensor,
         f"{0x01}-{0x30}": HomeAirConditioner,
         f"{0x01}-{0x35}": HomeAirCleaner,
@@ -77,6 +81,8 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0xA6}": HybridWaterHeater,
         f"{0x03}-{0xB2}": ElectricThermos,
         f"{0x03}-{0xB7}": Refrigerator,
+        f"{0x00}-{0x02}": CrimeSensor,
+        f"{0x00}-{0x03}": EmergencyButton,
         None: None,
     }
     instance_object = instances.get(instance, None)

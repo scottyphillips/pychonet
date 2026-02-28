@@ -96,6 +96,29 @@ def _int(edt, values: dict = {}, non_value: Any = "Invalid setting"):  # unsigne
     else:
         return int.from_bytes(edt, "big")
 
+def _unsigned_long(edt, values: dict = {}, non_value: Any = "Invalid setting"):  # unsigned long
+    data_long = int.from_bytes(edt, "big")
+    if len(values):
+        return values.get(data_long, non_value)
+    else:
+        return data_long
+
+
+def _unsigned_short(edt, values: dict = {}, non_value: Any = "Invalid setting"):  # unsigned short
+    data_short = int.from_bytes(edt, "big")
+    if len(values):
+        return values.get(data_short, non_value)
+    else:
+        return data_short
+
+
+def _signed_long(edt, values: dict = {}, non_value: Any = "Invalid setting"):  # signed long
+    data_long = int.from_bytes(edt, byteorder="big", signed=True)
+    if len(values):
+        return values.get(data_long, non_value)
+    else:
+        return data_long
+
 
 def _call_int(data: bytes | list):
     if type(data) == list:
