@@ -34,6 +34,7 @@ from .SingleFunctionLighting import SingleFunctionLighting
 from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
 from .WaterFlowMeter import WaterFlowMeter
+from .Electricthermos import ElectricThermos
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
@@ -74,6 +75,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0xA3}": LightingSystem,
         f"{0x02}-{0xA5}": MultipleInputPCS,
         f"{0x02}-{0xA6}": HybridWaterHeater,
+        f"{0x03}-{0xB2}": ElectricThermos,
         f"{0x03}-{0xB7}": Refrigerator,
         None: None,
     }
