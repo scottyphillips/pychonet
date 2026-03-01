@@ -7,6 +7,7 @@ from .AutomaticEntranceDoor import AutomaticEntranceDoor
 from .BathroomDryer import BathroomDryer
 from .CeilingFan import CeilingFan
 from .CO2Sensor import CO2Sensor
+from .GasSensor import GasSensor
 from .DistributionPanelMeter import DistributionPanelMeter
 from .EchonetInstance import EchonetInstance
 from .ElectricBlind import ElectricBlind
@@ -41,6 +42,14 @@ from .Electricthermos import ElectricThermos
 from .CrimeSensor import CrimeSensor
 from .EmergencyButton import EmergencyButton
 from .CigaretteSensor import CigaretteSensor
+from .VO2Sensor import VO2Sensor
+from .DiffPressureSensor import DiffPressureSensor
+from .AirSpeedSensor import AirSpeedSensor
+from .FlameSensor import FlameSensor
+from .WaterFlowSensor import WaterFlowSensor
+from .OdorSensor import OdorSensor
+from .ElectricEnergySensor import ElectricEnergySensor
+from .CurrentSensor import CurrentSensor
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -53,6 +62,15 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x00}-{0x03}": FirstAidSensor,
         f"{0x00}-{0x1A}": CigaretteSensor,
         f"{0x00}-{0x1B}": CO2Sensor,
+        f"{0x00}-{0x1C}": GasSensor,
+        f"{0x00}-{0x1D}": VO2Sensor,
+        f"{0x00}-{0x1E}": DiffPressureSensor,
+        f"{0x00}-{0x1F}": AirSpeedSensor,
+        f"{0x00}-{0x20}": OdorSensor,
+        f"{0x00}-{0x21}": FlameSensor,
+        f"{0x00}-{0x22}": ElectricEnergySensor,
+        f"{0x00}-{0x23}": CurrentSensor,
+        f"{0x00}-{0x25}": WaterFlowSensor,
         f"{0x00}-{0x11}": TemperatureSensor,
         f"{0x01}-{0x30}": HomeAirConditioner,
         f"{0x01}-{0x35}": HomeAirCleaner,
