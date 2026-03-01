@@ -6,6 +6,7 @@ from .version import __version__
 from .AutomaticEntranceDoor import AutomaticEntranceDoor
 from .BathroomDryer import BathroomDryer
 from .CeilingFan import CeilingFan
+from .CO2Sensor import CO2Sensor
 from .DistributionPanelMeter import DistributionPanelMeter
 from .EchonetInstance import EchonetInstance
 from .ElectricBlind import ElectricBlind
@@ -39,6 +40,7 @@ from .WaterFlowMeter import WaterFlowMeter
 from .Electricthermos import ElectricThermos
 from .CrimeSensor import CrimeSensor
 from .EmergencyButton import EmergencyButton
+from .CigaretteSensor import CigaretteSensor
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -49,6 +51,8 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
     """Factory Method"""
     instances = {
         f"{0x00}-{0x03}": FirstAidSensor,
+        f"{0x00}-{0x1A}": CigaretteSensor,
+        f"{0x00}-{0x1B}": CO2Sensor,
         f"{0x00}-{0x11}": TemperatureSensor,
         f"{0x01}-{0x30}": HomeAirConditioner,
         f"{0x01}-{0x35}": HomeAirCleaner,
