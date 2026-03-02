@@ -50,6 +50,11 @@ from .WaterFlowSensor import WaterFlowSensor
 from .OdorSensor import OdorSensor
 from .ElectricEnergySensor import ElectricEnergySensor
 from .CurrentSensor import CurrentSensor
+from .BedPresenceSensor import BedPresenceSensor
+from .MicromotionSensor import MicromotionSensor
+from .PassageSensor import PassageSensor
+from .OpenCloseSensor import OpenCloseSensor
+from .ActivityAmountSensor import ActivityAmountSensor
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -71,6 +76,11 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x00}-{0x22}": ElectricEnergySensor,
         f"{0x00}-{0x23}": CurrentSensor,
         f"{0x00}-{0x25}": WaterFlowSensor,
+        f"{0x00}-{0x26}": MicromotionSensor,
+        f"{0x00}-{0x27}": PassageSensor,
+        f"{0x00}-{0x28}": BedPresenceSensor,
+        f"{0x00}-{0x29}": OpenCloseSensor,
+        f"{0x00}-{0x2A}": ActivityAmountSensor,
         f"{0x00}-{0x11}": TemperatureSensor,
         f"{0x01}-{0x30}": HomeAirConditioner,
         f"{0x01}-{0x35}": HomeAirCleaner,
