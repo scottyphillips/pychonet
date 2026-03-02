@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import asyncio
 import sys
 from pprint import pprint
@@ -30,7 +32,7 @@ async def main(argv):
     loop = asyncio.get_event_loop()
     udp.run("0.0.0.0", 3610, loop=loop)
     server = api(udp)
-    server._debug_flag = False
+    server._debug_flag = True
     server._message_timeout = 300
     target = argv[1]
 
