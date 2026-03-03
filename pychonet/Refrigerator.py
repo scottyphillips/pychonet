@@ -105,3 +105,30 @@ class Refrigerator(EchonetInstance):
         EchonetInstance.__init__(
             self, host, self.EOJGC, self.EOJCC, instance, api_connector
         )
+
+    async def getDoorOpenCloseStatus(self):  # EPC 0xB0
+        return await self.getMessage(0xB0)
+
+    async def getRefrigeratorCompartmentDoorStatus(self):  # EPC 0xB2
+        return await self.getMessage(0xB2)
+
+    async def getFreezerCompartmentDoorStatus(self):  # EPC 0xB3
+        return await self.getMessage(0xB3)
+
+    async def getMeasuredRefrigeratorCompartmentTemp(self):  # EPC 0xD1
+        return await self.getMessage(0xD1)
+
+    async def getMeasuredFreezerCompartmentTemp(self):  # EPC 0xD2
+        return await self.getMessage(0xD2)
+
+    async def getIcemakerSetting(self):  # EPC 0xA4
+        return await self.getMessage(0xA4)
+
+    async def getIcemakerOperationStatus(self):  # EPC 0xA5
+        return await self.getMessage(0xA5)
+
+    async def getCompressorRotationSpeed(self):  # EPC 0xD8
+        return await self.getMessage(0xD8)
+
+    async def getQuickFreezeFunctionSetting(self):  # EPC 0xA0
+        return await self.getMessage(0xA0)

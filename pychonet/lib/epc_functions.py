@@ -29,6 +29,15 @@ DICT_30_TRUE_FALSE = {0x30: True, 0x31: False}
 DICT_30_ON_OFF = {0x30: DATA_STATE_ON, 0x31: DATA_STATE_OFF}
 DICT_30_OPEN_CLOSED = {0x30: DATA_STATE_OPEN, 0x31: DATA_STATE_CLOSE}
 
+# Lighting type enums (used by CommercialShowcase, etc.)
+# EPC values with release I and later specifications
+DICT_LIGHTINGTYPE_40TO43 = {
+    0x40: "other",
+    0x41: "led",
+    0x42: "fluorescentLamp",
+    0x43: "incandescentBulb",
+}
+
 # Like select type
 DICT_41_AUTO_8_SPEEDS = {
     0x41: "auto",

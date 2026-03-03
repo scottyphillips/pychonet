@@ -86,7 +86,7 @@ AIRFLOW_VERT = {
     "lower": 0x42,
 }
 
-SILENT_MODE = {"normal": 0x41, "high-speed": 0x42, "silent": 0x43}
+
 
 AUTO_DIRECTION = {"auto": 0x41, "non-auto": 0x42, "auto-vert": 0x43, "auto-horiz": 0x44}
 

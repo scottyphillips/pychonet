@@ -55,6 +55,8 @@ from .MicromotionSensor import MicromotionSensor
 from .PassageSensor import PassageSensor
 from .OpenCloseSensor import OpenCloseSensor
 from .ActivityAmountSensor import ActivityAmountSensor
+from .RainSensor import RainSensor
+from .CommercialShowcase import CommercialShowcase
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -114,7 +116,9 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x03}-{0xB2}": ElectricThermos,
         f"{0x03}-{0xB7}": Refrigerator,
         f"{0x00}-{0x02}": CrimeSensor,
+        f"{0x00}-{0x13}": RainSensor,
         f"{0x00}-{0x03}": EmergencyButton,
+        f"{0x03}-{0xCE}": CommercialShowcase,
         None: None,
     }
     instance_object = instances.get(instance, None)

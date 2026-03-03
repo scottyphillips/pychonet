@@ -64,76 +64,76 @@ class FanHeater(EchonetInstance):
         super().__init__(host, self._eojgc, self._eojcc, instance, api_connector)
 
     async def getTemperatureSettingValue(self):
-        return self.getMessage(0xB3)
+        return await self.getMessage(0xB3)
 
     async def setTemperatureSettingValue(self, value):
-        self.setMessage(0xB3, value)
+        return await self.setMessage(0xB3, value)
 
     async def getMeasuredTemperature(self):
-        return self.getMessage(0xBB)
+        return await self.getMessage(0xBB)
 
     async def getAutomaticTemperatureControlSetting(self):
-        return self.getMessage(0xB1)
+        return await self.getMessage(0xB1)
 
     async def setAutomaticTemperatureControlSetting(self, setting):
-        self.setMessage(0xB1, setting)
+        return await self.setMessage(0xB1, setting)
 
     async def getOnTimerReservationSetting(self):
-        return self.getMessage(0x90)
+        return await self.getMessage(0x90)
 
     async def setOnTimerReservationSetting(self, setting):
-        self.setMessage(0x90, setting)
+        return await self.setMessage(0x90, setting)
 
     async def getOnTimerSettingValue(self):
-        return self.getMessage(0x91)
+        return await self.getMessage(0x91)
 
     async def setOnTimerSettingValue(self, value):
-        self.setMessage(0x91, value)
+        return await self.setMessage(0x91, value)
 
     async def getOnTimerSettingRelativeTime(self):
-        return self.getMessage(0x92)
+        return await self.getMessage(0x92)
 
     async def setOnTimerSettingRelativeTime(self, value):
-        self.setMessage(0x92, value)
+        return await self.setMessage(0x92, value)
 
     async def getOffTimerReservationSetting(self):
-        return self.getMessage(0x94)
+        return await self.getMessage(0x94)
 
     async def setOffTimerReservationSetting(self, setting):
-        self.setMessage(0x94, setting)
+        return await self.setMessage(0x94, setting)
 
     async def getOffTimerSettingValue(self):
-        return self.getMessage(0x95)
+        return await self.getMessage(0x95)
 
     async def setOffTimerSettingValue(self, value):
-        self.setMessage(0x95, value)
+        return await self.setMessage(0x95, value)
 
     async def getOffTimerSettingRelativeTime(self):
-        return self.getMessage(0x96)
+        return await self.getMessage(0x96)
 
     async def setOffTimerSettingRelativeTime(self, value):
-        self.setMessage(0x96, value)
+        return await self.setMessage(0x96, value)
 
     async def getExtensionalOperationSetting(self):
-        return self.getMessage(0xC0)
+        return await self.getMessage(0xC0)
 
     async def setExtensionalOperationSetting(self, setting):
-        self.setMessage(0xC0, setting)
+        return await self.setMessage(0xC0, setting)
 
     async def getExtensionalOperationTimerTimeSettingValue(self):
-        return self.getMessage(0xC1)
+        return await self.getMessage(0xC1)
 
     async def setExtensionalOperationTimerTimeSettingValue(self, value):
-        self.setMessage(0xC1, value)
+        return await self.setMessage(0xC1, value)
 
     async def getIonEmissionSetting(self):
-        return self.getMessage(0xC2)
+        return await self.getMessage(0xC2)
 
     async def setIonEmissionSetting(self, setting):
-        self.setMessage(0xC2, setting)
+        return await self.setMessage(0xC2, setting)
 
     async def getImplementedIonEmissionMethod(self):
-        return self.getMessage(0xC3)
+        return await self.getMessage(0xC3)
 
     async def getOilAmountLevel(self):
-        return self.getMessage(0xC4)
+        return await self.getMessage(0xC4)
