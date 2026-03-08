@@ -12,7 +12,6 @@ class DistributedGeneratorElectricEnergyMeter(EchonetInstance):
     EPC_FUNCTIONS = {
         0x80: _int, # Operation status
         0x98: _yyyy_mm_dd, # Current date setting
-        0xD1: _to_string, # Device ID
         0xD4: [
             _int,
             {
