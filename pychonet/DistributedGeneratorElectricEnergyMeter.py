@@ -31,13 +31,9 @@ class DistributedGeneratorElectricEnergyMeter(EchonetInstance):
     """
 
     EPC_FUNCTIONS = {
-        # 通用
-        0x80: _int,         # Operation status
-        #0x83: _to_string,   # Identification number???
-        #0x97: _hh_mm,       # Current time setting???
-        0x98: _yyyy_mm_dd,  # Current date setting
-
-        # 单位
+        0x80: _int, # Operation status
+        0x98: _yyyy_mm_dd, # Current date setting
+        0xD1: _to_string, # Device ID
         0xD4: [
             _int,
             {
@@ -51,17 +47,12 @@ class DistributedGeneratorElectricEnergyMeter(EchonetInstance):
                 0x0C: 1000,
                 0x0D: 10000,
             },
-            None,
-        ],         # 積算電力量単位 (unsignedChar) x kWh —— 上层解释倍率
-
-        # 累计量（unsigned long）
-        0xE0: _int,         # 積算電力量計測値(交流入力)
-        0xE2: _int,         # 積算電力量計測値(交流出力)
-        0xE4: _int,         # 積算電力量計測値(自立出力)
-
-        # 瞬时功率/电力（signed long）
-        0xE9: _signed_int,  # 交流入出力計測値
-        0xEA: _signed_int,  # 自立出力計測値
+        ], # Unit for cumulative amount of electric energy
+        0xE0: _int,         # Measured cumulative amount of electric energy (AC input)
+        0xE2: _int,         # Measured cumulative amount of electric energy (AC output)
+        0xE4: _int,         # Measured cumulative amount of electric energy (independent output)
+        0xE9: _signed_int,  # Measured instantaneous electric power (AC input/output)
+        0xEA: _signed_int,  # Measured instantaneous electric power (independent output)
     }
 
     def __init__(self, host, api_connector=None, instance=0x01):
