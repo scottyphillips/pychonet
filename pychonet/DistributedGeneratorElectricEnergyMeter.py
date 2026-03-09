@@ -6,24 +6,26 @@ from pychonet.lib.epc_functions import (
     _yyyy_mm_dd,
 )
 
+def _028ED4(edt):
+    op_mode = int.from_bytes(edt, "big")
+    values = {
+        0x00: 1,
+        0x01: 0.1,
+        0x02: 0.01,
+        0x03: 0.001,
+        0x04: 0.0001,
+        0x0A: 10,
+        0x0B: 100,
+        0x0C: 1000,
+        0x0D: 10000,
+    }
+    return values.get(op_mode, None)
+
 class DistributedGeneratorElectricEnergyMeter(EchonetInstance):
     EPC_FUNCTIONS = {
         0x80: _int, # Operation status
         0x98: _yyyy_mm_dd, # Current date setting
-        0xD4: [
-            _int,
-            {
-                0x00: "1 kWh",
-                0x01: "0.1 kWh",
-                0x02: "0.01 kWh",
-                0x03: "0.001 kWh",
-                0x04: "0.0001 kWh",
-                0x0A: "10 kWh",
-                0x0B: "100 kWh",
-                0x0C: "1000 kWh",
-                0x0D: "10000 kWh",
-            },
-        ],  # Unit for cumulative amount of electric energy
+        0xD4: _028ED4,  # Unit for cumulative amount of electric energy
         0xE0: _int, # Measured cumulative amount of electric energy (AC input)
         0xE2: _int, # Measured cumulative amount of electric energy (AC output)
         0xE4: _int, # Measured cumulative amount of electric energy (independent output)
