@@ -1,0 +1,16 @@
+# Ignore Python cache
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore environment/build folders
+venv/
+.venv/
+env/
+build/
+dist/
+
+# Ignore IDE junk
+.vscode/
+.idea/

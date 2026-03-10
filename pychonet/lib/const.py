@@ -328,6 +328,7 @@ MANUFACTURERS = {
     0x00012C: "Onamba",
     0x00012E: "Eneres",
     0x00012F: "FORMOSA BIO AND ENERGY CORP JAPAN",
+    0x000131: "Sungrow",  # EP Cube (GZ-000900)
     0xFFFFFE: "Undefined",
     0xFFFFFF: "Experimental",
 }

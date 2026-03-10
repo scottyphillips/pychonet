@@ -1,3 +1,30 @@
+# HomeAirConditioner.py
+# HomeAirConditioner class for ECHONET Lite
+# This class represents a home air conditioner device in the ECHONET Lite protocol.
+# It provides methods to get and set various properties of the air conditioner, such as temperature, humidity, mode, and fan speed.
+# The class uses the EchonetInstance class to interact with the ECHONET Lite API.
+# Reference: https://echonet.jp/wp/wp-content/uploads/pdf/General/Standard/Release/Release_R/Appendix_Release_R_rev3_E.pdf
+
+#  Author: Scott Phillips
+#  Date: 2026-02
+# License: MIT
+
+# +-----------------------------------------+------+------------------------------------------------+-----------+------+---------+-------+---------+
+# | Property Name                           | EPC  | Contents (Value Range)                         | Data Type | Size | Access  | Mand. | Announ. |
+# +-----------------------------------------+------+------------------------------------------------+-----------+------+---------+-------+---------+
+# | Operation status                        | 0x80 | ON=0x30, OFF=0x31                              | u_char    | 1 B  | Set/Get |   O   |    O    |
+# | Power-saving operation setting          | 0x8F | Saving=0x41, Normal=0x42                       | u_char    | 1 B  | Set/Get |   O   |    O    |
+# | Air flow rate setting                   | 0xA0 | Auto=0x41, Level=0x31-0x38                     | u_char    | 1 B  | Set/Get |   O   |    O    |
+# | Automatic control of air flow direction | 0xA1 | Auto=0x41, Non-auto=0x42, Vert=0x43, Horiz=0x44| u_char    | 1 B  | Set/Get |       |         |
+# | Air flow direction (vertical) setting   | 0xA4 | Up=0x41, L-Up=0x44, Cent=0x43, L-Dn=0x45, Dn=0x42| u_char  | 1 B  | Set/Get |       |         |
+# | Operation mode setting                  | 0xB0 | Auto=0x41, Cool=0x42, Heat=0x43, Dry=0x44      | u_char    | 1 B  | Set/Get |   O   |    O    |
+# | Normal/High-speed/Silent op. setting    | 0xB2 | Normal=0x41, High-speed=0x42, Silent=0x43      | u_char    | 1 B  | Set/Get |       |         |
+# | Set temperature value                   | 0xB3 | 0x00-0x32 (0-50°C)                             | u_char    | 1 B  | Set/Get |   O   |         |
+# | Measured value of room temperature      | 0xBB | 0x81-0x7D (-127 to 125°C)                      | s_char    | 1 B  | Get     |   O   |         |
+# +-----------------------------------------+------+------------------------------------------------+-----------+------+---------+-------+---------+
+
+
+
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
@@ -59,7 +86,7 @@ AIRFLOW_VERT = {
     "lower": 0x42,
 }
 
-SILENT_MODE = {"normal": 0x41, "high-speed": 0x42, "silent": 0x43}
+
 
 AUTO_DIRECTION = {"auto": 0x41, "non-auto": 0x42, "auto-vert": 0x43, "auto-horiz": 0x44}
 

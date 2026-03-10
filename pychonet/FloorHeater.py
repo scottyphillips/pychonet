@@ -54,3 +54,45 @@ class FloorHeater(EchonetInstance):
         self._eojgc = self.EOJGC
         self._eojcc = self.EOJCC
         super().__init__(host, self._eojgc, self._eojcc, instance, api_connector)
+
+    async def getMeasuredRoomTemp(self):  # EPC 0xE2
+        return await self.update(0xE2)
+
+    async def getMeasuredFloorTemp(self):  # EPC 0xE3
+        return await self.update(0xE3)
+
+    async def getTemperatureSetting1(self):  # EPC 0xE0
+        return await self.getMessage(0xE0)
+
+    async def getTemperatureSetting2(self):  # EPC 0xE1
+        return await self.getMessage(0xE1)
+
+    async def getMeasuredInstantPower(self):  # EPC 0x84
+        return await self.update(0x84)
+
+    async def getCumulativeEnergyConsumption(self):  # EPC 0x85
+        return await self.update(0x85)
+
+    async def getRatedPowerConsumption(self):  # EPC 0xE9
+        return await self.update(0xE9)
+
+    async def getDailyTimerSetting(self):  # EPC 0xE6
+        return await self.getMessage(0xE6)
+
+    async def getONTimerReservation(self):  # EPC 0x90
+        return await self.getMessage(0x90)
+
+    async def getOFFTimerReservation(self):  # EPC 0x94
+        return await self.getMessage(0x94)
+
+    async def setTemperatureSetting1(self, value):  # EPC 0xE0
+        return await self.setMessage(0xE0, value)
+
+    async def setTemperatureSetting2(self, value):  # EPC 0xE1
+        return await self.setMessage(0xE1, value)
+
+    async def setONTimerReservation(self, value):  # EPC 0x90
+        return await self.setMessage(0x90, value)
+
+    async def setOFFTimerReservation(self, value):  # EPC 0x94
+        return await self.setMessage(0x94, value)

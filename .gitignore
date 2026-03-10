@@ -5,3 +5,5 @@ dist/*
 pychonet.egg-info/*
 .DS_Store
 __pycache__
+venv/*
+.pytest_cache/*

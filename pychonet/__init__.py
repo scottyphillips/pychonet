@@ -1,3 +1,4 @@
+
 from pychonet.echonetapiclient import ECHONETAPIClient  # noqa
 from pychonet.lib.eojx import EOJX_CLASS
 
@@ -5,6 +6,8 @@ from .version import __version__
 from .AutomaticEntranceDoor import AutomaticEntranceDoor
 from .BathroomDryer import BathroomDryer
 from .CeilingFan import CeilingFan
+from .CO2Sensor import CO2Sensor
+from .GasSensor import GasSensor
 from .DistributionPanelMeter import DistributionPanelMeter
 from .EchonetInstance import EchonetInstance
 from .ElectricBlind import ElectricBlind
@@ -19,6 +22,7 @@ from .ElectricWaterHeater import ElectricWaterHeater
 from .ElectricWindow import ElectricWindow
 from .FloorHeater import FloorHeater
 from .FuelCell import FuelCell
+from .FirstAidSensor import FirstAidSensor
 from .GasMeter import GasMeter
 from .GeneralLighting import GeneralLighting
 from .HomeAirCleaner import HomeAirCleaner
@@ -35,6 +39,25 @@ from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
 from .WaterFlowMeter import WaterFlowMeter
 from .DistributedGeneratorElectricEnergyMeter import DistributedGeneratorElectricEnergyMeter
+from .Electricthermos import ElectricThermos
+from .CrimeSensor import CrimeSensor
+from .EmergencyButton import EmergencyButton
+from .CigaretteSensor import CigaretteSensor
+from .VO2Sensor import VO2Sensor
+from .DiffPressureSensor import DiffPressureSensor
+from .AirSpeedSensor import AirSpeedSensor
+from .FlameSensor import FlameSensor
+from .WaterFlowSensor import WaterFlowSensor
+from .OdorSensor import OdorSensor
+from .ElectricEnergySensor import ElectricEnergySensor
+from .CurrentSensor import CurrentSensor
+from .BedPresenceSensor import BedPresenceSensor
+from .MicromotionSensor import MicromotionSensor
+from .PassageSensor import PassageSensor
+from .OpenCloseSensor import OpenCloseSensor
+from .ActivityAmountSensor import ActivityAmountSensor
+from .RainSensor import RainSensor
+from .CommercialShowcase import CommercialShowcase
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -44,6 +67,23 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
 
     """Factory Method"""
     instances = {
+        f"{0x00}-{0x03}": FirstAidSensor,
+        f"{0x00}-{0x1A}": CigaretteSensor,
+        f"{0x00}-{0x1B}": CO2Sensor,
+        f"{0x00}-{0x1C}": GasSensor,
+        f"{0x00}-{0x1D}": VO2Sensor,
+        f"{0x00}-{0x1E}": DiffPressureSensor,
+        f"{0x00}-{0x1F}": AirSpeedSensor,
+        f"{0x00}-{0x20}": OdorSensor,
+        f"{0x00}-{0x21}": FlameSensor,
+        f"{0x00}-{0x22}": ElectricEnergySensor,
+        f"{0x00}-{0x23}": CurrentSensor,
+        f"{0x00}-{0x25}": WaterFlowSensor,
+        f"{0x00}-{0x26}": MicromotionSensor,
+        f"{0x00}-{0x27}": PassageSensor,
+        f"{0x00}-{0x28}": BedPresenceSensor,
+        f"{0x00}-{0x29}": OpenCloseSensor,
+        f"{0x00}-{0x2A}": ActivityAmountSensor,
         f"{0x00}-{0x11}": TemperatureSensor,
         f"{0x01}-{0x30}": HomeAirConditioner,
         f"{0x01}-{0x35}": HomeAirCleaner,
@@ -63,7 +103,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x7B}": FloorHeater,
         f"{0x02}-{0x7C}": FuelCell,
         f"{0x02}-{0x7D}": StorageBattery,
-        # f"{0x02}-{0x7E}": ElectricVehicleCharger,
+        f"{0x02}-{0x7E}": ElectricVehicleCharger,
         f"{0x02}-{0x80}": ElectricEnergyMeter,
         f"{0x02}-{0x81}": WaterFlowMeter,
         f"{0x02}-{0x82}": GasMeter,
@@ -75,7 +115,12 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0xA3}": LightingSystem,
         f"{0x02}-{0xA5}": MultipleInputPCS,
         f"{0x02}-{0xA6}": HybridWaterHeater,
+        f"{0x03}-{0xB2}": ElectricThermos,
         f"{0x03}-{0xB7}": Refrigerator,
+        f"{0x00}-{0x02}": CrimeSensor,
+        f"{0x00}-{0x13}": RainSensor,
+        f"{0x00}-{0x03}": EmergencyButton,
+        f"{0x03}-{0xCE}": CommercialShowcase,
         None: None,
     }
     instance_object = instances.get(instance, None)
