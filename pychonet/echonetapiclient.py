@@ -1,34 +1,70 @@
 import asyncio
+import time
 from typing import Callable
 
 from pychonet.lib.const import (
     ENL_GETMAP,
     ENL_MANUFACTURER,
-    ENL_PRODUCT_CODE,
+    ENL_MULTICAST_ADDRESS,
     ENL_PORT,
-    INSTANCE_LIST,
+    ENL_PRODUCT_CODE,
     ENL_SETMAP,
+    ENL_STATMAP,
     ENL_UID,
     GET,
-    MESSAGE_TIMEOUT,
-    ENL_STATMAP,
-    SETRES,
+    GET_SNA,
     GETRES,
     INF,
-    INFC,
-    SETC_SND,
-    GET_SNA,
     INF_SNA,
-    SETI,
+    INFC,
+    INSTANCE_LIST,
+    MESSAGE_TIMEOUT,
     SETC,
-    ENL_MULTICAST_ADDRESS,
+    SETC_SND,
+    SETI,
+    SETRES,
 )
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
+from pychonet.lib.udpserver import UDPServer
 
 
 class ECHONETAPIClient:
-    def __init__(self, server):
+    """
+    Async ECHONET Lite API client.
+
+    This class manages:
+      - Sending and receiving ECHONET Lite UDP packets
+      - Device discovery (multicast and unicast)
+      - Instance and property state tracking
+      - Callback dispatch for updates and received packets
+
+    Discovery behaviour
+    -------------------
+    Two discovery mechanisms are implemented:
+
+    1. Active discovery
+       A multicast Node Profile request (EPC=INSTANCE_LIST) is sent to
+       224.0.23.0:3610. Multiple devices may respond within a short time window.
+       Responses are collected during `_discovery_window`.
+
+    2. Passive discovery
+       When a valid ECHONET Lite packet is received from an unknown host,
+       the host is temporarily added to `_state` and a background discovery
+       probe is scheduled via `_discover_callback`.
+
+       To avoid repeated discovery storms, unknown host probing is suppressed
+       using `_unknown_discovery_in_progress` and `_unknown_discovery_last_failed`.
+
+    Notes
+    -----
+    - The first packet from an unknown device is still processed so discovery
+      data (e.g. INSTANCE_LIST, UID, manufacturer) can be extracted immediately.
+    - Discovery callbacks are scheduled using `asyncio.create_task()` so that
+      packet reception is not blocked.
+    """
+
+    def __init__(self, server: UDPServer):
         self._server = server
         self._logger: Callable = print
         self._server.subscribe(self.echonetMessageReceived)
@@ -43,18 +79,64 @@ class ECHONETAPIClient:
         self._receive_callbacks = {}
         self._discover_callback: Callable | None = None
         self._waiting = {}
+        # Discovery-specific response collection
+        #
+        # Multicast discovery can generate multiple responses from different devices.
+        # Instead of finishing the transaction when the first response arrives,
+        # responses are collected during `_discovery_window` seconds.
+        #
+        # `_discovery_tids` tracks TIDs currently used for discovery transactions.
+        self._discovery_tids = set()
+        self._discovery_window = 2.0
+        # Unknown host discovery control
+        #
+        # When a packet arrives from a host that is not yet known in `_state`,
+        # a background discovery probe will be scheduled.  These structures
+        # prevent repeated discovery attempts when devices send frequent
+        # notifications (INF/INFC).
+        #
+        # _unknown_discovery_in_progress
+        #     Hosts currently undergoing discovery.
+        #
+        # _unknown_discovery_last_failed
+        #     Timestamp of the last failed discovery attempt.
+        #
+        # _unknown_discovery_suppress_seconds
+        #     Minimum delay before retrying discovery for the same host.
+        #
+        # _unknown_discovery_last_scheduled
+        #     Timestamp of the last time discovery was scheduled for a host.
+        #
+        # _unknown_discovery_cooldown_seconds
+        #     Minimum delay before scheduling discovery again for the same host,
+        #     regardless of success or failure.
+        self._unknown_discovery_in_progress = set()
+        self._unknown_discovery_last_failed = {}
+        self._unknown_discovery_suppress_seconds = 30.0
+        self._unknown_discovery_last_scheduled = {}
+        self._unknown_discovery_cooldown_seconds = 10.0
 
     async def echonetMessageReceived(self, raw_data, addr):
         updated = False
         host = addr[0]
         is_discovery = False
 
+        if host in self._server._multicast_ips:
+            return
+
         if self._debug_flag:
             self._logger(
                 f"ECHONETLite Message Received from {host} - Raw data is {raw_data}"
             )
 
-        processed_data = decodeEchonetMsg(raw_data)
+        try:
+            processed_data = decodeEchonetMsg(raw_data)
+        except Exception as err:
+            if self._debug_flag:
+                self._logger(
+                    f"Failed to decode ECHONETLite packet from {host}: {err}, raw={raw_data}"
+                )
+            return
 
         if self._debug_flag:
             self._logger(
@@ -75,13 +157,28 @@ class ECHONETAPIClient:
         seojci = processed_data["SEOJCI"]
         esv = processed_data["ESV"]
 
-        if self._state.get(host) is None:  # echonet packet arrived we dont know about
+        # Passive discovery:
+        #
+        # If a packet arrives from a host that is not known yet, create a
+        # temporary state entry and schedule a background discovery probe.
+        #
+        # The current packet is still processed so that discovery information
+        # (e.g. INSTANCE_LIST) contained in the packet can be extracted
+        # immediately.
+        if self._state.get(host) is None:
             self._logger(f"Unknown ECHONETLite node has been identified - {host}")
-            if callable(self._discover_callback):
-                if self._debug_flag:
-                    self._logger(f"Called _discover_callback('{host}')")
-                await self._discover_callback(host)
-            return
+
+            # Create temporary host state so the current packet can still be processed
+            self._state[host] = {"instances": {}, "available": True}
+
+            # If this packet is already a Node Profile response, discovery data
+            # will be processed from this packet, so skip active discovery.
+            if seojgc == 0x0E and seojcc == 0xF0:
+                pass
+            elif self._should_schedule_unknown_discovery(host):
+                self._unknown_discovery_last_scheduled[host] = time.monotonic()
+                self._unknown_discovery_in_progress.add(host)
+                asyncio.create_task(self._run_unknown_host_discovery(host))
 
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
         esv_set = esv in [SETRES, SETC_SND]
@@ -122,16 +219,17 @@ class ECHONETAPIClient:
                         f"Packet received from {host} for user definition class group 0x0F"
                     )
                     self._logger(f"Full packet details are {processed_data}")
-                    self._logger(f"ignoring packet but please notify devs on Github.")
+                    self._logger("ignoring packet but please notify devs on Github.")
             else:  # process each EPC in order
+                self._ensure_instance_state(host, seojgc, seojcc, seojci)
                 if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
                     map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
                     self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
                 elif epc in (ENL_UID, ENL_MANUFACTURER, ENL_PRODUCT_CODE):
                     try:
-                        self._state[host]["instances"][seojgc][seojcc][seojci][
-                            epc
-                        ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
+                        self._state[host]["instances"][seojgc][seojcc][seojci][epc] = (
+                            EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
+                        )
                     except KeyError as e:
                         if self._debug_flag:
                             self._logger(
@@ -207,7 +305,7 @@ class ECHONETAPIClient:
                 if _key.startswith(host):
                     for receive_func in self._receive_callbacks[_key]:
                         await receive_func(False)
-            
+
         else:
             # Call update callback functions
             if updated and key in self._update_callbacks:
@@ -219,13 +317,32 @@ class ECHONETAPIClient:
                 for receive_func in self._receive_callbacks[key]:
                     await receive_func(isPush)
 
-        # if we get duplicate packets that have already been processed then dont worry about the message list.
-        # but still process them regardless.
+        # For multicast discovery, keep the TID alive until the discovery
+        # collection window ends so multiple responders can be gathered.
+        if tid in self._discovery_tids:
+            return
+
+        # if we get duplicate packets that have already been processed then
+        # dont worry about the message list, but still process them regardless.
         if tid_data is not None:
             del self._message_list[tid]
 
     async def discover(self, host=ENL_MULTICAST_ADDRESS):
-        if host is ENL_MULTICAST_ADDRESS:
+        """
+        Perform device discovery.
+
+        If `host` is the multicast address, a network-wide discovery is performed
+        by requesting INSTANCE_LIST from all devices.
+
+        If `host` is a specific IP address, a unicast discovery probe is sent to
+        obtain manufacturer, product code, UID, and instance list.
+
+        Returns
+        -------
+        bool
+            True if at least one device (or the specified host) responded.
+        """
+        if host == ENL_MULTICAST_ADDRESS:
             opc = [{"EPC": INSTANCE_LIST}]
         else:
             opc = [
@@ -237,7 +354,7 @@ class ECHONETAPIClient:
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x01, GET, opc)
 
     async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
-        no_res = True if esv is SETI else False
+        no_res = esv == SETI
         payload = None
         # Is node profile
         is_discover = deojgc == 0x0E and deojcc == 0xF0
@@ -296,6 +413,8 @@ class ECHONETAPIClient:
         tx_tid = self._next_tx_tid
         message_array["TID"] = tx_tid
         try:
+            discovery_deadline: float | None = None
+            discovered_before: set[str] | None = None
             try:
                 payload = buildEchonetMsg(message_array)
             except TIDError:  # Quashing the rollover bug hopefully once and for all...
@@ -319,35 +438,77 @@ class ECHONETAPIClient:
                 self._message_list[tx_tid] = tid_data
 
             self._server.send(payload, (host, ENL_PORT))
+            if is_discover:
+                self._discovery_tids.add(tx_tid)
+                discovery_deadline = time.monotonic() + self._discovery_window
+                if host == ENL_MULTICAST_ADDRESS:
+                    discovered_before = set(self._state.keys())
 
             if not no_res:
                 not_timeout = False
-                for x in range(0, self._message_timeout):
-                    # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
-                    await asyncio.sleep(0.1)
-                    # if tx_tid is not in message list then the message listener has received the message
-                    if self._message_list.get(tx_tid) is None:
-                        # Check OPC count in results
-                        if not is_discover and tx_tid in self._opc_counts:
-                            res_opc_count = self._opc_counts[tx_tid]
-                            del self._opc_counts[tx_tid]
-                            if self._debug_flag:
-                                self._logger(
-                                    f"OPC count in results is {res_opc_count}/{opc_count} from IP {host}."
-                                )
-                            if res_opc_count < opc_count:
-                                raise EchonetMaxOpcError(res_opc_count)
+                if is_discover:
+                    if discovery_deadline is None:
+                        raise RuntimeError("discovery_deadline was not initialized")
 
-                        # transaction sucessful remove from list
-                        if self._failure_list.get(tx_tid, opc_count) < opc_count:
-                            is_success = True
-                        if tx_tid in self._failure_list:
-                            del self._failure_list[tx_tid]
-                        not_timeout = True
-                        break
+                    # Collect discovery responses for a fixed time window
+                    while time.monotonic() < discovery_deadline:
+                        await asyncio.sleep(0.1)
+
+                    if self._message_list.get(tx_tid) is not None:
+                        del self._message_list[tx_tid]
+                    self._discovery_tids.discard(tx_tid)
+
+                    if host == ENL_MULTICAST_ADDRESS:
+                        discovered_hosts = {
+                            h
+                            for h, state in self._state.items()
+                            if h != ENL_MULTICAST_ADDRESS
+                            and (
+                                state.get("discovered")
+                                or len(state.get("instances", {}))
+                            )
+                        }
+                        if discovered_before is not None:
+                            discovered = len(discovered_hosts - discovered_before) > 0
+                        else:
+                            discovered = len(discovered_hosts) > 0
+                    else:
+                        discovered = bool(
+                            self._state.get(host, {}).get("discovered")
+                            or len(self._state.get(host, {}).get("instances", {}))
+                        )
+
+                    is_success = discovered
+                    not_timeout = discovered
+                else:
+                    for x in range(0, self._message_timeout):
+                        # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
+                        await asyncio.sleep(0.1)
+                        # if tx_tid is not in message list then the message listener has received the message
+                        if self._message_list.get(tx_tid) is None:
+                            # Check OPC count in results
+                            if tx_tid in self._opc_counts:
+                                res_opc_count = self._opc_counts[tx_tid]
+                                del self._opc_counts[tx_tid]
+                                if self._debug_flag:
+                                    self._logger(
+                                        f"OPC count in results is {res_opc_count}/{opc_count} from IP {host}."
+                                    )
+                                if res_opc_count < opc_count:
+                                    raise EchonetMaxOpcError(res_opc_count)
+
+                            # transaction sucessful remove from list
+                            if self._failure_list.get(tx_tid, opc_count) < opc_count:
+                                is_success = True
+                                if tx_tid in self._failure_list:
+                                    del self._failure_list[tx_tid]
+                                not_timeout = True
+                            break
+
                 if not is_success:
                     if self._message_list.get(tx_tid) is not None:
                         del self._message_list[tx_tid]
+                self._discovery_tids.discard(tx_tid)
                 if not is_discover and self._state[host]["available"] != not_timeout:
                     self._state[host]["available"] = not_timeout
                     # Call update callback functions
@@ -385,49 +546,30 @@ class ECHONETAPIClient:
         )
 
     async def process_discovery_data(self, host, opc_data):
-        if "discovered" not in self._state[host]:
-            if opc_data["EPC"] == ENL_UID:
-                self._state[host]["uid"] = EPC_SUPER_FUNCTIONS[ENL_UID](
-                    opc_data["EDT"], host
-                )
-            elif opc_data["EPC"] == ENL_MANUFACTURER:
-                self._state[host]["manufacturer"] = EPC_SUPER_FUNCTIONS[
-                    ENL_MANUFACTURER
-                ](opc_data["EDT"])
-            elif opc_data["EPC"] == ENL_PRODUCT_CODE:
-                self._state[host]["product_code"] = EPC_SUPER_FUNCTIONS[
-                    ENL_PRODUCT_CODE
-                ](opc_data["EDT"])
-            else:
-                edt = bytearray(opc_data["EDT"])
-                # 1st byte: Total number of instances
-                # 2nd to 253rd bytes: ECHONET object codes (EOJ3 bytes) enumerated
-                edtnum = bytearray(edt)[0]
-                for x in range(edtnum):
-                    eojgc = bytearray(edt)[1 + (3 * x)]
-                    eojcc = bytearray(edt)[2 + (3 * x)]
-                    eojci = bytearray(edt)[3 + (3 * x)]
-                    if eojgc != 0x0F:  # ignore this group code.
-                        # populate state table
-                        if eojgc not in list(self._state[host]["instances"].keys()):
-                            self._state[host]["instances"].update({eojgc: {}})
-                        if eojcc not in list(
-                            self._state[host]["instances"][eojgc].keys()
-                        ):
-                            self._state[host]["instances"][eojgc].update({eojcc: {}})
-                        if eojci not in list(
-                            self._state[host]["instances"][eojgc][eojcc].keys()
-                        ):
-                            self._state[host]["instances"][eojgc][eojcc][eojci] = {}
-                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                                {ENL_STATMAP: []}
-                            )
-                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                                {ENL_SETMAP: []}
-                            )
-                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                                {ENL_GETMAP: []}
-                            )
+        if opc_data["EPC"] == ENL_UID:
+            self._state[host]["uid"] = EPC_SUPER_FUNCTIONS[ENL_UID](
+                opc_data["EDT"], host
+            )
+        elif opc_data["EPC"] == ENL_MANUFACTURER:
+            self._state[host]["manufacturer"] = EPC_SUPER_FUNCTIONS[ENL_MANUFACTURER](
+                opc_data["EDT"]
+            )
+        elif opc_data["EPC"] == ENL_PRODUCT_CODE:
+            self._state[host]["product_code"] = EPC_SUPER_FUNCTIONS[ENL_PRODUCT_CODE](
+                opc_data["EDT"]
+            )
+        else:
+            edt = bytearray(opc_data["EDT"])
+            # 1st byte: Total number of instances
+            # 2nd to 253rd bytes: ECHONET object codes (EOJ3 bytes) enumerated
+            edtnum = bytearray(edt)[0]
+            for x in range(edtnum):
+                eojgc = bytearray(edt)[1 + (3 * x)]
+                eojcc = bytearray(edt)[2 + (3 * x)]
+                eojci = bytearray(edt)[3 + (3 * x)]
+                if eojgc != 0x0F:  # ignore this group code.
+                    # populate state table
+                    self._ensure_instance_state(host, eojgc, eojcc, eojci)
 
     def register_async_update_callbacks(self, host, eojgc, eojcc, eojci, fn):
         key = f"{host}-{eojgc}-{eojcc}-{eojci}"
@@ -440,6 +582,69 @@ class ECHONETAPIClient:
         if key not in self._receive_callbacks:
             self._receive_callbacks[key] = []
         self._receive_callbacks[key].append(fn)
+
+    def _ensure_instance_state(self, host, eojgc, eojcc, eojci):
+        instances = self._state[host]["instances"]
+        if eojgc not in instances:
+            instances[eojgc] = {}
+        if eojcc not in instances[eojgc]:
+            instances[eojgc][eojcc] = {}
+        if eojci not in instances[eojgc][eojcc]:
+            instances[eojgc][eojcc][eojci] = {
+                ENL_STATMAP: [],
+                ENL_SETMAP: [],
+                ENL_GETMAP: [],
+            }
+
+    async def _run_unknown_host_discovery(self, host):
+        """
+        Execute background discovery for an unknown host.
+
+        This method is scheduled via `asyncio.create_task()` so that
+        packet reception is not blocked by discovery logic.
+
+        Any exception raised by the discovery callback will mark the
+        discovery as failed and activate the retry suppression timer.
+        """
+        try:
+            if callable(self._discover_callback):
+                if self._debug_flag:
+                    self._logger(f"Called _discover_callback('{host}')")
+                await self._discover_callback(host)
+        except Exception as err:
+            self._unknown_discovery_last_failed[host] = time.monotonic()
+            self._logger(f"Unknown host discovery failed for {host}: {err}")
+        finally:
+            self._unknown_discovery_in_progress.discard(host)
+
+    def _should_schedule_unknown_discovery(self, host):
+        """
+        Determine whether discovery should be scheduled for an unknown host.
+
+        Discovery will be skipped if:
+          - A discovery is already running for the host
+          - Discovery was scheduled recently and cooldown has not expired
+          - A previous discovery failed recently and suppression time
+            has not yet expired
+        """
+        if host in self._unknown_discovery_in_progress:
+            return False
+
+        last_scheduled = self._unknown_discovery_last_scheduled.get(host)
+        if last_scheduled is not None:
+            if (
+                time.monotonic() - last_scheduled
+            ) < self._unknown_discovery_cooldown_seconds:
+                return False
+
+        last_failed = self._unknown_discovery_last_failed.get(host)
+        if last_failed is not None:
+            if (
+                time.monotonic() - last_failed
+            ) < self._unknown_discovery_suppress_seconds:
+                return False
+
+        return True
 
 
 class EchonetMaxOpcError(Exception):
