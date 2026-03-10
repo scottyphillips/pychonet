@@ -607,6 +607,8 @@ class ECHONETAPIClient:
         discovery as failed and activate the retry suppression timer.
         """
         try:
+            await asyncio.sleep(0.5)
+
             if callable(self._discover_callback):
                 if self._debug_flag:
                     self._logger(f"Called _discover_callback('{host}')")
@@ -614,6 +616,10 @@ class ECHONETAPIClient:
         except Exception as err:
             self._unknown_discovery_last_failed[host] = time.monotonic()
             self._logger(f"Unknown host discovery failed for {host}: {err}")
+
+            state = self._state.get(host)
+            if state and not state.get("instances") and not state.get("discovered"):
+                self._state.pop(host, None)
         finally:
             self._unknown_discovery_in_progress.discard(host)
 
