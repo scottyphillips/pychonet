@@ -142,6 +142,7 @@ EOJX_CLASS = {
         0x88: "Low voltage smart electric energy meter",
         0x89: "Smart gas meter",
         0x8A: "High voltage smart electric energy meter",
+        0x8E: "Power Detection Unit",
         0x90: "General lighting",
         0x91: "Single function lighting",
         0x99: "Emergency lighting",
