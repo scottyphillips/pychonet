@@ -38,6 +38,7 @@ from .SingleFunctionLighting import SingleFunctionLighting
 from .StorageBattery import StorageBattery
 from .TemperatureSensor import TemperatureSensor
 from .WaterFlowMeter import WaterFlowMeter
+from .DistributedGeneratorElectricEnergyMeter import DistributedGeneratorElectricEnergyMeter
 from .Electricthermos import ElectricThermos
 from .CrimeSensor import CrimeSensor
 from .EmergencyButton import EmergencyButton
@@ -108,6 +109,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x82}": GasMeter,
         f"{0x02}-{0x87}": DistributionPanelMeter,
         f"{0x02}-{0x88}": LowVoltageSmartElectricEnergyMeter,
+        f"{0x02}-{0x8E}": DistributedGeneratorElectricEnergyMeter,
         f"{0x02}-{0x90}": GeneralLighting,
         f"{0x02}-{0x91}": SingleFunctionLighting,
         f"{0x02}-{0xA3}": LightingSystem,
