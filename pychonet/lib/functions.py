@@ -1,11 +1,27 @@
+import logging
+
 from .const import EHD1, EHD2, ESV_CODES
 from .eojx import EOJX_CLASS, EOJX_GROUP
 
+# Echonet message constants
+DEFAULT_EHD = 0x1081       # Default EHD value (EHD1 + EHD2)
+DEFAULT_SEOJ = 0x05FF01    # Default SEOJ (Service Object ID)
+MAX_TID_VALUE = 0xFFFF     # Maximum Transaction ID (2 bytes)
+
 
 class TIDError(Exception):
-    """Base class for other exceptions"""
+    """Exception raised for invalid Transaction ID."""
 
     pass
+
+
+class DecodeEchonetMsgError(Exception):
+    """Exception raised when decoding Echonet message fails."""
+
+    pass
+
+
+logger = logging.getLogger(__name__)
 
 
 def decodeEchonetMsg(byte):
@@ -50,25 +66,23 @@ def decodeEchonetMsg(byte):
             data["OPC"].append(OPC)
 
     except ValueError as error:
-        print("Caught this error: " + repr(error))
-        quit()
+        logger.error("Failed to decode Echonet message: %s", error)
+        raise DecodeEchonetMsgError(f"Failed to decode Echonet message: {error}") from error
     return data
 
 
 def buildEchonetMsg(data):
-    # EHD is fixed to 0x1081 because I am lazy.
-    message = 0x1081
+    message = DEFAULT_EHD
 
     # validate TID (set a default value if none provided)
-    # TODO - TID message overlap.
     if "TID" not in data:
         data["TID"] = 0x0001
-    elif data["TID"] > 0xFFFF:
-        raise TIDError("Transaction ID is larger then 2 bytes.")
+    elif data["TID"] > MAX_TID_VALUE:
+        raise TIDError(f"Transaction ID {data['TID']} exceeds maximum value of {MAX_TID_VALUE:#x}")
     message = (message << 16) + data["TID"]
 
-    # append SEOJ which again is a fixed value to be lazy
-    message = (message << 24) + 0x05FF01
+    # append default SEOJ
+    message = (message << 24) + DEFAULT_SEOJ
 
     # validate DEOJ
     if data["DEOJGC"] in EOJX_GROUP:
