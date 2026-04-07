@@ -27,7 +27,6 @@ from pychonet.lib.const import (
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
 
-
 class ECHONETAPIClient:
     """ECHONET API client for handling ECHONETLite communication."""
 
@@ -39,6 +38,8 @@ class ECHONETAPIClient:
         """
         self._server: Any = server
         self._logger: Callable[..., Any] = print
+        self._debug_flag: bool = False
+        # Note: Home Assistant integration replaces self._logger with its own logger
         self._server.subscribe(self.echonetMessageReceived)
         self._state: Dict[str, Dict[str, Any]] = {}
         self._next_tx_tid: int = 0x0000
@@ -46,7 +47,6 @@ class ECHONETAPIClient:
         self._failure_list: Dict[int, int] = {}
         self._opc_counts: Dict[int, int] = {}
         self._message_timeout: int = MESSAGE_TIMEOUT
-        self._debug_flag: bool = False
         self._update_callbacks: Dict[str, List[Callable[[bool], Any]]] = {}
         self._receive_callbacks: Dict[str, List[Callable[[bool], Any]]] = {}
         self._discover_callback: Optional[Callable[[str], Any]] = None

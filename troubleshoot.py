@@ -1,5 +1,4 @@
 import asyncio
-
 from pychonet.lib.udpserver import UDPServer
 
 from pychonet import ECHONETAPIClient as api
@@ -11,11 +10,13 @@ from pychonet.lib.const import ENL_GETMAP, ENL_SETMAP, VERSION
 
 async def main():
 
-    print(f"pychonet verison is {VERSION}")
+    print(f"pychonet version is {VERSION}")
     udp = UDPServer()
     loop = asyncio.get_event_loop()
     udp.run("0.0.0.0", 3610, loop=loop)
     server = api(server=udp)
+    # Enable debug logging to see all messages
+    server._debug_flag = True
 
     host = "192.168.1.6"
     await server.discover(host)

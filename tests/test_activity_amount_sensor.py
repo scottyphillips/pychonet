@@ -1,6 +1,6 @@
-# tests/test_gas_sensor.py
+# tests/test_activity_amount_sensor.py
 import unittest
-from pychonet.GasSensor import GasSensor
+from pychonet.ActivityAmountSensor import ActivityAmountSensor
 
 
 class MockECHONETAPIClient:
@@ -9,15 +9,15 @@ class MockECHONETAPIClient:
         # DICT_30_ON_OFF: 0x30='on', 0x31='off'
         # DICT_31_8_LEVELS: 0x31='level-1', 0x38='level-8'
         self._state = {
-            "192.168.1.110": {
+            "192.168.1.60": {
                 "instances": {
-                    0x00: {  # Class group code for gas sensor
-                        0x1C: {  # Class code for gas sensor
+                    0x00: {  # Class group code for activity amount sensor
+                        0x1D: {  # Class code for activity amount sensor
                             0x01: {
                                 0x80: b'\x31',  # Operation status: OFF
-                                0xB0: b'\x35',  # Detection threshold level: level-5
-                                0xB1: b'\x41',  # Gas detection status: found
-                                0xE0: b'\x0d',  # Measured gas concentration: 13 ppm
+                                0xB0: b'\x35',  # Activity threshold level: level-5
+                                0xB1: b'\x41',  # Activity status: active
+                                0xE0: b'\x14',  # Measured activity amount: 20
                                 0x9F: [0x80, 0xB0, 0xB1, 0xE0],  # GETMAP
                                 0x9E: [0x80, 0xB0],  # SETMAP
                             }
@@ -32,10 +32,10 @@ class MockECHONETAPIClient:
         return True
 
 
-class TestGasSensor(unittest.IsolatedAsyncioTestCase):
+class TestActivityAmountSensor(unittest.IsolatedAsyncioTestCase):
     async def test_getOperationStatus(self):
         api_connector = MockECHONETAPIClient()
-        sensor = GasSensor("192.168.1.110", api_connector)
+        sensor = ActivityAmountSensor("192.168.1.60", api_connector)
 
         status = await sensor.getOperationStatus()
         self.assertEqual(status, b'\x31')  # OFF
@@ -46,49 +46,49 @@ class TestGasSensor(unittest.IsolatedAsyncioTestCase):
 
     async def test_setOperationStatus(self):
         api_connector = MockECHONETAPIClient()
-        sensor = GasSensor("192.168.1.110", api_connector)
+        sensor = ActivityAmountSensor("192.168.1.60", api_connector)
 
         result = await sensor.setOperationStatus('on')
         self.assertTrue(result)
 
-    async def test_getDetectionThresholdLevel(self):
+    async def test_getActivityThresholdLevel(self):
         api_connector = MockECHONETAPIClient()
-        sensor = GasSensor("192.168.1.110", api_connector)
+        sensor = ActivityAmountSensor("192.168.1.60", api_connector)
 
-        level = await sensor.getDetectionThresholdLevel()
+        level = await sensor.getActivityThresholdLevel()
         self.assertEqual(level, b'\x35')  # level-5
 
         level = await sensor.update(0xB0)
         expected = 'level-5'  # DICT_31_8_LEVELS[0x35] = 'level-5'
         self.assertEqual(level, expected)
 
-    async def test_setDetectionThresholdLevel(self):
+    async def test_setActivityThresholdLevel(self):
         api_connector = MockECHONETAPIClient()
-        sensor = GasSensor("192.168.1.110", api_connector)
+        sensor = ActivityAmountSensor("192.168.1.60", api_connector)
 
-        result = await sensor.setDetectionThresholdLevel('level-8')
+        result = await sensor.setActivityThresholdLevel('level-8')
         self.assertTrue(result)
 
-    async def test_getGasDetectionStatus(self):
+    async def test_getActivityStatus(self):
         api_connector = MockECHONETAPIClient()
-        sensor = GasSensor("192.168.1.110", api_connector)
+        sensor = ActivityAmountSensor("192.168.1.60", api_connector)
 
-        status = await sensor.getGasDetectionStatus()
-        self.assertEqual(status, b'\x41')  # found
+        status = await sensor.getActivityStatus()
+        self.assertEqual(status, b'\x41')  # active
         status = await sensor.update(0xB1)
-        expected = 'found'  # {0x41: 'found', 0x42: 'not found'}
+        expected = 'active'  # {0x41: 'active', 0x42: 'inactive'}
         self.assertEqual(status, expected)
 
-    async def test_getGasConcentration(self):
+    async def test_getMeasuredActivityAmount(self):
         api_connector = MockECHONETAPIClient()
-        sensor = GasSensor("192.168.1.110", api_connector)
+        sensor = ActivityAmountSensor("192.168.1.60", api_connector)
 
-        concentration = await sensor.getGasConcentration()
-        self.assertEqual(concentration, b'\x0d')  # 13 ppm
+        amount = await sensor.getMeasuredActivityAmount()
+        self.assertEqual(amount, b'\x14')  # 20
 
-        concentration = await sensor.update(0xE0)
-        expected = 13  # _int() returns integer value
-        self.assertEqual(concentration, expected)
+        amount = await sensor.update(0xE0)
+        expected = 20  # _int() returns integer value
+        self.assertEqual(amount, expected)
 
 
 if __name__ == '__main__':

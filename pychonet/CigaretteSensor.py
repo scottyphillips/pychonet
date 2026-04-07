@@ -20,12 +20,12 @@
 
 
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import _int, DICT_31_8_LEVELS
+from pychonet.lib.epc_functions import _int, DICT_31_8_LEVELS, DICT_30_ON_OFF
 
 class CigaretteSensor(EchonetInstance):
     EPC_FUNCTIONS = {
         # Cigarette sensor class
-        0x80: [_int, {0x30: 'ON', 0x31: 'OFF'}],  # "Operation status",
+        0x80: [_int, DICT_30_ON_OFF],  # "Operation status",
         0xB0: [_int, DICT_31_8_LEVELS],  # "Detection threshold level",
         0xB1: [_int, {0x41: 'Smoke (cigarette) detection status found', 0x42: 'Smoke (cigarette) detection status not found'}],  # "Smoke (cigarette) detection status",
     }

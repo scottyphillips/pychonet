@@ -19,12 +19,12 @@
 
 
 from pychonet.EchonetInstance import EchonetInstance
-from pychonet.lib.epc_functions import _int, DICT_41_ON_OFF, DICT_31_8_LEVELS
+from pychonet.lib.epc_functions import _int, DICT_41_ON_OFF, DICT_31_8_LEVELS, DICT_30_ON_OFF
 
 class FireSensor(EchonetInstance):
     EPC_FUNCTIONS = {
         # Fire detection sensor class
-        0x80: [_int, {0x30: 'ON', 0x31: 'OFF'}],  # "Operation status",
+        0x80: [_int, DICT_30_ON_OFF],  # "Operation status",
         0xB0: [_int, DICT_31_8_LEVELS],  # "Detection threshold level",
         0xB1: [_int, {0x41: 'Fire occurrence detection status found', 0x42: 'Fire occurrence detection status not found'}],  # "Fire occurrence detection status",
         0xBF: [_int, {0x00: 'Reset'}],  # "Fire occurrence detection status resetting",
