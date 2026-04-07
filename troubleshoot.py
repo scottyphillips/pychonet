@@ -15,7 +15,7 @@ async def main():
     udp = UDPServer()
     loop = asyncio.get_event_loop()
     udp.run("0.0.0.0", 3610, loop=loop)
-    server = api(server=udp, loop=loop)
+    server = api(server=udp)
 
     host = "192.168.1.6"
     await server.discover(host)

@@ -1,12 +1,13 @@
 import logging
+from typing import Dict, List, Any
 
 from .const import EHD1, EHD2, ESV_CODES
 from .eojx import EOJX_CLASS, EOJX_GROUP
 
 # Echonet message constants
-DEFAULT_EHD = 0x1081       # Default EHD value (EHD1 + EHD2)
-DEFAULT_SEOJ = 0x05FF01    # Default SEOJ (Service Object ID)
-MAX_TID_VALUE = 0xFFFF     # Maximum Transaction ID (2 bytes)
+DEFAULT_EHD = 0x1081  # Default EHD value (EHD1 + EHD2)
+DEFAULT_SEOJ = 0x05FF01  # Default SEOJ (Service Object ID)
+MAX_TID_VALUE = 0xFFFF  # Maximum Transaction ID (2 bytes)
 
 
 class TIDError(Exception):
@@ -24,8 +25,19 @@ class DecodeEchonetMsgError(Exception):
 logger = logging.getLogger(__name__)
 
 
-def decodeEchonetMsg(byte):
-    data = {}
+def decodeEchonetMsg(byte: bytes) -> Dict[str, Any]:
+    """Decode an ECHONET message from raw bytes.
+    
+    Args:
+        byte: Raw bytes containing the ECHONET message
+        
+    Returns:
+        Dictionary containing parsed ECHONET message fields
+        
+    Raises:
+        DecodeEchonetMsgError: If the message cannot be decoded
+    """
+    data: Dict[str, Any] = {}
     try:
         data["EHD1"] = byte[0]
         if data["EHD1"] not in EHD1:
@@ -52,7 +64,7 @@ def decodeEchonetMsg(byte):
         data["OPC"] = []
         # decode multiple processing properties (OPC)
         while i < (byte[11]):
-            OPC = {}
+            OPC: Dict[str, Any] = {}
             pdc_pointer = epc_pointer + 1
             edt_pointer = pdc_pointer + 1
             end_pointer = edt_pointer
@@ -71,7 +83,20 @@ def decodeEchonetMsg(byte):
     return data
 
 
-def buildEchonetMsg(data):
+def buildEchonetMsg(data: Dict[str, Any]) -> bytearray:
+    """Build an ECHONET message from a dictionary.
+    
+    Args:
+        data: Dictionary containing message components (TID, DEOJGC, DEOJCC, 
+              DEOJCI, ESV, OPC)
+              
+    Returns:
+        bytearray containing the constructed ECHONET message
+        
+    Raises:
+        TIDError: If Transaction ID exceeds maximum value
+        ValueError: If DEOJGC, DEOJCC, ESV, or other values are invalid
+    """
     message = DEFAULT_EHD
 
     # validate TID (set a default value if none provided)
@@ -126,7 +151,27 @@ def buildEchonetMsg(data):
     return bytearray.fromhex(format(int(message), "x"))
 
 
-def preparePayload(tid, deojgc, deojcc, deojci, esv, opc):
+def preparePayload(
+    tid: int,
+    deojgc: int,
+    deojcc: int,
+    deojci: int,
+    esv: int,
+    opc: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Prepare a payload for ECHONET message.
+    
+    Args:
+        tid: Transaction ID
+        deojgc: Destination ECHONET Group Code
+        deojcc: Destination ECHONET Class Code
+        deojci: Destination ECHONET Instance Code
+        esv: Service Element Value
+        opc: List of Operation Property Code dictionaries
+        
+    Returns:
+        Dictionary containing the prepared payload
+    """
     tx_payload = {
         "TID": tid,  # Transaction ID 1
         "DEOJGC": deojgc,

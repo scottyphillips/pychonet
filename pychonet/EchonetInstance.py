@@ -1,3 +1,5 @@
+from typing import Dict, List, Any, Optional, Union, Callable, ClassVar
+
 from pychonet.lib.const import (
     ENL_CUMULATIVE_POWER,
     ENL_CUMULATIVE_RUNTIME,
@@ -16,7 +18,19 @@ from pychonet.lib.epc import EPC_CODE, EPC_SUPER
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 
 
-def call_epc_function(epc_function, edt):
+def call_epc_function(
+    epc_function: Any,
+    edt: Any,
+) -> Any:
+    """Call an EPC function with the given EDT data.
+    
+    Args:
+        epc_function: The EPC function to call (can be a function or list)
+        edt: The EDT data to pass to the function
+        
+    Returns:
+        The result of calling the function
+    """
     if type(epc_function) == list:
         if list(epc_function) == 3:
             data = epc_function[0](
@@ -37,15 +51,22 @@ Superclass for Echonet instance objects.
 
 
 class EchonetInstance:
-    EPC_FUNCTIONS = {}
-    """
-    Constructs an object to represent an Echonet lite instance .
+    """Constructs an object to represent an Echonet lite instance.
 
+    :param host: Host IP address of the device
     :param eojgc: Echonet group code
     :param eojcc: Echonet class code
     :param instance: Instance ID
-    :param netif: IP address of node
+    :param api_connector: API connector for ECHONET communication
     """
+
+    EPC_FUNCTIONS: ClassVar[Dict[int, Any]] = {}
+    _host: str
+    _eojgc: int
+    _eojcc: int
+    _eojci: int
+    _api: Any
+    _epc_data: Dict[int, bytes]
 
     def __init__(self, host, eojgc, eojcc, instance, api_connector=None):
         self._host = host
@@ -57,7 +78,7 @@ class EchonetInstance:
             self._eojcc
         ][self._eojci]
 
-        # TODO self instntiate the API connector for backwards compatability with the older libary
+        # TODO self instantiate the API connector for backwards compatability with the older library
 
     """
     getMessage is used to fire a single ECHONET get messages to get Node information
@@ -68,13 +89,22 @@ class EchonetInstance:
 
     """
 
-    async def getMessage(self, epc, pdc=0x00):
+    async def getMessage(self, epc: int, pdc: int = 0) -> Optional[Any]:
+        """Get a property value from the device.
+
+        Args:
+            epc: EPC byte code for the request
+            pdc: Property Data Count (default: 0)
+
+        Returns:
+            The property value or None if not found
+        """
         opc = [{"EPC": epc, "PDC": pdc}]
         response = await self._api.echonetMessage(
             self._host, self._eojgc, self._eojcc, self._eojci, GET, opc
         )
         if not response:
-            return False
+            return None
         edt = self._api._state[self._host]["instances"][self._eojgc][self._eojcc][
             self._eojci
         ][epc]
@@ -89,7 +119,17 @@ class EchonetInstance:
     :return: True if sucessful, false if request message failed
     """
 
-    async def setMessage(self, epc, edt, pdc=0x01):
+    async def setMessage(self, epc: int, edt: Any, pdc: int = 1) -> bool:
+        """Set a property value on the device.
+
+        Args:
+            epc: EPC byte code for the request
+            edt: EDT data relevant to the request
+            pdc: Property Data Count (default: 1)
+
+        Returns:
+            True if successful, False if request failed
+        """
         opc = [{"EPC": epc, "PDC": pdc, "EDT": edt}]
         response = await self._api.echonetMessage(
             self._host, self._eojgc, self._eojcc, self._eojci, SETC, opc
@@ -107,7 +147,15 @@ class EchonetInstance:
     :return: True if sucessful, false if request message failed
     """
 
-    async def setMessages(self, opc):
+    async def setMessages(self, opc: List[Dict[str, Any]]) -> bool:
+        """Set multiple property values on the device.
+
+        Args:
+            opc: List of OPC dictionaries with EPC, PDC, and EDT
+
+        Returns:
+            True if successful, False if request failed
+        """
         response = await self._api.echonetMessage(
             self._host, self._eojgc, self._eojcc, self._eojci, SETC, opc
         )
@@ -133,14 +181,27 @@ class EchonetInstance:
 
     """
 
-    async def update(self, attributes=None, no_request=False):
-        opc = []
+    async def update(
+        self,
+        attributes: Optional[Union[int, List[int]]] = None,
+        no_request: bool = False,
+    ) -> Optional[Any]:
+        """Update and return property values.
+
+        Args:
+            attributes: Optional list of EPC codes, or a single EPC code
+            no_request: If True, skip network request (use cached data)
+
+        Returns:
+            Dictionary with property values, or None if no attributes specified
+        """
+        opc: List[Dict[str, Any]] = []
         if attributes is None:
             attributes = self.getGetProperties()
         if isinstance(attributes, int):
             list_attributes = [attributes]
             attributes = list_attributes
-        returned_json_data = {}
+        returned_json_data: Dict[int, Any] = {}
         if no_request:
             response = True
         else:
@@ -236,7 +297,12 @@ class EchonetInstance:
     :return: Identification number as a string.
     """
 
-    async def getIdentificationNumber(self):  # EPC 0x83
+    async def getIdentificationNumber(self) -> Optional[Any]:  # EPC 0x83
+        """Get device identification number.
+
+        Returns:
+            Device UID, or None if not available
+        """
         await self._api.getIdentificationNumber(
             self._host, self._eojgc, self._eojcc, self._eojci
         )
@@ -250,7 +316,12 @@ class EchonetInstance:
     :return: Manufacturer name as a string or echonet identification number as an int.
     """
 
-    async def getManufacturer(self):  # EPC 0x8A
+    async def getManufacturer(self) -> Optional[Any]:  # EPC 0x8A
+        """Get device manufacturer name.
+
+        Returns:
+            Manufacturer name or UID as string
+        """
         return await self.update(ENL_MANUFACTURER)
 
     """
@@ -258,8 +329,13 @@ class EchonetInstance:
     :return: Instantaneous Wh as an integer.
     """
 
-    async def getInstantaneousPower(self):  # EPC 0x84
-        return self.update(ENL_INSTANTANEOUS_POWER)
+    async def getInstantaneousPower(self) -> Optional[Any]:  # EPC 0x84
+        """Get instantaneous power consumption.
+
+        Returns:
+            Instantaneous power in Wh, or None if not available
+        """
+        return await self.update(ENL_INSTANTANEOUS_POWER)
 
     """
     getCumulativePower returns the total number of Wh the node has used.
@@ -267,15 +343,25 @@ class EchonetInstance:
     :return: Cumulative Wh as an integer.
     """
 
-    async def getCumulativePower(self):  # EPC 0x85
-        return self.update(ENL_CUMULATIVE_POWER)
+    async def getCumulativePower(self) -> Optional[Any]:  # EPC 0x85
+        """Get cumulative power consumption.
+
+        Returns:
+            Cumulative power in Wh, or None if not available
+        """
+        return await self.update(ENL_CUMULATIVE_POWER)
 
     """
     getCumulativeRuntime returns the total number of seconds the node has been running.
     :return: Runtime in seconds as an integer.
     """
 
-    async def getCumulativeRuntime(self):  # EPC 0x9A
+    async def getCumulativeRuntime(self) -> Optional[Any]:  # EPC 0x9A
+        """Get cumulative runtime.
+
+        Returns:
+            Runtime in seconds, or None if not available
+        """
         return await self.update(ENL_CUMULATIVE_RUNTIME)
 
     """
@@ -284,7 +370,12 @@ class EchonetInstance:
     :return: status as a string.
     """
 
-    async def getOperationalStatus(self):  # EPC 0x80
+    async def getOperationalStatus(self) -> Optional[Any]:  # EPC 0x80
+        """Get operational status (on/off).
+
+        Returns:
+            Status string, or None if not available
+        """
         return await self.getMessage(ENL_STATUS)
 
     """
@@ -292,7 +383,12 @@ class EchonetInstance:
 
     """
 
-    async def on(self):  # EPC 0x80
+    async def on(self) -> bool:  # EPC 0x80
+        """Turn device on.
+
+        Returns:
+            True if successful
+        """
         return await self.setMessage(ENL_STATUS, ENL_ON)
 
     """
@@ -300,25 +396,50 @@ class EchonetInstance:
 
     """
 
-    async def off(self):  # EPC 0x80
+    async def off(self) -> bool:  # EPC 0x80
+        """Turn device off.
+
+        Returns:
+            True if successful
+        """
         return await self.setMessage(ENL_STATUS, ENL_OFF)
 
-    def getSetProperties(self):  # EPC 0x9E
+    def getSetProperties(self) -> Any:  # EPC 0x9E
+        """Get list of writable properties.
+
+        Returns:
+            List of EPC codes that can be written
+        """
         return self._api._state[self._host]["instances"][self._eojgc][self._eojcc][
             self._eojci
         ][ENL_SETMAP]
 
-    def getGetProperties(self):  # EPC 0x9F
+    def getGetProperties(self) -> Any:  # EPC 0x9F
+        """Get list of readable properties.
+
+        Returns:
+            List of EPC codes that can be read
+        """
         return self._api._state[self._host]["instances"][self._eojgc][self._eojcc][
             self._eojci
         ][ENL_GETMAP]
 
-    async def getAllPropertyMaps(self):
+    async def getAllPropertyMaps(self) -> Any:
+        """Get all property maps.
+
+        Returns:
+            Dictionary of property maps, or None
+        """
         return await self._api.getAllPropertyMaps(
             self._host, self._eojgc, self._eojcc, self._eojci
         )
 
-    def register_async_update_callbacks(self, fn):
+    def register_async_update_callbacks(self, fn: Callable[[], Any]) -> None:
+        """Register an async update callback.
+
+        Args:
+            fn: Callback function to be called on updates
+        """
         self._api.register_async_update_callbacks(
             self._host, self._eojgc, self._eojcc, self._eojci, fn
         )
