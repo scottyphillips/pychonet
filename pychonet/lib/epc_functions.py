@@ -29,6 +29,15 @@ DICT_30_TRUE_FALSE = {0x30: True, 0x31: False}
 DICT_30_ON_OFF = {0x30: DATA_STATE_ON, 0x31: DATA_STATE_OFF}
 DICT_30_OPEN_CLOSED = {0x30: DATA_STATE_OPEN, 0x31: DATA_STATE_CLOSE}
 
+# Lighting type enums (used by CommercialShowcase, etc.)
+# EPC values with release I and later specifications
+DICT_LIGHTINGTYPE_40TO43 = {
+    0x40: "other",
+    0x41: "led",
+    0x42: "fluorescentLamp",
+    0x43: "incandescentBulb",
+}
+
 # Like select type
 DICT_41_AUTO_8_SPEEDS = {
     0x41: "auto",
@@ -95,6 +104,29 @@ def _int(edt, values: dict = {}, non_value: Any = "Invalid setting"):  # unsigne
         return values.get(data_int, non_value)
     else:
         return int.from_bytes(edt, "big")
+
+def _unsigned_long(edt, values: dict = {}, non_value: Any = "Invalid setting"):  # unsigned long
+    data_long = int.from_bytes(edt, "big")
+    if len(values):
+        return values.get(data_long, non_value)
+    else:
+        return data_long
+
+
+def _unsigned_short(edt, values: dict = {}, non_value: Any = "Invalid setting"):  # unsigned short
+    data_short = int.from_bytes(edt, "big")
+    if len(values):
+        return values.get(data_short, non_value)
+    else:
+        return data_short
+
+
+def _signed_long(edt, values: dict = {}, non_value: Any = "Invalid setting"):  # signed long
+    data_long = int.from_bytes(edt, byteorder="big", signed=True)
+    if len(values):
+        return values.get(data_long, non_value)
+    else:
+        return data_long
 
 
 def _call_int(data: bytes | list):

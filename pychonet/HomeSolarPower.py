@@ -85,8 +85,14 @@ class HomeSolarPower(EchonetInstance):
             self, host, self._eojgc, self._eojcc, instance, api_connector
         )
 
-    def getMeasuredInstantPower(self):
-        return self.getMessage(0xE0)
+    async def getMeasuredCumulPower(self):
+        return await self.getMessage(0xE1)
 
-    def getMeasuredCumulPower(self):
-        return self.getMessage(0xE1)
+    async def getSystemInterconnectedType(self):  # EPC 0xD0
+        return await self.getMessage(0xD0)
+
+    async def getOutputPowerRestraintStatus(self):  # EPC 0xD1
+        return await self.getMessage(0xD1)
+    
+    async def getMeasuredInstantPower(self):  # EPC 0xE0
+        return await self.getMessage(0xE0)

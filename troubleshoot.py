@@ -1,6 +1,5 @@
 import asyncio
-
-from aioudp import UDPServer
+from pychonet.lib.udpserver import UDPServer
 
 from pychonet import ECHONETAPIClient as api
 from pychonet import EchonetInstance
@@ -11,15 +10,17 @@ from pychonet.lib.const import ENL_GETMAP, ENL_SETMAP, VERSION
 
 async def main():
 
-    print(f"pychonet verison is {VERSION}")
+    print(f"pychonet version is {VERSION}")
     udp = UDPServer()
     loop = asyncio.get_event_loop()
     udp.run("0.0.0.0", 3610, loop=loop)
-    server = api(server=udp, loop=loop)
+    server = api(server=udp)
+    # Enable debug logging to see all messages
+    server._debug_flag = True
 
-    host = "192.168.1.50"
+    host = "192.168.1.6"
     await server.discover(host)
-    device = EchonetInstance("192.168.1.50", 2, 163, 1, server)
+    device = EchonetInstance("192.168.1.6", 1, 48, 1, server)
     # value = await device.getMessage(ENL_SETMAP)
     # print(value)
     getmap = await device.getMessage(ENL_GETMAP)

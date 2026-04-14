@@ -1,7 +1,42 @@
-*.pyc
-*.tar.gz
-build/*
-dist/*
-pychonet.egg-info/*
+# Bytecode
+__pycache__/*
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Distribution / packaging
+*.egg-info/*
+build/
+dist/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
-__pycache__
+
+# Testing
+.pytest_cache/*
+.coverage
+htmlcov/
+.tox/
+
+# Type checking
+.mypy_cache/*
+
+# Environment variables
+.env
+*.env
+
+# Temporary files
+*.log
+*.tmp
+*.bak

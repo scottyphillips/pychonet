@@ -1,6 +1,6 @@
 import asyncio
 import time
-from typing import Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from pychonet.lib.const import (
     ENL_GETMAP,
@@ -65,20 +65,25 @@ class ECHONETAPIClient:
     """
 
     def __init__(self, server: UDPServer):
-        self._server = server
-        self._logger: Callable = print
+        """Initialize the ECHONET API client.
+
+        Args:
+            server: UDPServer instance for sending and receiving messages
+        """
+        self._server: Any = server
+        self._logger: Callable[..., Any] = print
+        self._debug_flag: bool = False
         self._server.subscribe(self.echonetMessageReceived)
-        self._state = {}
-        self._next_tx_tid = 0x0000
-        self._message_list = {}
-        self._failure_list = {}
-        self._opc_counts = {}
-        self._message_timeout = MESSAGE_TIMEOUT
-        self._debug_flag = False
-        self._update_callbacks = {}
-        self._receive_callbacks = {}
-        self._discover_callback: Callable | None = None
-        self._waiting = {}
+        self._state: Dict[str, Dict[str, Any]] = {}
+        self._next_tx_tid: int = 0x0000
+        self._message_list: Dict[int, Dict[str, Any]] = {}
+        self._failure_list: Dict[int, int] = {}
+        self._opc_counts: Dict[int, int] = {}
+        self._message_timeout: int = MESSAGE_TIMEOUT
+        self._update_callbacks: Dict[str, List[Callable[[bool], Any]]] = {}
+        self._receive_callbacks: Dict[str, List[Callable[[bool], Any]]] = {}
+        self._discover_callback: Optional[Callable[[str], Any]] = None
+        self._waiting: Dict[str, int] = {}
         # Discovery-specific response collection
         #
         # Multicast discovery can generate multiple responses from different devices.
@@ -116,7 +121,17 @@ class ECHONETAPIClient:
         self._unknown_discovery_last_scheduled = {}
         self._unknown_discovery_cooldown_seconds = 10.0
 
-    async def echonetMessageReceived(self, raw_data, addr):
+    async def echonetMessageReceived(
+        self,
+        raw_data: bytes,
+        addr: Tuple[str, int],
+    ) -> None:
+        """Handle incoming ECHONET messages.
+
+        Args:
+            raw_data: Raw bytes of the received message
+            addr: Tuple of (host IP, port) from the sender
+        """
         updated = False
         host = addr[0]
         is_discovery = False
@@ -327,22 +342,19 @@ class ECHONETAPIClient:
         if tid_data is not None:
             del self._message_list[tid]
 
-    async def discover(self, host=ENL_MULTICAST_ADDRESS):
+    async def discover(
+        self,
+        host: str = ENL_MULTICAST_ADDRESS,
+    ) -> bool:
+        """Discover devices on the network.
+
+        Args:
+            host: Host to discover (default: multicast address)
+
+        Returns:
+            True if message was successful, False otherwise
         """
-        Perform device discovery.
-
-        If `host` is the multicast address, a network-wide discovery is performed
-        by requesting INSTANCE_LIST from all devices.
-
-        If `host` is a specific IP address, a unicast discovery probe is sent to
-        obtain manufacturer, product code, UID, and instance list.
-
-        Returns
-        -------
-        bool
-            True if at least one device (or the specified host) responded.
-        """
-        if host == ENL_MULTICAST_ADDRESS:
+        if host is ENL_MULTICAST_ADDRESS:
             opc = [{"EPC": INSTANCE_LIST}]
         else:
             opc = [
@@ -353,8 +365,29 @@ class ECHONETAPIClient:
             ]
         return await self.echonetMessage(host, 0x0E, 0xF0, 0x01, GET, opc)
 
-    async def echonetMessage(self, host, deojgc, deojcc, deojci, esv, opc):
-        no_res = esv == SETI
+    async def echonetMessage(
+        self,
+        host: str,
+        deojgc: int,
+        deojcc: int,
+        deojci: int,
+        esv: int,
+        opc: List[Dict[str, Any]],
+    ) -> bool:
+        """Send an ECHONET message and await response.
+
+        Args:
+            host: Destination host IP
+            deojgc: Destination ECHONET Group Code
+            deojcc: Destination ECHONET Class Code
+            deojci: Destination ECHONET Instance Code
+            esv: Service Element Value
+            opc: List of OPC dictionaries with EPC, PDC, EDT
+
+        Returns:
+            True if message was successful, False otherwise
+        """
+        no_res = True if esv is SETI else False
         payload = None
         # Is node profile
         is_discover = deojgc == 0x0E and deojcc == 0xF0
@@ -521,7 +554,24 @@ class ECHONETAPIClient:
             self._waiting[host] -= 1
         return is_success
 
-    async def getAllPropertyMaps(self, host, eojgc, eojcc, eojci):
+    async def getAllPropertyMaps(
+        self,
+        host: str,
+        eojgc: int,
+        eojcc: int,
+        eojci: int,
+    ) -> bool:
+        """Get property maps for a device.
+
+        Args:
+            host: Device host IP
+            eojgc: ECHONET Group Code
+            eojcc: ECHONET Class Code
+            eojci: ECHONET Instance Code
+
+        Returns:
+            True if message was successful, False otherwise
+        """
         return await self.echonetMessage(
             host,
             eojgc,
@@ -535,7 +585,24 @@ class ECHONETAPIClient:
             ],
         )
 
-    async def getIdentificationInformation(self, host, eojgc, eojcc, eojci):
+    async def getIdentificationInformation(
+        self,
+        host: str,
+        eojgc: int,
+        eojcc: int,
+        eojci: int,
+    ) -> bool:
+        """Get device identification information.
+
+        Args:
+            host: Device host IP
+            eojgc: ECHONET Group Code
+            eojcc: ECHONET Class Code
+            eojci: ECHONET Instance Code
+
+        Returns:
+            True if message was successful, False otherwise
+        """
         return await self.echonetMessage(
             host,
             eojgc,
@@ -545,7 +612,17 @@ class ECHONETAPIClient:
             [{"EPC": ENL_UID}, {"EPC": ENL_MANUFACTURER}],
         )
 
-    async def process_discovery_data(self, host, opc_data):
+    async def process_discovery_data(
+        self,
+        host: str,
+        opc_data: Dict[str, Any],
+    ) -> None:
+        """Process discovered device data.
+
+        Args:
+            host: Device host IP
+            opc_data: OPC data from discovery response
+        """
         if opc_data["EPC"] == ENL_UID:
             self._state[host]["uid"] = EPC_SUPER_FUNCTIONS[ENL_UID](
                 opc_data["EDT"], host
@@ -571,13 +648,45 @@ class ECHONETAPIClient:
                     # populate state table
                     self._ensure_instance_state(host, eojgc, eojcc, eojci)
 
-    def register_async_update_callbacks(self, host, eojgc, eojcc, eojci, fn):
+    def register_async_update_callbacks(
+        self,
+        host: str,
+        eojgc: int,
+        eojcc: int,
+        eojci: int,
+        fn: Callable,
+    ) -> None:
+        """Register an async update callback.
+
+        Args:
+            host: Device host IP
+            eojgc: ECHONET Group Code
+            eojcc: ECHONET Class Code
+            eojci: ECHONET Instance Code
+            fn: Callback function to be called on updates
+        """
         key = f"{host}-{eojgc}-{eojcc}-{eojci}"
         if key not in self._update_callbacks:
             self._update_callbacks[key] = []
         self._update_callbacks[key].append(fn)
 
-    def register_async_receive_callbacks(self, host, eojgc, eojcc, eojci, fn):
+    def register_async_receive_callbacks(
+        self,
+        host: str,
+        eojgc: int,
+        eojcc: int,
+        eojci: int,
+        fn: Callable,
+    ) -> None:
+        """Register an async receive callback.
+
+        Args:
+            host: Device host IP
+            eojgc: ECHONET Group Code
+            eojcc: ECHONET Class Code
+            eojci: ECHONET Instance Code
+            fn: Callback function to be called on receives
+        """
         key = f"{host}-{eojgc}-{eojcc}-{eojci}"
         if key not in self._receive_callbacks:
             self._receive_callbacks[key] = []
@@ -651,6 +760,44 @@ class ECHONETAPIClient:
                 return False
 
         return True
+
+    def unregister_async_update_callbacks(
+        self,
+        host: str,
+        eojgc: int,
+        eojcc: int,
+        eojci: int,
+    ) -> None:
+        """Unregister all async update callbacks for a device.
+
+        Args:
+            host: Device host IP
+            eojgc: ECHONET Group Code
+            eojcc: ECHONET Class Code
+            eojci: ECHONET Instance Code
+        """
+        key = f"{host}-{eojgc}-{eojcc}-{eojci}"
+        if key in self._update_callbacks:
+            self._update_callbacks[key].clear()
+
+    def unregister_async_receive_callbacks(
+        self,
+        host: str,
+        eojgc: int,
+        eojcc: int,
+        eojci: int,
+    ) -> None:
+        """Unregister all async receive callbacks for a device.
+
+        Args:
+            host: Device host IP
+            eojgc: ECHONET Group Code
+            eojcc: ECHONET Class Code
+            eojci: ECHONET Instance Code
+        """
+        key = f"{host}-{eojgc}-{eojcc}-{eojci}"
+        if key in self._receive_callbacks:
+            self._receive_callbacks[key].clear()
 
 
 class EchonetMaxOpcError(Exception):

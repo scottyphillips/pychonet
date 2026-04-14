@@ -20,3 +20,9 @@ class GasMeter(EchonetInstance):
         EchonetInstance.__init__(
             self, host, self._eojgc, self._eojcc, instance, api_connector
         )
+
+    async def getCumulativeAmount(self):  # EPC 0xE0
+        return await self.getMessage(0xE0)
+
+    async def getMeasurementLog(self):  # EPC 0xE2
+        return await self.getMessage(0xE2)
