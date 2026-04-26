@@ -1084,6 +1084,16 @@ EPC_CODE = {
             0xCD: "Unit of measurement data of cumulative amount of reactive electric power consumption (lag)",
             0xCE: "Historical data of measurement data of cumulative amount of reactive electric power consumption(lag) for power factor measurement",
         },
+        0x8E: {  # Distributed Generator Electric Energy Meter
+            0x80: "Operation status",
+            0x98: "Current date setting",
+            0xD4: "Unit for cumulative amount of electric energy",
+            0xE0: "Measured cumulative amount of electric energy (AC input)",
+            0xE2: "Measured cumulative amount of electric energy (AC output)",
+            0xE4: "Measured cumulative amount of electric energy (independent output)",
+            0xE9: "Measured instantaneous electric power (AC input/output)",
+            0xEA: "Measured instantaneous electric power (independent output)",
+        },
         0x90: {  # General lighting class class
             0x80: "Operation status",
             0xB0: "Illuminance level",
