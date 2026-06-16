@@ -57,6 +57,7 @@ from .MicromotionSensor import MicromotionSensor
 from .PassageSensor import PassageSensor
 from .OpenCloseSensor import OpenCloseSensor
 from .ActivityAmountSensor import ActivityAmountSensor
+from .HumanDetectionSensor import HumanDetectionSensor
 from .RainSensor import RainSensor
 from .CommercialShowcase import CommercialShowcase
 
@@ -82,6 +83,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x00}-{0x25}": WaterFlowSensor,
         f"{0x00}-{0x26}": MicromotionSensor,
         f"{0x00}-{0x27}": PassageSensor,
+        f"{0x00}-{0x07}": HumanDetectionSensor,
         f"{0x00}-{0x28}": BedPresenceSensor,
         f"{0x00}-{0x29}": OpenCloseSensor,
         f"{0x00}-{0x2A}": ActivityAmountSensor,
