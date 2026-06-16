@@ -36,6 +36,7 @@ from .LowVoltageSmartElectricEnergyMeter import LowVoltageSmartElectricEnergyMet
 from .Refrigerator import Refrigerator
 from .SingleFunctionLighting import SingleFunctionLighting
 from .StorageBattery import StorageBattery
+from .HumiditySensor import HumiditySensor
 from .TemperatureSensor import TemperatureSensor
 from .WaterFlowMeter import WaterFlowMeter
 from .DistributedGeneratorElectricEnergyMeter import DistributedGeneratorElectricEnergyMeter
@@ -84,6 +85,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x00}-{0x28}": BedPresenceSensor,
         f"{0x00}-{0x29}": OpenCloseSensor,
         f"{0x00}-{0x2A}": ActivityAmountSensor,
+        f"{0x00}-{0x12}": HumiditySensor,
         f"{0x00}-{0x11}": TemperatureSensor,
         f"{0x01}-{0x30}": HomeAirConditioner,
         f"{0x01}-{0x35}": HomeAirCleaner,
