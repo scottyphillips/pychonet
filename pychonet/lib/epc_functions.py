@@ -176,18 +176,23 @@ def _0080(edt):
 
 def _009X(edt):
     payload = []
+    # Rule A: Less than 16 properties - simple sequential list
     if len(edt) < 17:
         for i in range(1, len(edt)):
             payload.append(edt[i])
-        return payload
-
-    for i in range(1, len(edt)):
-        code = i - 1
-        binary = "{0:08b}".format(edt[i])[::-1]
-        for j in range(0, 8):
-            if binary[j] == "1":
-                EPC = (j + 8) * 0x10 + code
-                payload.append(EPC)
+    else:
+        # Rule B: 16 or more properties - 16-byte bitmask
+        # Each byte covers a range of 8 EPCs starting from 0x80
+        for byte_idx in range(1, 17):  # edt[1] through edt[16]
+            if byte_idx >= len(edt):
+                break
+            byte_val = edt[byte_idx]
+            base_epc = 0x80 + (byte_idx - 1) * 8  # 0x80, 0x88, 0x90, ... 0xF8
+            for bit_pos in range(8):
+                if byte_val & (1 << bit_pos):
+                    epc = base_epc + bit_pos
+                    payload.append(epc)
+    
     return payload
 
 
