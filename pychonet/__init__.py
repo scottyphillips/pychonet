@@ -60,6 +60,8 @@ from .ActivityAmountSensor import ActivityAmountSensor
 from .HumanDetectionSensor import HumanDetectionSensor
 from .RainSensor import RainSensor
 from .CommercialShowcase import CommercialShowcase
+from .DistributionPanelMeterController import DistributionPanelMeterController
+
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instance = None
@@ -125,6 +127,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x00}-{0x13}": RainSensor,
         f"{0x00}-{0x03}": EmergencyButton,
         f"{0x03}-{0xCE}": CommercialShowcase,
+        f"{0x05}-{0xFF}": DistributionPanelMeterController,
         None: None,
     }
     instance_object = instances.get(instance, None)
