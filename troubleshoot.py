@@ -20,7 +20,7 @@ async def main():
 
     host = "192.168.1.63"
     await server.discover(host)
-    device = EchonetInstance("192cd e.168.1.63", 5, 255, 1, server)
+    device = EchonetInstance("192.168.1.63", 5, 255, 1, server)
     # value = await device.getMessage(ENL_SETMAP)
     # print(value)
     getmap = await device.getMessage(ENL_GETMAP)
