@@ -8,26 +8,26 @@ class ElectricVehicleChargerDischarger(EchonetInstance):
         # Electric vehicle charger/discharger class (V2G)
         # Note: EPC super functions (0x80, 0x83-0x85, 0x88-0x8A, 0x8C, 0x97, 0x9A, 0x9D-0x9F) 
         # are handled automatically by EchonetInstance via EPC_SUPER_FUNCTIONS
-        0x81: [None],  # Installation location
-        0x82: [None],  # Standard version information
-        0x86: [None],  # Manufacturer's fault code
-        0x87: [_int],  # Current limit setting (0-100%)
-        0x8B: [None],  # Business facility code (3 bytes)
-        0x8D: [None],  # Production number (ASCII)
-        0x8E: [None],  # Production date (4 bytes)
+        # 0x81: None,  # Installation location
+        # 0x82: None,  # Standard version information
+        # 0x86: None,  # Manufacturer's fault code
+        # 0x87: [_int],  # Current limit setting (0-100%
+        # 0x8B: None,  # Business facility code (3 bytes)
+        # 0x8D: None,  # Production number (ASCII)
+        # 0x8E: None,  # Production date (4 bytes)
         0x8F: [_int, {0x41: "Power saving Operation", 0x42: "Normal Operation"}],  # Power-saving operation setting
-        0x93: [None],  # Remote control setting (raw_16)
-        0x98: [_yyyy_mm_dd],  # Current date setting (YYYY:MM:DD format)
-        0x99: [_unsigned_short],  # Power limit setting (W)
+        # 0x93: None,  # Remote control setting (raw_16)
+        0x98: _yyyy_mm_dd,  # Current date setting (YYYY:MM:DD format)
+        0x99: _unsigned_short,  # Power limit setting (W)
         # Discharge capacity properties
-        0xC0: [_unsigned_long],  # Dischargeable capacity of vehicle mounted battery 1 (Wh)
-        0xC1: [_unsigned_short],  # Dischargeable capacity of vehicle mounted battery 2 (0.1Ah)
-        0xC2: [_unsigned_long],  # Remaining dischargeable capacity of vehicle mounted battery 1 (Wh)
-        0xC3: [_unsigned_short],  # Remaining dischargeable capacity of vehicle mounted battery 2 (0.1Ah)
-        0xC4: [_int],  # Remaining dischargeable capacity of vehicle mounted battery 3 (%)
+        0xC0: _unsigned_long,  # Dischargeable capacity of vehicle mounted battery 1 (Wh)
+        0xC1: _unsigned_short,  # Dischargeable capacity of vehicle mounted battery 2 (0.1Ah)
+        0xC2: _unsigned_long,  # Remaining dischargeable capacity of vehicle mounted battery 1 (Wh)
+        0xC3: _unsigned_short,  # Remaining dischargeable capacity of vehicle mounted battery 2 (0.1Ah)
+        0xC4: _int,  # Remaining dischargeable capacity of vehicle mounted battery 3 (%)
         # Charge capacity properties
-        0xC5: [_unsigned_long],  # Rated charge capacity (W)
-        0xC6: [_unsigned_long],  # Rated discharge capacity (W)
+        0xC5: _unsigned_long,  # Rated charge capacity (W)
+        0xC6: _unsigned_long,  # Rated discharge capacity (W)
         # Vehicle connection and charge/discharge status
         0xC7: [_int, {
             0x30: "Not Connected",
@@ -37,10 +37,10 @@ class ElectricVehicleChargerDischarger(EchonetInstance):
             0x43: "Chargeable and Dischargeable"
         }],  # Vehicle connection and chargeable/dischargeable status
         # Charging limits
-        0xC8: [_unsigned_long],  # Minimum/maximum charging electric energy (W)
-        0xC9: [_unsigned_long],  # Minimum/maximum discharging electric energy (W)
-        0xCA: [_unsigned_short],  # Minimum/maximum charging current (0.1A)
-        0xCB: [_unsigned_short],  # Minimum/maximum discharging current (0.1A)
+        0xC8: _unsigned_long,  # Minimum/maximum charging electric energy (W)
+        0xC9: _unsigned_long,  # Minimum/maximum discharging electric energy (W)
+        0xCA: _unsigned_short,  # Minimum/maximum charging current (0.1A)
+        0xCB: _unsigned_short,  # Minimum/maximum discharging current (0.1A)
         # Charger/Discharger type
         0xCC: [_int, {
             0x11: "AC_CPLT",
@@ -61,19 +61,19 @@ class ElectricVehicleChargerDischarger(EchonetInstance):
         }],  # Charger/Discharger type
         0xCD: [_int, {0x10: "Connection confirmation"}],  # Vehicle connection confirmation (set only)
         # Battery capacity properties
-        0xCE: [_unsigned_long],  # Chargeable capacity of vehicle mounted battery (Wh)
-        0xCF: [_unsigned_long],  # Remaining chargeable capacity of vehicle mounted battery (Wh)
-        0xD0: [_unsigned_long],  # Used capacity of vehicle mounted battery 1 (Wh)
-        0xD1: [_unsigned_short],  # Used capacity of vehicle mounted battery 2 (0.1Ah)
-        0xD2: [_unsigned_short],  # Rated voltage (V)
+        0xCE: _unsigned_long,  # Chargeable capacity of vehicle mounted battery (Wh)
+        0xCF: _unsigned_long,  # Remaining chargeable capacity of vehicle mounted battery (Wh)
+        0xD0: _unsigned_long,  # Used capacity of vehicle mounted battery 1 (Wh)
+        0xD1: _unsigned_short,  # Used capacity of vehicle mounted battery 2 (0.1Ah)
+        0xD2: _unsigned_short,  # Rated voltage (V)
         # Instantaneous measurements (signed for bidirectional)
-        0xD3: [_signed_long],  # Measured instantaneous charging/discharging electric energy (±W)
-        0xD4: [_signed_int],  # Measured instantaneous charging/discharging current (±0.1A)
-        0xD5: [_signed_int],  # Measured instantaneous charging/discharging voltage (±V)
+        0xD3: _signed_long,  # Measured instantaneous charging/discharging electric energy (±W)
+        0xD4: _signed_int,  # Measured instantaneous charging/discharging current (±0.1A)
+        0xD5: _signed_int,  # Measured instantaneous charging/discharging voltage (±V)
         # Discharge cumulative energy
-        0xD6: [_unsigned_long],  # Measured cumulative amount of discharging electric energy (0.001kWh)
+        0xD6: _unsigned_long,  # Measured cumulative amount of discharging electric energy (0.001kWh)
         0xD7: [_int, {0x0: "Reset"}],  # Cumulative amount of discharging electric energy reset setting (set only)
-        0xD8: [_unsigned_long],  # Measured cumulative amount of charging electric energy (0.001kWh)
+        0xD8: _unsigned_long,  # Measured cumulative amount of charging electric energy (0.001kWh)
         0xD9: [_int, {0x0: "Reset"}],  # Cumulative amount of charging electric energy reset setting (set only)
         # Operation mode
         0xDA: [_int, {
@@ -105,9 +105,9 @@ class ElectricVehicleChargerDischarger(EchonetInstance):
             0x4: "Designated electric current discharging",
             0x5: "Designated purchasing electric power discharging"
         }],  # Discharging method
-        0xDE: [_unsigned_long],  # Purchasing electric power setting (W)
+        0xDE: _unsigned_long,  # Purchasing electric power setting (W)
         0xDF: [_int, {0x41: "Permitted", 0x42: "Prohibited"}],  # Re-interconnection permission setting
-        0xE0: [_signed_long],  # Charging/Discharging electric power setting (±W)
+        0xE0: _signed_long,  # Charging/Discharging electric power setting (±W)
         0xE1: [_int, {
             0x40: "Other",
             0x42: "Charge",
@@ -117,19 +117,19 @@ class ElectricVehicleChargerDischarger(EchonetInstance):
             0x48: "Preparation"
         }],  # Actual operation mode
         # Remaining stored electricity
-        0xE2: [_unsigned_long],  # Remaining stored electricity of vehicle mounted battery1 (Wh)
-        0xE3: [_unsigned_short],  # Remaining stored electricity of vehicle mounted battery2 (0.1Ah)
-        0xE4: [_int],  # Remaining stored electricity of vehicle mounted battery3 (%)
+        0xE2: _unsigned_long,  # Remaining stored electricity of vehicle mounted battery1 (Wh)
+        0xE3: _unsigned_short,  # Remaining stored electricity of vehicle mounted battery2 (0.1Ah)
+        0xE4: _int,  # Remaining stored electricity of vehicle mounted battery3 (%)
         0xE5: [_int, {0x41: "Occurrence status found", 0x42: "Occurrence status not found"}],  # Maintenance status
-        0xE6: [_int],  # Vehicle ID
-        0xE7: [_unsigned_long],  # Charging amount setting 1 (Wh)
-        0xE9: [_unsigned_short],  # Charging amount setting 2 (0.1Ah)
-        0xEA: [_unsigned_long],  # Discharging electric energy setting (Wh)
-        0xEB: [_unsigned_long],  # Charging electric energy setting (W)
-        0xEC: [_unsigned_long],  # Discharging electric energy setting (W)
-        0xED: [_unsigned_short],  # Charging current setting (0.1A)
-        0xEE: [_unsigned_short],  # Discharging current setting (0.1A)
-        0xEF: [_unsigned_short],  # Rated voltage (Independent) (V)
+        0xE6: _int,  # Vehicle ID
+        0xE7: _unsigned_long,  # Charging amount setting 1 (Wh)
+        0xE9: _unsigned_short,  # Charging amount setting 2 (0.1Ah)
+        0xEA: _unsigned_long,  # Discharging electric energy setting (Wh)
+        0xEB: _unsigned_long,  # Charging electric energy setting (W)
+        0xEC: _unsigned_long,  # Discharging electric energy setting (W)
+        0xED: _unsigned_short,  # Charging current setting (0.1A)
+        0xEE: _unsigned_short,  # Discharging current setting (0.1A)
+        0xEF: _unsigned_short,  # Rated voltage (Independent) (V)
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):
