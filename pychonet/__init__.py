@@ -18,6 +18,7 @@ from .ElectricLock import ElectricLock
 from .ElectricRainSlidingDoor import ElectricRainSlidingDoor
 from .ElectricShutter import ElectricShutter
 from .ElectricVehicleCharger import ElectricVehicleCharger
+from .ElectricVehicleChargerDischarger import ElectricVehicleChargerDischarger
 from .ElectricWaterHeater import ElectricWaterHeater
 from .ElectricWindow import ElectricWindow
 from .FloorHeater import FloorHeater
@@ -109,7 +110,8 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0x7B}": FloorHeater,
         f"{0x02}-{0x7C}": FuelCell,
         f"{0x02}-{0x7D}": StorageBattery,
-        f"{0x02}-{0x7E}": ElectricVehicleCharger,
+        f"{0x02}-{0xA1}": ElectricVehicleCharger,
+        f"{0x02}-{0x7E}": ElectricVehicleChargerDischarger,
         f"{0x02}-{0x80}": ElectricEnergyMeter,
         f"{0x02}-{0x81}": WaterFlowMeter,
         f"{0x02}-{0x82}": GasMeter,
