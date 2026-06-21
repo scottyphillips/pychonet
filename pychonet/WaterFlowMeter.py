@@ -91,8 +91,11 @@ class WaterFlowMeter(EchonetInstance):
             None,
         ],  # "Unit for measured cumulative amounts of flowing water"
         0xE2: _0281E2,  # "Historical data of measured cumulative amounts of flowing water"
+        0xE3: _int,  # "Detection of abnormal value in metering data"
+        0xE4: _int,  # "Security data information"
         0xE5: _to_string,  # "ID number setting"
         0xE6: _to_string,  # "Verification expiration information"
+        0xE7: _0281E2,  # "Historical data 2 of measured cumulative amount of flowing water"
     }
 
     def getWaterFlowMeterClassification(self):
