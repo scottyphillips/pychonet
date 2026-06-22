@@ -139,10 +139,10 @@ class ECHONETAPIClient:
         if host in self._server._multicast_ips:
             return
 
-        if self._debug_flag:
-            self._logger(
-                f"ECHONETLite Message Received from {host} - Raw data is {raw_data}"
-            )
+        # if self._debug_flag:
+        #     self._logger(
+        #         f"ECHONETLite Message Received from {host} - Raw data is {raw_data}"
+        #     )
 
         try:
             processed_data = decodeEchonetMsg(raw_data)
