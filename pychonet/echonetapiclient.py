@@ -525,13 +525,13 @@ class ECHONETAPIClient:
                             if tx_tid in self._opc_counts:
                                 res_opc_count = self._opc_counts[tx_tid]
                                 del self._opc_counts[tx_tid]
-                                self._logger(f"Debug point 2")
+                                self._logger(f"Debug point 2 - OPC count")
                                 if self._debug_flag:
                                     self._logger(
                                         f"OPC count in results is {res_opc_count}/{opc_count} from IP {host}."
                                     )
                                 if res_opc_count < opc_count:
-                                    self._logger(f"Debug point 3")
+                                    self._logger(f"Debug point 3 - OPC count failure")
                                     raise EchonetMaxOpcError(res_opc_count)
 
                             # transaction sucessful remove from list
@@ -541,9 +541,10 @@ class ECHONETAPIClient:
                                     del self._failure_list[tx_tid]
                                 not_timeout = True
                             break
-                    self._logger(f"Debug point 4 - message timeout")
+                    
                     
                 if not is_success:
+                    self._logger(f"Debug point 4 - post transaction - message RX failure")
                     if self._message_list.get(tx_tid) is not None:
                         del self._message_list[tx_tid]
                 self._discovery_tids.discard(tx_tid)
