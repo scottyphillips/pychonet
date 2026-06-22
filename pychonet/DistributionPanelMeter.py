@@ -70,32 +70,30 @@ def _0287C8(edt):
 def _0287D0EF(edt):
     """Measurement channel data (EPC 0xD0-0xEF).
     
+    The EPC code itself identifies the channel (0xD0=channel 1, 0xD1=channel 2, etc.).
+    This function returns the flat measurement data for the specific channel identified
+    by the EPC that was used.
+    
     Format: [electric_energy(4 bytes uint32), current_r(2 bytes int16), current_t(2 bytes int16)]
     Total: 8 bytes. Current values divided by 10, 0x7FFE = Not measured.
     """
-    result = {}
-    num_channels = len(edt) // 8  # Each channel is 8 bytes
-    for i in range(num_channels):
-        offset = i * 8
-        chan_num = i + 1
-        electric_energy = int.from_bytes(edt[offset:offset+4], "big", signed=False)
-        current_r = float(int.from_bytes(edt[offset+4:offset+6], "big", signed=True)) / 10
-        current_t = float(int.from_bytes(edt[offset+6:offset+8], "big", signed=True)) / 10
-        
-        # Handle "Not measured" codes
-        if electric_energy == 0xFFFFFFFE:
-            electric_energy = None  # Not measured
-        if current_r == 3276.6:
-            current_r = None
-        if current_t == 3276.6:
-            current_t = None
-        
-        result[f"channel_{chan_num}"] = {
-            "electric_energy_kwh": electric_energy,
-            "current_r_phase_a": current_r,
-            "current_t_phase_a": current_t
-        }
-    return result
+    electric_energy = int.from_bytes(edt[0:4], "big", signed=False)
+    current_r = float(int.from_bytes(edt[4:6], "big", signed=True)) / 10
+    current_t = float(int.from_bytes(edt[6:8], "big", signed=True)) / 10
+    
+    # Handle "Not measured" codes
+    if electric_energy == 0xFFFFFFFE:
+        electric_energy = None  # Not measured
+    if current_r == 3276.6:
+        current_r = None
+    if current_t == 3276.6:
+        current_t = None
+    
+    return {
+        "electric_energy_kwh": electric_energy,
+        "current_r_phase_a": current_r,
+        "current_t_phase_a": current_t
+    }
 
 
 def _0287B2(edt):
