@@ -162,27 +162,21 @@ def _0287B9(edt):
 
 
 def _0287BA(edt):
-    """Measured cumulative amount of electric power consumption list (duplex).
-    
-    Format: [start_channel(1 byte), range(1 byte), then for each channel: normal_dir(4 bytes uint32), reverse_dir(4 bytes uint32)]
-    0xFFFFFFFE = Not measured.
-    """
-    start_channel = edt[0]
-    range_count = edt[1]
-    energies = []
-    for i in range(range_count):
-        offset = 2 + i * 8
+    """Measured cumulative amount of electric power consumption list (duplex)."""
+    values = []
+    for x in range(0, edt[1]):
+        offset = x * 8 + 2
         normal_dir = int.from_bytes(edt[offset:offset+4], "big", signed=False)
         reverse_dir = int.from_bytes(edt[offset+4:offset+8], "big", signed=False)
         if normal_dir == 0xFFFFFFFE:
             normal_dir = None
         if reverse_dir == 0xFFFFFFFE:
             reverse_dir = None
-        energies.append({
+        values.append({
             "normal_direction_kwh": normal_dir,
             "reverse_direction_kwh": reverse_dir
         })
-    return {"start_channel": start_channel, "range": range_count, "energies": energies}
+    return {"start": edt[0], "range": edt[1], "values": values}
 
 
 def _0287BB(edt):
@@ -237,16 +231,13 @@ def _0287BE(edt):
     Format: [start_channel(1 byte), range(1 byte), then for each channel: power(4 bytes int32)]
     0x7FFFFFFE = Not measured.
     """
-    start_channel = edt[0]
-    range_count = edt[1]
-    powers = []
-    for i in range(range_count):
-        offset = 2 + i * 4
-        power = int.from_bytes(edt[offset:offset+4], "big", signed=True)
-        if power == 0x7FFFFFFE:
-            power = None
-        powers.append(power)
-    return {"start_channel": start_channel, "range": range_count, "powers_watts": powers}
+    values = []
+    for x in range(0, edt[1]):
+        val = int.from_bytes(edt[x * 4 + 2 : (x + 1) * 4 + 2], "big", signed=True)
+        if val == 0x7FFFFFFE:
+            val = None
+        values.append(val)
+    return {"start": edt[0], "range": edt[1], "values": values}
 
 
 def _0287C3(edt):
