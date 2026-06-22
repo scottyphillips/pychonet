@@ -439,6 +439,7 @@ class ECHONETAPIClient:
                 if not self._waiting[host]:
                     break
             if self._waiting[host]:
+                self._logger("ECHONETLite message timeout - no response received from {host} after waiting for previous messages to complete.")
                 return False
         self._waiting[host] += 1
 
