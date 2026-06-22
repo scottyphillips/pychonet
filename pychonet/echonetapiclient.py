@@ -439,7 +439,7 @@ class ECHONETAPIClient:
                 if not self._waiting[host]:
                     break
             if self._waiting[host]:
-                self._logger("ECHONETLite message timeout - no response received from {host} after waiting for previous messages to complete.")
+                self._logger(f"ECHONETLite message timeout - no response received from {host} after waiting for previous messages to complete.")
                 return False
         self._waiting[host] += 1
 
@@ -461,6 +461,7 @@ class ECHONETAPIClient:
             if no_res:
                 is_success = True
             else:
+                self._logger(f"Debug point 1")
                 is_success = False
                 tid_data = {}
                 for opc_data in opc:
@@ -470,7 +471,7 @@ class ECHONETAPIClient:
                                 opc_data["PDC"], "big"
                             )
                 self._message_list[tx_tid] = tid_data
-
+            self._logger(f"Sending payload {payload.hex()} to {host}.")
             self._server.send(payload, (host, ENL_PORT))
             if is_discover:
                 self._discovery_tids.add(tx_tid)
@@ -524,6 +525,7 @@ class ECHONETAPIClient:
                             if tx_tid in self._opc_counts:
                                 res_opc_count = self._opc_counts[tx_tid]
                                 del self._opc_counts[tx_tid]
+                                self._logger(f"Debug point 2")
                                 if self._debug_flag:
                                     self._logger(
                                         f"OPC count in results is {res_opc_count}/{opc_count} from IP {host}."
