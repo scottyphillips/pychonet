@@ -379,11 +379,11 @@ class DistributionPanelMeter(EchonetInstance):
         # Duplex metering properties (0xB8-0xBE)
         0xB8: _int,  # Number of measurement channels (duplex)
         0xB9: _0287B9,  # Channel range specification for cumulative amount of electric power consumption measurement (duplex)
-        0xBA: _0287BA,  # Measured cumulative amount of electric power consumption list (duplex)
-        0xBB: _0287BB,  # Channel range specification for instantaneous current measurement (duplex)
-        0xBC: _0287BC,  # Measured instantaneous current list (duplex)
-        0xBD: _0287BD,  # Channel range specification for instantaneous power consumption measurement (duplex)
-        0xBE: _0287BE,  # Measured instantaneous power consumption list (duplex)
+        # 0xBA: _0287BA,  # Measured cumulative amount of electric power consumption list (duplex)
+        # 0xBB: _0287BB,  # Channel range specification for instantaneous current measurement (duplex)
+        # 0xBC: _0287BC,  # Measured instantaneous current list (duplex)
+        # 0xBD: _0287BD,  # Channel range specification for instantaneous power consumption measurement (duplex)
+        # 0xBE: _0287BE,  # Measured instantaneous power consumption list (duplex)
 
         # Energy/voltage/current properties (0xC0-0xC8)
         0xC0: _int,  # Measured cumulative amount of electric energy (normal direction)
@@ -397,38 +397,38 @@ class DistributionPanelMeter(EchonetInstance):
         0xC8: _0287C8,  # Measured instantaneous voltages
 
         # Measurement channels 1-32 (0xD0-0xEF) - 8 bytes each
-        0xD0: _0287D0EF,  # Measurement channel 1
-        0xD1: _0287D0EF,  # Measurement channel 2
-        0xD2: _0287D0EF,  # Measurement channel 3
-        0xD3: _0287D0EF,  # Measurement channel 4
-        0xD4: _0287D0EF,  # Measurement channel 5
-        0xD5: _0287D0EF,  # Measurement channel 6
-        0xD6: _0287D0EF,  # Measurement channel 7
-        0xD7: _0287D0EF,  # Measurement channel 8
-        0xD8: _0287D0EF,  # Measurement channel 9
-        0xD9: _0287D0EF,  # Measurement channel 10
-        0xDA: _0287D0EF,  # Measurement channel 11
-        0xDB: _0287D0EF,  # Measurement channel 12
-        0xDC: _0287D0EF,  # Measurement channel 13
-        0xDD: _0287D0EF,  # Measurement channel 14
-        0xDE: _0287D0EF,  # Measurement channel 15
-        0xDF: _0287D0EF,  # Measurement channel 16
-        0xE0: _0287D0EF,  # Measurement channel 17
-        0xE1: _0287D0EF,  # Measurement channel 18
-        0xE2: _0287D0EF,  # Measurement channel 19
-        0xE3: _0287D0EF,  # Measurement channel 20
-        0xE4: _0287D0EF,  # Measurement channel 21
-        0xE5: _0287D0EF,  # Measurement channel 22
-        0xE6: _0287D0EF,  # Measurement channel 23
-        0xE7: _0287D0EF,  # Measurement channel 24
-        0xE8: _0287D0EF,  # Measurement channel 25
-        0xE9: _0287D0EF,  # Measurement channel 26
-        0xEA: _0287D0EF,  # Measurement channel 27
-        0xEB: _0287D0EF,  # Measurement channel 28
-        0xEC: _0287D0EF,  # Measurement channel 29
-        0xED: _0287D0EF,  # Measurement channel 30
-        0xEE: _0287D0EF,  # Measurement channel 31
-        0xEF: _0287D0EF,  # Measurement channel 32
+        # 0xD0: _0287D0EF,  # Measurement channel 1
+        # 0xD1: _0287D0EF,  # Measurement channel 2
+        # 0xD2: _0287D0EF,  # Measurement channel 3
+        # 0xD3: _0287D0EF,  # Measurement channel 4
+        # 0xD4: _0287D0EF,  # Measurement channel 5
+        # 0xD5: _0287D0EF,  # Measurement channel 6
+        # 0xD6: _0287D0EF,  # Measurement channel 7
+        # 0xD7: _0287D0EF,  # Measurement channel 8
+        # 0xD8: _0287D0EF,  # Measurement channel 9
+        # 0xD9: _0287D0EF,  # Measurement channel 10
+        # 0xDA: _0287D0EF,  # Measurement channel 11
+        # 0xDB: _0287D0EF,  # Measurement channel 12
+        # 0xDC: _0287D0EF,  # Measurement channel 13
+        # 0xDD: _0287D0EF,  # Measurement channel 14
+        # 0xDE: _0287D0EF,  # Measurement channel 15
+        # 0xDF: _0287D0EF,  # Measurement channel 16
+        # 0xE0: _0287D0EF,  # Measurement channel 17
+        # 0xE1: _0287D0EF,  # Measurement channel 18
+        # 0xE2: _0287D0EF,  # Measurement channel 19
+        # 0xE3: _0287D0EF,  # Measurement channel 20
+        # 0xE4: _0287D0EF,  # Measurement channel 21
+        # 0xE5: _0287D0EF,  # Measurement channel 22
+        # 0xE6: _0287D0EF,  # Measurement channel 23
+        # 0xE7: _0287D0EF,  # Measurement channel 24
+        # 0xE8: _0287D0EF,  # Measurement channel 25
+        # 0xE9: _0287D0EF,  # Measurement channel 26
+        # 0xEA: _0287D0EF,  # Measurement channel 27
+        # 0xEB: _0287D0EF,  # Measurement channel 28
+        # 0xEC: _0287D0EF,  # Measurement channel 29
+        # 0xED: _0287D0EF,  # Measurement channel 30
+        # 0xEE: _0287D0EF,  # Measurement channel 31
+        # 0xEF: _0287D0EF,  # Measurement channel 32
     }
 
     def __init__(self, host, api_connector, instance=0x1):
