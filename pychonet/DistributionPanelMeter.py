@@ -340,31 +340,6 @@ def _028789(edt):
 
 class DistributionPanelMeter(EchonetInstance):
     EPC_FUNCTIONS = {
-        # Basic properties (0x80-0x9F)
-        0x80: _int,  # Operation status
-        0x81: _int,  # Installation location
-        0x82: _int,  # Standard version information
-        0x83: _int,  # Identification number
-        0x84: _int,  # Measured instantaneous power consumption
-        0x85: _int,  # Measured cumulative electric energy consumption
-        0x86: _int,  # Manufacturer's fault code
-        0x87: _int,  # Current limit setting
-        0x88: _028788,  # Fault status (state: 0x41=Fault, 0x42=No fault)
-        0x89: _028789,  # Fault description (2-byte enum with detailed fault types)
-        0x8A: _int,  # Manufacturer code
-        0x8B: _int,  # Business facility code
-        0x8C: _int,  # Product code
-        0x8D: _int,  # Production number
-        0x8E: _int,  # Production date
-        0x8F: _int,  # Power-saving operation setting
-        0x93: _int,  # Remote control setting
-        0x97: _int,  # Current time setting
-        0x98: _int,  # Current date setting
-        0x99: _int,  # Power limit setting
-        0x9A: _int,  # Cumulative operating time
-        0x9D: _int,  # Status change announcement property map (STATMAP)
-        0x9E: _int,  # Set property map (SETMAP)
-        0x9F: _int,  # Get property map (GETMAP)
 
         # Simplex metering properties (0xB0-0xB7)
         0xB0: _int,  # Master rated capacity
@@ -397,6 +372,7 @@ class DistributionPanelMeter(EchonetInstance):
         0xC8: _0287C8,  # Measured instantaneous voltages
 
         # Measurement channels 1-32 (0xD0-0xEF) - 8 bytes each
+        # commented out because pansonic smart cosmo has a firmware bug where it will not respond to these properties even if defined in getmap.
         # 0xD0: _0287D0EF,  # Measurement channel 1
         # 0xD1: _0287D0EF,  # Measurement channel 2
         # 0xD2: _0287D0EF,  # Measurement channel 3
