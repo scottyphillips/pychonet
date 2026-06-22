@@ -208,6 +208,7 @@ class EchonetInstance:
             for value in attributes:
                 if value in self.getGetProperties():
                     opc.append({"EPC": value})
+            self._api._logger(f"Updating instance {self._eojgc}/{self._eojcc}/{self._eojci} with attributes {attributes}")
             response = await self._api.echonetMessage(
                 self._host, self._eojgc, self._eojcc, self._eojci, GET, opc
             )
