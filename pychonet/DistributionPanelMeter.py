@@ -340,26 +340,7 @@ def _028789(edt):
 
 class DistributionPanelMeter(EchonetInstance):
     EPC_FUNCTIONS = {
-
-        # Simplex metering properties (0xB0-0xB7)
-        0xB0: _int,  # Master rated capacity
-        0xB1: _int,  # Number of measurement channels (simplex)
-        # 0xB2: _0287B2,  # Channel range specification for cumulative amount of electric power consumption measurement (simplex)
-        0xB3: _0287B3,  # Measured cumulative amount of electric power consumption list (simplex)
-        #0xB4: _0287B4,  # Channel range specification for instantaneous current measurement (simplex)
-        #0xB5: _0287B5,  # Measured instantaneous current list (simplex)
-        # 0xB6: _0287B6,  # Channel range specification for instantaneous power consumption measurement (simplex)
-        0xB7: _0287B7,  # Measured instantaneous power consumption list (simplex)
-
-        # Duplex metering properties (0xB8-0xBE)
-        0xB8: _int,  # Number of measurement channels (duplex)
-        # 0xB9: _0287B9,  # Channel range specification for cumulative amount of electric power consumption measurement (duplex)
-        # 0xBA: _0287BA,  # Measured cumulative amount of electric power consumption list (duplex)
-        # 0xBB: _0287BB,  # Channel range specification for instantaneous current measurement (duplex)
-        # 0xBC: _0287BC,  # Measured instantaneous current list (duplex)
-        # 0xBD: _0287BD,  # Channel range specification for instantaneous power consumption measurement (duplex)
-        # 0xBE: _0287BE,  # Measured instantaneous power consumption list (duplex)
-
+        
         # Energy/voltage/current properties (0xC0-0xC8)
         0xC0: _int,  # Measured cumulative amount of electric energy (normal direction)
         0xC1: _int,  # Measured cumulative amount of electric energy (reverse direction)
@@ -405,6 +386,25 @@ class DistributionPanelMeter(EchonetInstance):
         # 0xED: _0287D0EF,  # Measurement channel 30
         # 0xEE: _0287D0EF,  # Measurement channel 31
         # 0xEF: _0287D0EF,  # Measurement channel 32
+
+        # Simplex metering properties (0xB0-0xB7)
+        0xB0: _int,  # Master rated capacity
+        0xB1: _int,  # Number of measurement channels (simplex)
+        # 0xB2: _0287B2,  # Channel range specification for cumulative amount of electric power consumption measurement (simplex)
+        0xB3: _0287B3,  # Measured cumulative amount of electric power consumption list (simplex)
+        #0xB4: _0287B4,  # Channel range specification for instantaneous current measurement (simplex)
+        #0xB5: _0287B5,  # Measured instantaneous current list (simplex)
+        # 0xB6: _0287B6,  # Channel range specification for instantaneous power consumption measurement (simplex)
+        0xB7: _0287B7,  # Measured instantaneous power consumption list (simplex)
+
+        # Duplex metering properties (0xB8-0xBE)
+        0xB8: _int,  # Number of measurement channels (duplex)
+        # 0xB9: _0287B9,  # Channel range specification for cumulative amount of electric power consumption measurement (duplex)
+        # 0xBA: _0287BA,  # Measured cumulative amount of electric power consumption list (duplex)
+        # 0xBB: _0287BB,  # Channel range specification for instantaneous current measurement (duplex)
+        # 0xBC: _0287BC,  # Measured instantaneous current list (duplex)
+        # 0xBD: _0287BD,  # Channel range specification for instantaneous power consumption measurement (duplex)
+        # 0xBE: _0287BE,  # Measured instantaneous power consumption list (duplex)
     }
 
     def __init__(self, host, api_connector, instance=0x1):
