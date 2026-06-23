@@ -344,16 +344,16 @@ class DistributionPanelMeter(EchonetInstance):
         # Simplex metering properties (0xB0-0xB7)
         0xB0: _int,  # Master rated capacity
         0xB1: _int,  # Number of measurement channels (simplex)
-        0xB2: _0287B2,  # Channel range specification for cumulative amount of electric power consumption measurement (simplex)
+        # 0xB2: _0287B2,  # Channel range specification for cumulative amount of electric power consumption measurement (simplex)
         0xB3: _0287B3,  # Measured cumulative amount of electric power consumption list (simplex)
-        0xB4: _0287B4,  # Channel range specification for instantaneous current measurement (simplex)
-        0xB5: _0287B5,  # Measured instantaneous current list (simplex)
-        0xB6: _0287B6,  # Channel range specification for instantaneous power consumption measurement (simplex)
+        #0xB4: _0287B4,  # Channel range specification for instantaneous current measurement (simplex)
+        #0xB5: _0287B5,  # Measured instantaneous current list (simplex)
+        # 0xB6: _0287B6,  # Channel range specification for instantaneous power consumption measurement (simplex)
         0xB7: _0287B7,  # Measured instantaneous power consumption list (simplex)
 
         # Duplex metering properties (0xB8-0xBE)
         0xB8: _int,  # Number of measurement channels (duplex)
-        0xB9: _0287B9,  # Channel range specification for cumulative amount of electric power consumption measurement (duplex)
+        # 0xB9: _0287B9,  # Channel range specification for cumulative amount of electric power consumption measurement (duplex)
         # 0xBA: _0287BA,  # Measured cumulative amount of electric power consumption list (duplex)
         # 0xBB: _0287BB,  # Channel range specification for instantaneous current measurement (duplex)
         # 0xBC: _0287BC,  # Measured instantaneous current list (duplex)
@@ -364,8 +364,8 @@ class DistributionPanelMeter(EchonetInstance):
         0xC0: _int,  # Measured cumulative amount of electric energy (normal direction)
         0xC1: _int,  # Measured cumulative amount of electric energy (reverse direction)
         0xC2: _0287C2,  # Unit for cumulative amounts of electric energy
-        0xC3: _0287C3,  # Historical data of measured cumulative amounts of electric energy (normal direction)
-        0xC4: _0287C4,  # Historical data of measured cumulative amounts of electric energy (reverse direction)
+        # 0xC3: _0287C3,  # Historical data of measured cumulative amounts of electric energy (normal direction)
+        # 0xC4: _0287C4,  # Historical data of measured cumulative amounts of electric energy (reverse direction)
         0xC5: _int,  # Day for which the historical data of measured cumulative amounts of electric energy is to be retrieved
         0xC6: _signed_int,  # Measured instantaneous amount of electric energy
         0xC7: _0287C7,  # Measured instantaneous currents
