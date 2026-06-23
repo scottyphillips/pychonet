@@ -285,7 +285,7 @@ class ECHONETAPIClient:
             opc: List of OPC dictionaries with EPC, PDC, EDT
             
         Returns:
-            True if message was successful, False otherwise
+            True if message was successful, False otherwise, None if queue is full
         """
         no_res = True if esv is SETI else False
         payload = None
@@ -334,12 +334,15 @@ class ECHONETAPIClient:
             self._waiting[host] = 0
         if self._waiting[host] > 0:
             for x in range(0, self._message_timeout):
-                # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
+                # Wait up to message_timeout * 0.1 seconds for the queue to clear.
                 await asyncio.sleep(0.1)
                 if not self._waiting[host]:
                     break
             if self._waiting[host]:
-                return False
+                # Queue is still busy — return None to distinguish this from a
+                # genuine device timeout (False). Callers can treat None as
+                # "queue busy, serve cached data" rather than "device offline".
+                return None
         self._waiting[host] += 1
 
         self._next_tx_tid += 1
