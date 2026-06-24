@@ -4,163 +4,230 @@
 [![License][license-shield]](LICENSE)
 ![Project Maintenance][maintenance-shield]
 
+A Python library for interfacing with the ECHONET Lite protocol as commonly used in Japan.
+Useful for interfacing with HVACs, lighting systems, electric car chargers, solar systems,
+distribution panel meters, water heaters, and many other devices that support ECHONET Lite.
 
-A library for interfacing with the ECHONETlite protocol as commonly used in Japan.
-Useful for interfacing to many interesting devices such as HVACs, light systems,
-electric car chargers, rice cookers (not joking), and solar systems
-that support ECHONETLite.
+Designed to work with Python 3.9+. Built on asyncio for compatibility with Home Assistant
+and other async frameworks.
 
-The current functionality is limited to a few ECHONETLite classes, notably HVAC
-but it can easily be extended to any ECHONETlite classes required.
+## Installation
 
-The basic boilerplate EchoNetInstance class can be used to provide
-raw connectivity to any compatible device but it is up to the developer
-to create useful classes. Any ECHONETlite class additions to the library are welcome.
-
-Version 2.0.0 of this library was rebuilt to use asyncio for better compatability with home assistant.
-
-
-It is designed to work with Python 3.9.5+
-
-## Instructions
-
-Simplest way to install is to use pip:
-
-```
+```bash
 pip install pychonet
 ```
 
-## Basic usage
+## Basic Usage
 
-### Create the ECHONETLite listener service on port 3610:
+### Start the ECHONET Lite listener
+
 ```python
+import asyncio
 from pychonet.lib.udpserver import UDPServer
-from pychonet import Factory
 from pychonet import ECHONETAPIClient as api
-from pychonet import HomeAirConditioner
-from pychonet import EchonetInstance
+
 udp = UDPServer()
 loop = asyncio.get_event_loop()
 udp.run("0.0.0.0", 3610, loop=loop)
 server = api(server=udp)
 ```
 
-### Discover a list of ECHONETlite instances on a particular server:
+### Configure the client
+
 ```python
-await server.discover('192.168.1.6')
+import logging
+_LOGGER = logging.getLogger(__name__)
+
+server.configure(
+    message_timeout=50,       # 50 ticks × 0.1s = 5s per request (default: 200 = 20s)
+    logger=_LOGGER.debug,     # route pychonet logs to your logger
+    debug=True,               # enable verbose internal logging
+    discover_callback=my_cb,  # async callback when unknown host is detected
+)
 ```
 
+### Discover devices
 
-### Populate the propertymap for a particular ECHONETLite instance:
+```python
+# Discover instances on a host
+await server.discover('192.168.1.6')
+
+# Register multicast for the interface used to reach a host
+server.register_multicast('192.168.1.6')
+```
+
+### Pre-populate instance state (without network discovery)
+
+Useful when restoring known device state from stored configuration:
+
+```python
+server.register_instance(
+    host='192.168.1.6',
+    eojgc=1, eojcc=48, eojci=1,
+    ntfmap=[0x80, 0x81, 0x88],   # STATMAP — EPCs the device pushes notifications for
+    setmap=[0x80, 0x81, 0xB3],   # SETMAP
+    getmap=[0x80, 0x81, 0x88, 0xB3, 0xBB],  # GETMAP
+    uid='abc123',
+)
+```
+
+### Unregister a host (e.g. on shutdown)
+
+```python
+server.unregister_host('192.168.1.6')
+```
+
+### Create a device instance
+
+```python
+from pychonet import Factory
+
+# Using the Factory (recommended — selects the correct class automatically)
+device = Factory('192.168.1.6', server, 1, 48, 1)
+
+# Or directly
+from pychonet import HomeAirConditioner
+aircon = HomeAirConditioner('192.168.1.6', server)
+```
+
+### Read EPC values
+
+```python
+# Read all supported EPCs
+data = await device.update()
+
+# Read specific EPCs
+data = await device.update([0x80, 0xBB, 0xB3])
+
+# Read from local cache (no network request)
+data = await device.update([0x80], no_request=True)
+```
+
+### Write EPC values
+
+```python
+# Set a single EPC
+await device.setMessage(0x80, b'\x30')  # operating status = on
+
+# Set multiple EPCs
+await device.setMessages([
+    {'EPC': 0x80, 'EDT': b'\x30'},
+    {'EPC': 0xB3, 'EDT': b'\x41'},
+])
+```
+
+### Register custom EPC decode functions (quirks)
+
+For devices with non-standard EPC behaviour, register instance-level overrides:
+
+```python
+def my_custom_decoder(edt):
+    return {'value': int.from_bytes(edt, 'big')}
+
+device.register_epc_function(0xB3, my_custom_decoder)
+```
+
+This creates an instance-level override — the custom function only applies to this
+device instance, not all instances of the same device class.
+
+### Push notifications
+
+Register a callback to receive unsolicited INF packets from the device:
+
+```python
+async def on_update(isPush: bool):
+    data = await device.update([0x80, 0x88], no_request=True)
+    print(f"Device state changed: {data}")
+
+server.register_async_update_callbacks('192.168.1.6', 1, 48, 1, on_update)
+```
+
+Unregister when done:
+
+```python
+server.unregister_async_update_callbacks('192.168.1.6', 1, 48, 1)
+```
+
+### Populate property maps
+
 ```python
 await server.getAllPropertyMaps('192.168.1.6', 1, 48, 1)
 ```
-### Create a ECHONETLite device using the Factory:
 
-Paramaters include the port listener, and EOJGC, EOJCC, and EOJCI codes.
+## Return values from `update()`
+
+| Return value | Meaning |
+|---|---|
+| `dict` | Success — EPC values keyed by EPC code |
+| `None` | pychonet `_waiting` queue was busy — request not sent, serve cached data |
+| Raises `TimeoutError` | Request sent but device did not respond |
+
+`None` (queue busy) should be treated as a cache-serve rather than an error. A `TimeoutError`
+indicates the device genuinely did not respond within `message_timeout` ticks.
+
+## Device Classes
+
+pychonet includes classes for many ECHONET Lite device types. Each class provides
+an `EPC_FUNCTIONS` dict mapping EPC codes to decode functions, and inherits the
+generic `update()` and `setMessage()` API from `EchonetInstance`.
+
+Use `Factory()` to automatically select the correct class based on `eojgc`/`eojcc`:
+
 ```python
-aircon = Factory("192.168.1.6",server, 1, 48, 1)
+from pychonet import Factory
+device = Factory(host, server, eojgc, eojcc, eojci)
 ```
 
-### OR, create a specific ECHONETLite instance using built in objects:
-```python
-aircon = HomeAirConditioner("192.168.1.6", server)
-```
+For device types not yet supported, `EchonetInstance` provides raw connectivity
+and the generic `update()`/`setMessage()` API works for any EPC.
 
-### Turn HVAC on or off:
-```python
-await aircon.on()
-await aircon.off()
-await aircon.getOperationalStatus()
-{'status': 'off'}
-```
+## Using with Home Assistant
 
-### Set or Get a HVACs target temperature:
-```python
-await aircon.setOperationalTemperature(25)
-await aircon.getOperationalTemperature()
-{'set_temperature': 25}
-```
+For Home Assistant users there is a dedicated integration installable via HACS:
 
-### Set or Get a HVACs mode of operation:
-```python
-supported modes =  'auto', 'cool', 'heat', 'dry', 'fan_only', 'other'
-
-await aircon.setMode('cool')
-await aircon.getMode()
-{'mode': 'cool'}
-```
-### Set or Get a HVACs fan speed:
-
-Note - your HVAC may not support all fan speeds.
-```python
-supported modes = 'auto', 'minimum', 'low', 'medium-Low', 'medium', 'medium-high', 'high', 'very high', 'max'
-
-await aircon.setFanSpeed('medium-high')
-await aircon.getFanSpeed()
-{'fan_speed': 'medium-high'}
-```
-### Get HVAC attributes at once (Note, the property map must be populated):
-```python
-await aircon.update()
-{'status': 'On', 'set_temperature': 25, 'fan_speed': 'medium-high', 'room_temperature': 25, 'mode': 'cooling'}
-```
-
-### OR grab a specific attribute at once (Note, the property map must be populated):
-```python
-await aircon.update(0x80)
-```
-
-## Using this library with Home Assistant
-
-NOTE: For Home Assistant users there is a dedicated repo that can be installed via HACS that can provide custom components for discovered ECHONETlite devices such as Mitsubishi airconditioners:
-(https://github.com/scottyphillips/echonetlite_homeassistant)
-
-'example_async.py' gives you a boilerplate asyncio program that will discover your ECHONETLite instance and return information about supported services.
+**https://github.com/scottyphillips/echonetlite_homeassistant**
 
 ## Hall of Fame
-Big Thanks to Naoki Sawada for many excellent updates to enable push notifications via multicast.
-どうもありがとうございます !
 
-Thanks to Jason Nader for all the quality of life updates to the codebase and doco.
+Big thanks to Naoki Sawada (nao-pon) for many excellent updates including push
+notification support via multicast.
+どうもありがとうございます！
 
-Thanks to khcnz (Karl Chaffey) and gvs for helping refector the old code
+Thanks to Jason Nader for quality of life updates to the codebase and documentation.
+
+Thanks to khcnz (Karl Chaffey) and gvs for helping refactor the old code
 and contributing to testing.
 
-Thanks to Dick Swart, Masaki Tagawa, Paul, khcnz,  Kolodnerd, Leonunix, and Alfie Gerner
-for each contributing code updates to this library.
+Thanks to Dick Swart, Masaki Tagawa, Paul, khcnz, Kolodnerd, Leonunix, and Alfie Gerner
+for contributing code updates to this library.
 
-Thanks to Jeffro Carr who inspired me to write my own native Python ECHONET
-library for Home Assistant.
+Thanks to Jeffro Carr who inspired me to write a native Python ECHONET library
+for Home Assistant.
 
-Thanks to Futomi Hatano for open sourcing a well-documented ECHONET Lite
-library in Node JS.
-(https://github.com/futomi/node-echonet-lite)
+Thanks to Futomi Hatano for open sourcing a well-documented ECHONET Lite library
+in Node JS: https://github.com/futomi/node-echonet-lite
 
-## References for ECHONET specifications
+Extra Special thanks to 'sayurin' for offering up so many constructive ideas on how to make this project better,
+
+## References
 
 - [ECHONET Lite Specification, Version 1.13](https://echonet.jp/spec_v113_lite_en/)
-  - [Part 2 ECHONET Lite Communications Middleware Specifications](https://echonet.jp/wp/wp-content/uploads/pdf/General/Standard/ECHONET_lite_V1_13_en/ECHONET-Lite_Ver.1.13(02)_E.pdf)
 - [APPENDIX, Detailed Requirements for ECHONET Device objects, Release Q](https://echonet.jp/wp/wp-content/uploads/pdf/General/Standard/Release/Release_Q/Appendix_Release_Q_E.pdf)
+- [Machine Readable Appendix (MRA)](https://echonet.jp/spec_mra_rq/)
 
 ## License
 
-This application is licensed under an MIT license, refer to LICENSE-MIT for details.
+MIT License — refer to LICENSE for details.
 
 Portions of 'ECHONET Lite Device Emulator' (Copyright 2020 Kanagawa Institute of Technology)
-have been used in this application. This code was licensed under the MIT licence.
+have been used. Licensed under MIT.
 
-The UDP code is based on 'aio-udp-server' (Copyright 2021 Dmitriy Bashkirtsev)
-This code is licenced under the GPL licence.
-(https://github.com/bashkirtsevich-llc/aioudp)
+The UDP code is based on 'aio-udp-server' (Copyright 2021 Dmitriy Bashkirtsev).
+Licensed under GPL: https://github.com/bashkirtsevich-llc/aioudp
 
-Слава Україні! 🇺🇦
-
-***
+---
 [pychonet]: https://github.com/scottyphillips/pychonet
 [releases-shield]: https://img.shields.io/github/release/scottyphillips/pychonet.svg?style=for-the-badge
 [releases]: https://github.com/scottyphillips/pychonet/releases
-[license-shield]:https://img.shields.io/github/license/scottyphillips/pychonet?style=for-the-badge
-[buymecoffee]: https://www.buymeacoffee.com/RgKWqyt?style=for-the-badge
-[buymecoffeebadge]: https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/scottyphillips/pychonet?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/Maintainer-Scott%20Phillips-blue?style=for-the-badge
