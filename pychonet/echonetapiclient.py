@@ -609,5 +609,130 @@ class ECHONETAPIClient:
             self._receive_callbacks[key].clear()
 
 
+    # ------------------------------------------------------------------
+    # Public configuration and state management API
+    # Provides clean alternatives to direct private attribute access,
+    # addressing the coupling concern raised about external code touching
+    # _state, _message_timeout, _logger, _debug_flag, _discover_callback,
+    # _update_callbacks, and _server directly.
+    # ------------------------------------------------------------------
+
+    def configure(
+        self,
+        message_timeout: Optional[int] = None,
+        logger: Optional[Callable[..., Any]] = None,
+        debug: Optional[bool] = None,
+        discover_callback: Optional[Callable[[str], Any]] = None,
+    ) -> None:
+        """Configure the API client settings.
+
+        Replaces direct access to _message_timeout, _logger, _debug_flag,
+        and _discover_callback private attributes.
+
+        Args:
+            message_timeout: Number of 0.1s ticks before a request times out.
+                             Defaults to MESSAGE_TIMEOUT if not set.
+            logger:          Callable for log output (e.g. logging.debug).
+            debug:           Enable verbose internal debug logging.
+            discover_callback: Async callable invoked when an unknown host
+                               is detected. Receives host IP as argument.
+        """
+        if message_timeout is not None:
+            self._message_timeout = message_timeout
+        if logger is not None:
+            self._logger = logger
+        if debug is not None:
+            self._debug_flag = debug
+        if discover_callback is not None:
+            self._discover_callback = discover_callback
+
+    def register_multicast(self, host: str) -> None:
+        """Register multicast for the interface used to reach host.
+
+        Replaces direct access to server._server.register_multicast_from_host().
+
+        Args:
+            host: Device host IP address used to determine local interface.
+        """
+        self._server.register_multicast_from_host(host)
+
+    def register_instance(
+        self,
+        host: str,
+        eojgc: int,
+        eojcc: int,
+        eojci: int,
+        ntfmap: List[int],
+        setmap: List[int],
+        getmap: List[int],
+        uid: Optional[str] = None,
+    ) -> None:
+        """Pre-populate instance state from stored configuration.
+
+        Replaces direct manipulation of the _state dict. Called during
+        integration setup to restore known device state without performing
+        a network discovery.
+
+        Args:
+            host:   Device host IP address.
+            eojgc:  ECHONET Group Code.
+            eojcc:  ECHONET Class Code.
+            eojci:  ECHONET Instance Code.
+            ntfmap: Notification property map (STATMAP).
+            setmap: Set property map.
+            getmap: Get property map.
+            uid:    Optional device unique identifier.
+        """
+        from pychonet.lib.const import ENL_STATMAP, ENL_SETMAP, ENL_GETMAP, ENL_UID
+
+        if host not in self._state:
+            self._state[host] = {"instances": {}, "available": True}
+
+        instances = self._state[host]["instances"]
+        if eojgc not in instances:
+            instances[eojgc] = {}
+        if eojcc not in instances[eojgc]:
+            instances[eojgc][eojcc] = {}
+        if eojci not in instances[eojgc][eojcc]:
+            instances[eojgc][eojcc][eojci] = {
+                ENL_STATMAP: ntfmap,
+                ENL_SETMAP: setmap,
+                ENL_GETMAP: getmap,
+            }
+            if uid is not None:
+                instances[eojgc][eojcc][eojci][ENL_UID] = uid
+
+    def unregister_host(self, host: str) -> None:
+        """Remove all state and callbacks for a host.
+
+        Replaces direct manipulation of _state and _update_callbacks during
+        integration unload.
+
+        Args:
+            host: Device host IP address to remove.
+        """
+        self._state.pop(host, None)
+        for key in list(self._update_callbacks.keys()):
+            if key.startswith(host):
+                del self._update_callbacks[key]
+        for key in list(self._receive_callbacks.keys()):
+            if key.startswith(host):
+                del self._receive_callbacks[key]
+
+    @property
+    def message_timeout(self) -> int:
+        """Current message timeout in 0.1s ticks."""
+        return self._message_timeout
+
+    @property
+    def state(self) -> Dict[str, Dict[str, Any]]:
+        """Read-only view of internal device state.
+
+        Returns the live state dict — callers should not mutate it directly.
+        Use register_instance() and unregister_host() for state management.
+        """
+        return self._state
+
+
 class EchonetMaxOpcError(Exception):
     pass

@@ -425,6 +425,36 @@ class EchonetInstance:
             self._eojci
         ][ENL_GETMAP]
 
+    def register_epc_function(
+        self, epc: int, func: Any, op_code: Optional[Dict[str, Any]] = None
+    ) -> None:
+        """Register a custom EPC decode function for this instance.
+
+        Replaces direct mutation of the EPC_FUNCTIONS class attribute via
+        self._instance.EPC_FUNCTIONS.update({epc: func}).
+
+        This creates an instance-level override so the custom function only
+        applies to this specific device instance, not all instances of the
+        same device class. Used for quirks in specific devices that require custom decoding logic.
+
+        Args:
+            epc:     EPC code to register the function for.
+            func:    Decode function taking EDT bytes and returning a value.
+            op_code: Optional HA op_code metadata dict (name, icon etc).
+                     Stored as instance attribute for retrieval by callers.
+        """
+        # Override at instance level to avoid polluting the class definition
+        if not hasattr(self, '_instance_epc_functions'):
+            self._instance_epc_functions: Dict[int, Any] = {}
+        self._instance_epc_functions[epc] = func
+        # Merge into EPC_FUNCTIONS — instance dict shadows class dict
+        self.EPC_FUNCTIONS = {**self.__class__.EPC_FUNCTIONS, **self._instance_epc_functions}
+
+        if op_code is not None:
+            if not hasattr(self, '_instance_op_codes'):
+                self._instance_op_codes: Dict[int, Any] = {}
+            self._instance_op_codes[epc] = op_code
+
     async def getAllPropertyMaps(self) -> Any:
         """Get all property maps.
 
