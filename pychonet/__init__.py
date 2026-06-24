@@ -62,6 +62,7 @@ from .HumanDetectionSensor import HumanDetectionSensor
 from .RainSensor import RainSensor
 from .CommercialShowcase import CommercialShowcase
 from .DistributionPanelMeterController import DistributionPanelMeterController
+from .CombinationMicrowaveOven import CombinationMicrowaveOven
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
@@ -125,6 +126,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x02}-{0xA6}": HybridWaterHeater,
         f"{0x03}-{0xB2}": ElectricThermos,
         f"{0x03}-{0xB7}": Refrigerator,
+        f"{0x03}-{0xB8}": CombinationMicrowaveOven,
         f"{0x00}-{0x02}": CrimeSensor,
         f"{0x00}-{0x13}": RainSensor,
         f"{0x00}-{0x03}": EmergencyButton,
