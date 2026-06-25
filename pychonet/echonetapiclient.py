@@ -51,6 +51,7 @@ class ECHONETAPIClient:
         self._receive_callbacks: Dict[str, List[Callable[[bool], Any]]] = {}
         self._discover_callback: Optional[Callable[[str], Any]] = None
         self._waiting: Dict[str, int] = {}
+        self._last_activity: Dict[str, float] = {}  # host -> monotonic timestamp of last received packet
 
     async def echonetMessageReceived(
         self,
@@ -65,6 +66,8 @@ class ECHONETAPIClient:
         """
         updated = False
         host = addr[0]
+        import time as _time
+        self._last_activity[host] = _time.monotonic()
         is_discovery = False
 
         if self._debug_flag:
@@ -732,6 +735,21 @@ class ECHONETAPIClient:
         Use register_instance() and unregister_host() for state management.
         """
         return self._state
+
+    def last_activity(self, host: str) -> Optional[float]:
+        """Return monotonic timestamp of last received packet from host.
+
+        Updated whenever any ECHONET Lite packet arrives from the host —
+        GET responses, INF notifications, discovery packets, anything.
+        Returns None if no packet has ever been received from this host.
+
+        Callers can use this to implement a silence threshold for availability:
+
+            elapsed = time.monotonic() - (server.last_activity(host) or 0)
+            if elapsed > SILENCE_THRESHOLD:
+                # device has been silent too long
+        """
+        return self._last_activity.get(host)
 
 
 class EchonetMaxOpcError(Exception):
