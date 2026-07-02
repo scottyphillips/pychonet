@@ -34,6 +34,14 @@ class UDPServer:
 
         self._subscribers = {}
 
+        # Strong references to scheduled tasks. asyncio only holds WEAK
+        # references to tasks internally — without storing a strong reference
+        # here, _send_periodically() and _recv_periodically() can be garbage
+        # collected mid-execution, silently killing the send/receive loop.
+        # This was the root cause of intermittent discovery failures where
+        # "Task was destroyed but it is pending!" appeared in logs.
+        self._tasks: list = []
+
     # figure out which multicast IP would be used to reach host
     def register_multicast_from_host(self, host):
         # connect to known destination, e.g. via UDP port 80
@@ -64,6 +72,18 @@ class UDPServer:
 
         self._run_future(self._send_periodically(), self._recv_periodically())
 
+    def close(self):
+        """Cleanly cancel running tasks and close the socket.
+
+        Replaces direct access to _sock.close(), which left the
+        _send_periodically and _recv_periodically tasks orphaned rather
+        than cleanly cancelled.
+        """
+        for task in list(self._tasks):
+            if not task.done():
+                task.cancel()
+        self._sock.close()
+
     def subscribe(self, fut):
         self._subscribers[id(fut)] = fut
 
@@ -81,7 +101,12 @@ class UDPServer:
 
     def _run_future(self, *args):
         for fut in args:
-            asyncio.ensure_future(fut, loop=self.loop)
+            task = asyncio.ensure_future(fut, loop=self.loop)
+            # Hold a strong reference to prevent premature garbage collection.
+            self._tasks.append(task)
+            # Clean up the reference once the task completes, to avoid
+            # unbounded growth of self._tasks over the server's lifetime.
+            task.add_done_callback(lambda t: self._tasks.remove(t) if t in self._tasks else None)
 
     def _sock_recv(self, fut=None, registered=False):
         fd = self._sock.fileno()
