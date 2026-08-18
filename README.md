@@ -11,6 +11,10 @@ distribution panel meters, water heaters, and many other devices that support EC
 Designed to work with Python 3.9+. Built on asyncio for compatibility with Home Assistant
 and other async frameworks.
 
+> ⚠️ **Project status: maintenance mode.** This project is no longer under active feature development. Sayurin's [pyhems](https://github.com/sayurin/pyhems) is a modern, actively developed alternative, built from a clean slate rather than carrying eight years of incremental history.
+>
+> I want to thank everyone for their support the last 8 years; especially all the contributors. It wasn't exactly on my bingo card in 2018 here in Australia of all places, to publish a library to pypi for integrating with Japanese smart appliances, yet here we are. It's been a fun project; it is now time for me to enjoy life with my kids without having to worry about supporting someone else's EV smart charger/discharger, rice cookers, or smart power conditioners!
+
 ## Installation
 
 ```bash
