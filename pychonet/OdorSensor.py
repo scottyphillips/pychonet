@@ -20,7 +20,7 @@ class OdorSensor(EchonetInstance):
 
     def __init__(self, host, api_connector=None, instance=0x1):
         self._eojgc = 0x00
-        self._eojcc = 0x1D
+        self._eojcc = 0x20
         EchonetInstance.__init__(
             self, host, self._eojgc, self._eojcc, instance, api_connector
         )

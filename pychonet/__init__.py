@@ -79,7 +79,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
 
     """Factory Method"""
     instances = {
-        f"{0x00}-{0x03}": FirstAidSensor,
+        f"{0x00}-{0x04}": FirstAidSensor,
         f"{0x00}-{0x08}": VisitorSensor,
         f"{0x00}-{0x19}": FireSensor,
         f"{0x00}-{0x1A}": CigaretteSensor,
