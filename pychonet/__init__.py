@@ -69,6 +69,7 @@ from .FanHeater import FanHeater
 from .FireSensor import FireSensor
 from .RiceCooker import RiceCooker
 from .VisitorSensor import VisitorSensor
+from .MailingSensor import MailingSensor
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
@@ -81,6 +82,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
     instances = {
         f"{0x00}-{0x04}": FirstAidSensor,
         f"{0x00}-{0x08}": VisitorSensor,
+        f"{0x00}-{0x0F}": MailingSensor,
         f"{0x00}-{0x19}": FireSensor,
         f"{0x00}-{0x1A}": CigaretteSensor,
         f"{0x00}-{0x1B}": CO2Sensor,
