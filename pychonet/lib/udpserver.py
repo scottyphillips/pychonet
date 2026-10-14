@@ -1,7 +1,10 @@
 import asyncio
+import logging
 import socket
 import struct
 from collections import deque
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class UDPServer:
@@ -82,6 +85,13 @@ class UDPServer:
         for task in list(self._tasks):
             if not task.done():
                 task.cancel()
+        # Unregister any pending reader/writer *before* closing the socket,
+        # otherwise a stale callback keeps firing against a dead fd.
+        loop = getattr(self, "loop", None)
+        fd = self._sock.fileno()
+        if loop is not None and fd != -1:
+            loop.remove_reader(fd)
+            loop.remove_writer(fd)
         self._sock.close()
 
     def subscribe(self, fut):
@@ -130,6 +140,16 @@ class UDPServer:
         return fut
 
     def _sock_send(self, data, addr, fut=None, registered=False):
+        """Send one datagram; returns a future resolved with the byte count.
+
+        Only "would block" conditions (EAGAIN/EINTR) are retried, by waiting
+        for the socket to become writable. Any other OSError (ENETUNREACH,
+        EHOSTUNREACH, ENOKEY from a down WireGuard tunnel, EPERM, ...) is
+        permanent for this packet: retrying it re-arms a writer on a socket
+        that is always writable, which spins the event loop at 100% CPU.
+        Instead the error is set on the future and the packet is dropped,
+        as UDP permits.
+        """
         fd = self._sock.fileno()
 
         if fut is None:
@@ -138,12 +158,16 @@ class UDPServer:
         if registered:
             self.loop.remove_writer(fd)
 
+        if fut.done():  # cancelled by the awaiter while waiting for the writer
+            return fut
+
         if not data:
-            return
+            fut.set_result(0)
+            return fut
 
         try:
             bytes_sent = self._sock.sendto(data, addr)
-        except (BlockingIOError, InterruptedError, OSError):
+        except (BlockingIOError, InterruptedError):
             self.loop.add_writer(fd, self._sock_send, data, addr, fut, True)
         except Exception as e:
             fut.set_exception(e)
@@ -163,7 +187,13 @@ class UDPServer:
             try:
                 while self._send_queue:
                     data, addr = self._send_queue.popleft()
-                    bytes_sent = self._sock_send(data, addr)
+                    try:
+                        # Awaited so only one send is ever waiting on the
+                        # socket's (single, per-fd) asyncio writer slot.
+                        bytes_sent = await self._sock_send(data, addr)
+                    except Exception as e:
+                        _LOGGER.debug("Dropping datagram to %s: %r", addr, e)
+                        continue
                     await self._throttle(bytes_sent, self._upload_speed)
             finally:
                 self._send_event.clear()
