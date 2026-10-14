@@ -12,7 +12,7 @@ class MockECHONETAPIClient:
             "192.168.1.60": {
                 "instances": {
                     0x00: {  # Class group code for activity amount sensor
-                        0x1D: {  # Class code for activity amount sensor
+                        0x2A: {  # Class code for activity amount sensor
                             0x01: {
                                 0x80: b'\x31',  # Operation status: OFF
                                 0xB0: b'\x35',  # Activity threshold level: level-5

@@ -35,7 +35,7 @@ class MicromotionSensor(EchonetInstance):
         # The class/group codes for a micromotion sensor. These values are
         # placeholders; replace with the correct codes if they differ.
         self._eojgc = 0x00
-        self._eojcc = 0x1E
+        self._eojcc = 0x26
         EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
 
     # ---- Operation status -------------------------------------------------

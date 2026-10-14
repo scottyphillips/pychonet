@@ -9,7 +9,7 @@ class MockECHONETAPIClient:
             "192.168.1.190": {
                 "instances": {
                     0x00: {
-                        0x1D: {
+                        0x20: {
                             0x01: {
                                 0x80: b'\x31',  # Operation status: OFF
                                 0xB0: b'\x35',  # Detection threshold level: level-5
