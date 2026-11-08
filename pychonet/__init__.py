@@ -63,6 +63,13 @@ from .RainSensor import RainSensor
 from .CommercialShowcase import CommercialShowcase
 from .DistributionPanelMeterController import DistributionPanelMeterController
 from .CombinationMicrowaveOven import CombinationMicrowaveOven
+from .ElectricHeater import ElectricHeater
+from .ElectricStorageHeater import ElectricStorageHeater
+from .FanHeater import FanHeater
+from .FireSensor import FireSensor
+from .RiceCooker import RiceCooker
+from .VisitorSensor import VisitorSensor
+from .MailingSensor import MailingSensor
 
 
 def Factory(host, server, eojgc, eojcc, eojci=0x01):
@@ -73,7 +80,10 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
 
     """Factory Method"""
     instances = {
-        f"{0x00}-{0x03}": FirstAidSensor,
+        f"{0x00}-{0x04}": FirstAidSensor,
+        f"{0x00}-{0x08}": VisitorSensor,
+        f"{0x00}-{0x0F}": MailingSensor,
+        f"{0x00}-{0x19}": FireSensor,
         f"{0x00}-{0x1A}": CigaretteSensor,
         f"{0x00}-{0x1B}": CO2Sensor,
         f"{0x00}-{0x1C}": GasSensor,
@@ -96,6 +106,9 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x01}-{0x30}": HomeAirConditioner,
         f"{0x01}-{0x35}": HomeAirCleaner,
         f"{0x01}-{0x3A}": CeilingFan,
+        f"{0x01}-{0x42}": ElectricHeater,
+        f"{0x01}-{0x43}": FanHeater,
+        f"{0x01}-{0x55}": ElectricStorageHeater,
         f"{0x02}-{0x60}": ElectricBlind,
         f"{0x02}-{0x61}": ElectricShutter,
         f"{0x02}-{0x62}": ElectricCurtain,
@@ -127,6 +140,7 @@ def Factory(host, server, eojgc, eojcc, eojci=0x01):
         f"{0x03}-{0xB2}": ElectricThermos,
         f"{0x03}-{0xB7}": Refrigerator,
         f"{0x03}-{0xB8}": CombinationMicrowaveOven,
+        f"{0x03}-{0xBB}": RiceCooker,
         f"{0x00}-{0x02}": CrimeSensor,
         f"{0x00}-{0x13}": RainSensor,
         f"{0x00}-{0x03}": EmergencyButton,
