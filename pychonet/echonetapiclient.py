@@ -1,5 +1,7 @@
 import asyncio
-from typing import Callable, Dict, List, Tuple, Any, Optional
+from dataclasses import dataclass
+from time import monotonic
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 
 from pychonet.lib.const import (
@@ -8,6 +10,7 @@ from pychonet.lib.const import (
     ENL_PRODUCT_CODE,
     ENL_PORT,
     INSTANCE_LIST,
+    INSTANCE_LIST_NOTIFICATION,
     ENL_SETMAP,
     ENL_UID,
     GET,
@@ -17,15 +20,46 @@ from pychonet.lib.const import (
     GETRES,
     INF,
     INFC,
+    INFREQ,
     SETC_SND,
     GET_SNA,
     INF_SNA,
     SETI,
     SETC,
+    ENL_BROADCAST_ADDRESS,
     ENL_MULTICAST_ADDRESS,
 )
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
-from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
+from pychonet.lib.functions import (
+    DEFAULT_SEOJ,
+    MAX_TID_VALUE,
+    DecodeEchonetMsgError,
+    buildEchonetMsg,
+    decodeEchonetMsg,
+    encode_property_data,
+)
+
+
+_RESPONSE_ESVS = {
+    GET: (GETRES, GET_SNA),
+    SETC: (SETRES, SETC_SND),
+    INFREQ: (INF, INF_SNA),
+}
+_CONTROLLER_EOJ = tuple(DEFAULT_SEOJ.to_bytes(3, "big"))
+_NODE_PROFILE = (0x0E, 0xF0)
+_PROPERTY_MAPS = {ENL_STATMAP, ENL_GETMAP, ENL_SETMAP}
+_NODE_INFORMATION = {ENL_UID, ENL_MANUFACTURER, ENL_PRODUCT_CODE}
+
+
+@dataclass
+class _PendingRequest:
+    host: str
+    eoj: Tuple[int, int, int]
+    esv: int
+    properties: Dict[int, bytes]
+    reply: "asyncio.Future[Tuple[bool, int]]"
+    responders: Optional[Set[str]] = None
+
 
 class ECHONETAPIClient:
     """ECHONET API client for handling ECHONETLite communication."""
@@ -43,9 +77,7 @@ class ECHONETAPIClient:
         self._server.subscribe(self.echonetMessageReceived)
         self._state: Dict[str, Dict[str, Any]] = {}
         self._next_tx_tid: int = 0x0000
-        self._message_list: Dict[int, Dict[str, Any]] = {}
-        self._failure_list: Dict[int, int] = {}
-        self._opc_counts: Dict[int, int] = {}
+        self._pending_requests: Dict[int, _PendingRequest] = {}
         self._message_timeout: int = MESSAGE_TIMEOUT
         self._update_callbacks: Dict[str, List[Callable[[bool], Any]]] = {}
         self._receive_callbacks: Dict[str, List[Callable[[bool], Any]]] = {}
@@ -53,211 +85,180 @@ class ECHONETAPIClient:
         self._waiting: Dict[str, int] = {}
         self._last_activity: Dict[str, float] = {}  # host -> monotonic timestamp of last received packet
 
-    async def echonetMessageReceived(
-        self,
-        raw_data: bytes,
-        addr: Tuple[str, int],
-    ) -> None:
-        """Handle incoming ECHONET messages.
-        
-        Args:
-            raw_data: Raw bytes of the received message
-            addr: Tuple of (host IP, port) from the sender
-        """
-        updated = False
+    async def echonetMessageReceived(self, raw_data: bytes, addr: Tuple[str, int]) -> None:
+        """Update device state from a response or an unsolicited notification."""
         host = addr[0]
-        import time as _time
-        self._last_activity[host] = _time.monotonic()
-        is_discovery = False
-
-        if self._debug_flag:
-            self._logger(
-                f"ECHONETLite Message Received from {host} - Raw data is {raw_data}"
-            )
-
-        processed_data = decodeEchonetMsg(raw_data)
-
-        if self._debug_flag:
-            self._logger(
-                f"ECHONETLite Message Received from {host} - Processed data is {processed_data}"
-            )
-
-        tid = processed_data["TID"]
-        tid_data = self._message_list.get(tid)
-
-        if self._debug_flag:
-            self._logger(
-                f"ECHONETLite Message Received from {host} - tid_data is {tid_data}"
-            )
-
-        isPush = tid_data is None
-        seojgc = processed_data["SEOJGC"]
-        seojcc = processed_data["SEOJCC"]
-        seojci = processed_data["SEOJCI"]
-        esv = processed_data["ESV"]
-
-        if self._state.get(host) is None:  # echonet packet arrived we dont know about
-            self._logger(f"Unknown ECHONETLite node has been identified - {host}")
-            if callable(self._discover_callback):
-                if self._debug_flag:
-                    self._logger(f"Called _discover_callback('{host}')")
-                await self._discover_callback(host)
+        try:
+            message = decodeEchonetMsg(raw_data)
+        except (DecodeEchonetMsgError, IndexError) as error:
+            if self._debug_flag:
+                self._logger(f"Ignoring an invalid ECHONET Lite frame from {host}: {error}")
             return
 
-        key = f"{host}-{seojgc}-{seojcc}-{seojci}"
-        esv_set = esv in [SETRES, SETC_SND]
-        esv_get = esv in [GETRES, GET_SNA, INF, INF_SNA, INFC]
-        if not isPush:
-            self._failure_list[tid] = 0
-            self._opc_counts[tid] = len(processed_data["OPC"])
-        # handle discovery message response
-        for opc in processed_data["OPC"]:
-            epc = opc["EPC"]
-            if seojgc == 0x0E and seojcc == 0xF0:  # Node Profile Class Response
-                if epc in [
-                    INSTANCE_LIST,
-                    ENL_MANUFACTURER,
-                    ENL_PRODUCT_CODE,
-                    ENL_UID,
-                ]:  # process discovery data
-                    is_discovery = True
-                    await self.process_discovery_data(host, opc)
-                else:
-                    # @todo handling others
-                    """
-                    Ex. 0x05: Instance list notification
-                    A property to announce the configuration of instances to be disclosed to the network at startup.
-                    This property also announces instances held at the self-node each time the configuration of
-                    instances disclosed to the network is changed during system operation, such as instance
-                    addition or deletion.
-                    """
-                    """
-                    It is desirable to dynamically add and delete entities when there is an increase
-                    or decrease in the number of instances within a device already configured with HA,
-                    but that will be an issue for the future.
-                    """
+        properties = message["OPC"]
+        if any(prop["PDC"] != len(prop["EDT"]) for prop in properties):
+            return
+        self._last_activity[host] = monotonic()
+
+        tid = message["TID"]
+        source = (message["SEOJGC"], message["SEOJCC"], message["SEOJCI"])
+        destination = (message["DEOJGC"], message["DEOJCC"], message["DEOJCI"])
+        esv = message["ESV"]
+        if self._debug_flag:
+            self._logger(f"ECHONET Lite message from {host}: {message}")
+
+        request = self._pending_requests.get(tid)
+        if request is not None and (
+            destination != _CONTROLLER_EOJ
+            or source[:2] != request.eoj[:2]
+            or request.eoj[2] not in (0, source[2])
+            or esv not in _RESPONSE_ESVS.get(request.esv, ())
+            or (request.responders is None and (host != request.host or request.reply.done()))
+        ):
+            request = None
+
+        if request is not None and request.responders is not None:
+            await self._record_multicast_response(request, host, esv, properties)
+            return
+
+        if request is None and esv not in (INF, INFC):
+            return
+        if host not in self._state:
+            if request is None and callable(self._discover_callback):
+                await self._discover_callback(host)
+            return
+        if source[0] == 0x0F:
+            return
+
+        updated = False
+        returned = set()
+        accepted = 0
+        is_set = esv in (SETRES, SETC_SND)
+        is_profile = source[:2] == _NODE_PROFILE
+        instance = None if is_profile else self._instance_state(host, source)
+        if not is_profile and instance is None:
+            if request is None:
+                return
+            instance = self._ensure_instance(host, source)
+
+        for prop in properties:
+            epc = prop["EPC"]
+            if request is not None:
+                if epc not in request.properties:
                     continue
-            elif seojgc == 0x0F:  # User definition class group
-                if self._debug_flag:
-                    self._logger(
-                        f"Packet received from {host} for user definition class group 0x0F"
-                    )
-                    self._logger(f"Full packet details are {processed_data}")
-                    self._logger(f"ignoring packet but please notify devs on Github.")
-            else:  # process each EPC in order
-                if epc == ENL_SETMAP or epc == ENL_GETMAP or epc == ENL_STATMAP:
-                    map = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
-                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = map
-                elif epc in (ENL_UID, ENL_MANUFACTURER, ENL_PRODUCT_CODE):
-                    try:
-                        self._state[host]["instances"][seojgc][seojcc][seojci][
-                            epc
-                        ] = EPC_SUPER_FUNCTIONS[epc](opc["EDT"])
-                    except KeyError as e:
-                        if self._debug_flag:
-                            self._logger(
-                                f"ECHONET _state _key error {e} of {host} this packet contains the following data: {processed_data}"
-                            )
-                        continue
-                        # raise Exception(
-                        #     f"ECHONET Packet contains the following data: {processed_data}"
-                        # )
+                # A large node may return several D5 lists in one notification.
+                multiple_lists = is_profile and esv == INF and epc == INSTANCE_LIST_NOTIFICATION
+                if epc in returned and not multiple_lists:
+                    continue
+                returned.add(epc)
+            if is_set:
+                if prop["PDC"] != 0:
+                    continue
+                edt = request.properties[epc]
+            else:
+                if not prop["PDC"]:
+                    continue
+                edt = prop["EDT"]
+
+            if is_profile:
+                if not await self.process_discovery_data(host, prop):
+                    continue
+            elif epc in _PROPERTY_MAPS or epc in _NODE_INFORMATION:
+                instance[epc] = EPC_SUPER_FUNCTIONS[epc](edt)
+            else:
+                updated |= instance.get(epc) != edt
+                instance[epc] = edt
+            accepted += 1
+
+        if request is not None:
+            if not returned:
+                return
+            if is_set:
+                success = esv == SETRES and accepted == len(request.properties)
+            else:
+                success = accepted > 0
+            request.reply.set_result((success, len(returned)))
+
+        node = self._state[host]
+        if not node.get("available"):
+            node["available"] = True
+            await self._notify_host_available(host)
+            return
+
+        key = f"{host}-{source[0]}-{source[1]}-{source[2]}"
+        is_push = request is None
+        if updated:
+            for callback in tuple(self._update_callbacks.get(key, ())):
+                await callback(is_push)
+        for callback in tuple(self._receive_callbacks.get(key, ())):
+            await callback(is_push)
+
+    async def _record_multicast_response(self, request, host, esv, properties):
+        if esv != GETRES or host in request.responders:
+            return
+        for prop in properties:
+            if prop["EPC"] == INSTANCE_LIST and self._decode_instance_list(prop["EDT"], False):
+                request.responders.add(host)
+                node = self._state.setdefault(host, {"instances": {}, "available": True})
+                unknown = not node["instances"] and not node.get("discovered")
+                recovered = not node["available"]
+                node["available"] = True
+                await self.process_discovery_data(host, prop)
+                if not request.reply.done():
+                    request.reply.set_result((True, 1))
+                if recovered:
+                    await self._notify_host_available(host)
+                if unknown and callable(self._discover_callback):
+                    await self._discover_callback(host)
                 else:
-                    if esv_set:
-                        if opc["PDC"] > 0 or isPush:
-                            if not isPush:
-                                self._failure_list[tid] += 1
-                            continue
-                        if tid_data.get(epc) is None:
-                            self._failure_list[tid] += 1
-                            if self._debug_flag:
-                                self._logger(
-                                    f"EDT is not set in send data for EPC '{epc}' - process each EPC"
-                                )
-                            continue
-                        else:
-                            # set request data
-                            opc["EDT"] = tid_data[epc]
-                    elif esv_get:
-                        if opc["PDC"] == 0:
-                            if not isPush:
-                                self._failure_list[tid] += 1
-                            continue
-                    else:
-                        # @todo more esv support
-                        continue
+                    await self._request_additional_instances(host)
+                return
 
-                    if (
-                        epc
-                        not in self._state[host]["instances"][seojgc][seojcc][seojci]
-                        or self._state[host]["instances"][seojgc][seojcc][seojci][epc]
-                        != opc["EDT"]
-                    ):
-                        updated = True
-                    self._state[host]["instances"][seojgc][seojcc][seojci][epc] = opc[
-                        "EDT"
-                    ]
+    async def _notify_host_available(self, host):
+        prefix = f"{host}-"
+        for registry in (self._update_callbacks, self._receive_callbacks):
+            for key, callbacks in tuple(registry.items()):
+                if key.startswith(prefix):
+                    for callback in tuple(callbacks):
+                        await callback(False)
 
-        # Markup "discovered"
-        if is_discovery and len(self._state[host]["instances"]):
-            if self._state[host].get("uid") is None:
-                self._state[host]["uid"] = EPC_SUPER_FUNCTIONS[ENL_UID](b"", host)
-            if self._state[host].get("manufacturer") is None:
-                self._state[host]["manufacturer"] = EPC_SUPER_FUNCTIONS[
-                    ENL_MANUFACTURER
-                ](0xFFFFFF.to_bytes(3, "big"))
-            self._state[host]["discovered"] = True
+    def _instance_state(self, host, eoj):
+        group, code, instance = eoj
+        node = self._state.get(host, {})
+        return node.get("instances", {}).get(group, {}).get(code, {}).get(instance)
 
-        # Markup "available"
-        _to_available = False
-        if host in self._state:
-            if not self._state[host].get("available"):
-                _to_available = True
-                self._state[host]["available"] = True
+    def _ensure_instance(self, host, eoj):
+        group, code, instance = eoj
+        instances = self._state[host]["instances"]
+        return instances.setdefault(group, {}).setdefault(code, {}).setdefault(instance, {})
 
-        if _to_available:
-            # Call update callback functions
-            # key is f"{host}-{deojgc}-{deojcc}-{deojci}"
-            for _key in self._update_callbacks:
-                if _key.startswith(host):
-                    for update_func in self._update_callbacks[_key]:
-                        await update_func(False)
-
-            # Call receive callback functions
-            for _key in self._receive_callbacks:
-                if _key.startswith(host):
-                    for receive_func in self._receive_callbacks[_key]:
-                        await receive_func(False)
-            
-        else:
-            # Call update callback functions
-            if updated and key in self._update_callbacks:
-                for update_func in self._update_callbacks[key]:
-                    await update_func(isPush)
-
-            # Call receive callback functions
-            if key in self._receive_callbacks:
-                for receive_func in self._receive_callbacks[key]:
-                    await receive_func(isPush)
-
-        # if we get duplicate packets that have already been processed then dont worry about the message list.
-        # but still process them regardless.
-        if tid_data is not None:
-            del self._message_list[tid]
+    def _allocate_tid(self):
+        for _ in range(MAX_TID_VALUE):
+            self._next_tx_tid = self._next_tx_tid % MAX_TID_VALUE + 1
+            if self._next_tx_tid not in self._pending_requests:
+                return self._next_tx_tid
+        raise RuntimeError("No ECHONET Lite transaction IDs available")
 
     async def discover(
         self,
         host: str = ENL_MULTICAST_ADDRESS,
-    ) -> List[Any]:
+        *,
+        broadcast: bool = False,
+    ) -> Optional[bool]:
         """Discover devices on the network.
-        
+
         Args:
-            host: Host to discover (default: multicast address)
-            
+            host: Host to discover (default: multicast address). The IPv4
+                broadcast address requests both multicast and broadcast.
+            broadcast: Also send multicast discovery to the IPv4 broadcast address.
+
         Returns:
-            List of discovered device information
+            True on response, False on timeout, or None if the request queue is busy.
         """
-        if host is ENL_MULTICAST_ADDRESS:
+        if host == ENL_BROADCAST_ADDRESS:
+            host = ENL_MULTICAST_ADDRESS
+            broadcast = True
+        if host == ENL_MULTICAST_ADDRESS:
             opc = [{"EPC": INSTANCE_LIST}]
         else:
             opc = [
@@ -266,7 +267,22 @@ class ECHONETAPIClient:
                 {"EPC": ENL_UID},
                 {"EPC": INSTANCE_LIST},
             ]
-        return await self.echonetMessage(host, 0x0E, 0xF0, 0x01, GET, opc)
+        if broadcast:
+            return await self.echonetMessage(
+                host, 0x0E, 0xF0, 0x01, GET, opc, broadcast=True
+            )
+        result = await self.echonetMessage(host, 0x0E, 0xF0, 0x01, GET, opc)
+        if result and host != ENL_MULTICAST_ADDRESS:
+            await self._request_additional_instances(host)
+        return result
+
+    async def _request_additional_instances(self, host):
+        if self._state.get(host, {}).get("instance_count", 0) > 84:
+            # D6 holds at most 84 EOJs. D5 can announce the rest in separate lists.
+            await self.echonetMessage(
+                host, 0x0E, 0xF0, 0x01, INFREQ,
+                [{"EPC": INSTANCE_LIST_NOTIFICATION}],
+            )
 
     async def echonetMessage(
         self,
@@ -276,7 +292,9 @@ class ECHONETAPIClient:
         deojci: int,
         esv: int,
         opc: List[Dict[str, Any]],
-    ) -> bool:
+        *,
+        broadcast: bool = False,
+    ) -> Optional[bool]:
         """Send an ECHONET message and await response.
         
         Args:
@@ -286,135 +304,103 @@ class ECHONETAPIClient:
             deojci: Destination ECHONET Instance Code
             esv: Service Element Value
             opc: List of OPC dictionaries with EPC, PDC, EDT
+            broadcast: Also send the multicast node discovery request via IPv4 broadcast.
             
         Returns:
             True if message was successful, False otherwise, None if queue is full
         """
-        no_res = True if esv is SETI else False
-        payload = None
-        # Is node profile
-        is_discover = deojgc == 0x0E and deojcc == 0xF0
-        map_epcs = {ENL_STATMAP, ENL_GETMAP, ENL_SETMAP}
-        # Check OPC Code
-        try:
-            if not is_discover:
-                if esv == GET:
-                    check_map = set(
-                        self._state[host]["instances"][deojgc][deojcc][deojci].get(
-                            ENL_GETMAP, []
-                        )
-                    )
-                    check_map |= map_epcs
-                elif esv == SETC:
-                    check_map = set(
-                        self._state[host]["instances"][deojgc][deojcc][deojci].get(
-                            ENL_SETMAP, []
-                        )
-                    )
-                else:
-                    check_map = {}
-                if len(check_map):
-                    checked_opc = []
-                    for values in opc:
-                        if values.get("EPC") in check_map:
-                            checked_opc.append(values)
-                    opc = checked_opc
-        except KeyError:
-            pass
+        if host == ENL_BROADCAST_ADDRESS:
+            raise ValueError("Use discover(broadcast=True) for IPv4 broadcast")
 
-        message_array = {
-            "DEOJGC": deojgc,
-            "DEOJCC": deojcc,
-            "DEOJCI": deojci,
-            "ESV": esv,
-            "OPC": opc,
-        }
-        if self._state.get(host) is None:
-            self._state[host] = {"instances": {}, "available": True}
+        eoj = (deojgc, deojcc, deojci)
+        is_profile = eoj[:2] == _NODE_PROFILE
+        multicast_discovery = (
+            host == ENL_MULTICAST_ADDRESS
+            and is_profile
+            and esv == GET
+            and [prop["EPC"] for prop in opc] == [INSTANCE_LIST]
+        )
+        if broadcast and not multicast_discovery:
+            raise ValueError("Broadcast requires multicast node discovery")
 
-        # Consecutive requests to the device must wait for a response
-        if self._waiting.get(host) is None:
-            self._waiting[host] = 0
-        if self._waiting[host] > 0:
-            for x in range(0, self._message_timeout):
-                # Wait up to message_timeout * 0.1 seconds for the queue to clear.
+        if self._waiting.get(host):
+            for _ in range(self._message_timeout):
                 await asyncio.sleep(0.1)
                 if not self._waiting[host]:
                     break
             if self._waiting[host]:
-                # Queue is still busy — return None to distinguish this from a
-                # genuine device timeout (False). Callers can treat None as
-                # "queue busy, serve cached data" rather than "device offline".
                 return None
-        self._waiting[host] += 1
-
-        self._next_tx_tid += 1
-        tx_tid = self._next_tx_tid
-        message_array["TID"] = tx_tid
+        self._waiting[host] = 1
+        tid = None
+        retain_discovery = False
         try:
-            try:
-                payload = buildEchonetMsg(message_array)
-            except TIDError:  # Quashing the rollover bug hopefully once and for all...
-                self._next_tx_tid = 1
-                tx_tid = self._next_tx_tid
-                message_array["TID"] = tx_tid
-                payload = buildEchonetMsg(message_array)
+            instance = self._instance_state(host, eoj)
+            if instance is not None and not is_profile:
+                if esv == GET and ENL_GETMAP in instance:
+                    readable = set(instance[ENL_GETMAP]) | _PROPERTY_MAPS
+                    opc = [prop for prop in opc if prop["EPC"] in readable]
+                elif esv in (SETC, SETI) and ENL_SETMAP in instance:
+                    writable = set(instance[ENL_SETMAP])
+                    if any(prop["EPC"] not in writable for prop in opc):
+                        return False
 
-            opc_count = len(opc)
-            if no_res:
-                is_success = True
-            else:
-                is_success = False
-                tid_data = {}
-                for opc_data in opc:
-                    if opc_data.get("EDT") is not None:
-                        if isinstance(opc_data["EDT"], int):
-                            tid_data[opc_data["EPC"]] = opc_data["EDT"].to_bytes(
-                                opc_data["PDC"], "big"
-                            )
-                self._message_list[tx_tid] = tid_data
+            if not opc:
+                return False
+            properties = {prop["EPC"]: encode_property_data(prop) for prop in opc}
+            if esv in (SETC, SETI) and not all(properties.values()):
+                return False
+            tid = self._allocate_tid()
+            payload = buildEchonetMsg({
+                "TID": tid,
+                "DEOJGC": deojgc,
+                "DEOJCC": deojcc,
+                "DEOJCI": deojci,
+                "ESV": esv,
+                "OPC": opc,
+            })
+
+            loop = asyncio.get_running_loop()
+            timeout = self._message_timeout * 0.1
+            deadline = loop.time() + timeout
+            if not multicast_discovery:
+                self._state.setdefault(host, {"instances": {}, "available": True})
+            if esv != SETI:
+                request = _PendingRequest(
+                    host, eoj, esv, properties, loop.create_future(),
+                    set() if multicast_discovery else None,
+                )
+                self._pending_requests[tid] = request
 
             self._server.send(payload, (host, ENL_PORT))
+            if broadcast:
+                self._server.send(payload, (ENL_BROADCAST_ADDRESS, ENL_PORT))
+            if esv == SETI:
+                return True
 
-            if not no_res:
-                not_timeout = False
-                for x in range(0, self._message_timeout):
-                    # Wait up to 20(0.1*200) seconds depending on the Echonet specifications.
-                    await asyncio.sleep(0.1)
-                    # if tx_tid is not in message list then the message listener has received the message
-                    if self._message_list.get(tx_tid) is None:
-                        # Check OPC count in results
-                        if not is_discover and tx_tid in self._opc_counts:
-                            res_opc_count = self._opc_counts[tx_tid]
-                            del self._opc_counts[tx_tid]
-                            if self._debug_flag:
-                                self._logger(
-                                    f"OPC count in results is {res_opc_count}/{opc_count} from IP {host}."
-                                )
-                            if res_opc_count < opc_count:
-                                raise EchonetMaxOpcError(res_opc_count)
+            try:
+                success, returned = await asyncio.wait_for(request.reply, timeout)
+            except asyncio.TimeoutError:
+                node = self._state.get(host)
+                if not is_profile and node is not None and node["available"]:
+                    node["available"] = False
+                    prefix = f"{host}-"
+                    for key, callbacks in tuple(self._update_callbacks.items()):
+                        if key.startswith(prefix):
+                            for callback in tuple(callbacks):
+                                await callback(False)
+                return False
 
-                        # transaction sucessful remove from list
-                        if self._failure_list.get(tx_tid, opc_count) < opc_count:
-                            is_success = True
-                        if tx_tid in self._failure_list:
-                            del self._failure_list[tx_tid]
-                        not_timeout = True
-                        break
-                if not is_success:
-                    if self._message_list.get(tx_tid) is not None:
-                        del self._message_list[tx_tid]
-                if not is_discover and self._state[host]["available"] != not_timeout:
-                    self._state[host]["available"] = not_timeout
-                    # Call update callback functions
-                    # key is f"{host}-{deojgc}-{deojcc}-{deojci}"
-                    for key in self._update_callbacks:
-                        if key.startswith(host):
-                            for update_func in self._update_callbacks[key]:
-                                await update_func(False)
+            if multicast_discovery:
+                # Keep deduplicating and collecting peers for the original discovery window.
+                loop.call_at(deadline, self._pending_requests.pop, tid, None)
+                retain_discovery = True
+            elif esv == GET and not is_profile and returned < len(properties):
+                raise EchonetMaxOpcError(returned)
+            return success
         finally:
-            self._waiting[host] -= 1
-        return is_success
+            if tid is not None and not retain_discovery:
+                self._pending_requests.pop(tid, None)
+            self._waiting[host] = 0
 
     async def getAllPropertyMaps(
         self,
@@ -474,60 +460,48 @@ class ECHONETAPIClient:
             [{"EPC": ENL_UID}, {"EPC": ENL_MANUFACTURER}],
         )
 
-    async def process_discovery_data(
-        self,
-        host: str,
-        opc_data: Dict[str, Any],
-    ) -> None:
-        """Process discovered device data.
-        
-        Args:
-            host: Device host IP
-            opc_data: OPC data from discovery response
-        """
-        if "discovered" not in self._state[host]:
-            if opc_data["EPC"] == ENL_UID:
-                self._state[host]["uid"] = EPC_SUPER_FUNCTIONS[ENL_UID](
-                    opc_data["EDT"], host
-                )
-            elif opc_data["EPC"] == ENL_MANUFACTURER:
-                self._state[host]["manufacturer"] = EPC_SUPER_FUNCTIONS[
-                    ENL_MANUFACTURER
-                ](opc_data["EDT"])
-            elif opc_data["EPC"] == ENL_PRODUCT_CODE:
-                self._state[host]["product_code"] = EPC_SUPER_FUNCTIONS[
-                    ENL_PRODUCT_CODE
-                ](opc_data["EDT"])
-            else:
-                edt = bytearray(opc_data["EDT"])
-                # 1st byte: Total number of instances
-                # 2nd to 253rd bytes: ECHONET object codes (EOJ3 bytes) enumerated
-                edtnum = bytearray(edt)[0]
-                for x in range(edtnum):
-                    eojgc = bytearray(edt)[1 + (3 * x)]
-                    eojcc = bytearray(edt)[2 + (3 * x)]
-                    eojci = bytearray(edt)[3 + (3 * x)]
-                    if eojgc != 0x0F:  # ignore this group code.
-                        # populate state table
-                        if eojgc not in list(self._state[host]["instances"].keys()):
-                            self._state[host]["instances"].update({eojgc: {}})
-                        if eojcc not in list(
-                            self._state[host]["instances"][eojgc].keys()
-                        ):
-                            self._state[host]["instances"][eojgc].update({eojcc: {}})
-                        if eojci not in list(
-                            self._state[host]["instances"][eojgc][eojcc].keys()
-                        ):
-                            self._state[host]["instances"][eojgc][eojcc][eojci] = {}
-                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                                {ENL_STATMAP: []}
-                            )
-                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                                {ENL_SETMAP: []}
-                            )
-                            self._state[host]["instances"][eojgc][eojcc][eojci].update(
-                                {ENL_GETMAP: []}
-                            )
+    @staticmethod
+    def _decode_instance_list(edt, notification):
+        if not edt or len(edt) > 253 or (len(edt) - 1) % 3:
+            return None
+        count = edt[0]
+        listed = (len(edt) - 1) // 3
+        if count < listed or ((notification or count <= 84) and count != listed):
+            return None
+        instances = [tuple(edt[index : index + 3]) for index in range(1, len(edt), 3)]
+        return count, instances
+
+    async def process_discovery_data(self, host: str, opc_data: Dict[str, Any]) -> bool:
+        """Merge information from a node profile response."""
+        node = self._state[host]
+        epc = opc_data["EPC"]
+        edt = opc_data["EDT"]
+        if epc == ENL_UID:
+            node["uid"] = EPC_SUPER_FUNCTIONS[ENL_UID](edt, host)
+        elif epc == ENL_MANUFACTURER:
+            node["manufacturer"] = EPC_SUPER_FUNCTIONS[ENL_MANUFACTURER](edt)
+        elif epc == ENL_PRODUCT_CODE:
+            node["product_code"] = EPC_SUPER_FUNCTIONS[ENL_PRODUCT_CODE](edt)
+        elif epc in (INSTANCE_LIST, INSTANCE_LIST_NOTIFICATION):
+            listing = self._decode_instance_list(edt, epc == INSTANCE_LIST_NOTIFICATION)
+            if listing is None:
+                return False
+            count, instances = listing
+            if epc == INSTANCE_LIST:
+                node["instance_count"] = count
+            for eoj in instances:
+                if eoj[0] != 0x0F:
+                    self._ensure_instance(host, eoj)
+        else:
+            return True
+
+        if node["instances"]:
+            if node.get("uid") is None:
+                node["uid"] = EPC_SUPER_FUNCTIONS[ENL_UID](b"", host)
+            if node.get("manufacturer") is None:
+                node["manufacturer"] = EPC_SUPER_FUNCTIONS[ENL_MANUFACTURER](b"\xff\xff\xff")
+            node["discovered"] = True
+        return True
 
     def register_async_update_callbacks(
         self,
@@ -686,24 +660,13 @@ class ECHONETAPIClient:
             getmap: Get property map.
             uid:    Optional device unique identifier.
         """
-        from pychonet.lib.const import ENL_STATMAP, ENL_SETMAP, ENL_GETMAP, ENL_UID
-
-        if host not in self._state:
-            self._state[host] = {"instances": {}, "available": True}
-
-        instances = self._state[host]["instances"]
-        if eojgc not in instances:
-            instances[eojgc] = {}
-        if eojcc not in instances[eojgc]:
-            instances[eojgc][eojcc] = {}
-        if eojci not in instances[eojgc][eojcc]:
-            instances[eojgc][eojcc][eojci] = {
-                ENL_STATMAP: ntfmap,
-                ENL_SETMAP: setmap,
-                ENL_GETMAP: getmap,
-            }
-            if uid is not None:
-                instances[eojgc][eojcc][eojci][ENL_UID] = uid
+        self._state.setdefault(host, {"instances": {}, "available": True})
+        instance = self._ensure_instance(host, (eojgc, eojcc, eojci))
+        instance.setdefault(ENL_STATMAP, ntfmap)
+        instance.setdefault(ENL_SETMAP, setmap)
+        instance.setdefault(ENL_GETMAP, getmap)
+        if uid is not None:
+            instance.setdefault(ENL_UID, uid)
 
     def unregister_host(self, host: str) -> None:
         """Remove all state and callbacks for a host.

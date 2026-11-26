@@ -1,3 +1,6 @@
+import json
+from importlib.resources import files
+
 # ------------------------------------------------------------------
 # EPC set
 # ---------------------------------------------------------------- */
@@ -31,6 +34,10 @@ EPC_CODE = {
             0xB0: "Detection threshold level",
             0xB1: "Earthquake occurrence status",
             0xBF: "Earthquake occurrence status resetting",
+            0xC0: "SI value",
+            0xC1: "SI value resetting",
+            0xC2: "Collapse occurrence status",
+            0xC3: "Collapse occurrence status resetting",
         },
         0x06: {  # Electric leak sensor class
             0x80: "Operation status",
@@ -453,6 +460,46 @@ EPC_CODE = {
             0xD3: "Fan timer 2 setting",
             0xD4: "Fan timer 2 ON time setting",
             0xD5: "Fan timer 2 OFF time setting",
+        },
+        0x58: {  # Gas heat pump-type commercial air conditioner (indoor unit)
+            0x80: "Operation status",
+            0xAC: "Thermo status",
+            0xAE: "Operation mode status during automatic operation",
+            0xB0: "Operation mode setting",
+            0xB3: "Temperature setting value",
+            0xBB: "Measured indoor unit temperature",
+            0xCA: "Group information",
+            0xDB: "Power consumption range for indoor units",
+        },
+        0x59: {  # Gas heat pump-type commercial air conditioner (outdoor unit)
+            0x80: "Operation status",
+            0xBE: "Measured outdoor unit temperature",
+            0xC0: "Measured cumulative gas consumption",
+            0xCA: "Group information",
+            0xE0: "Time slot operation factor setting",
+            0xE1: "Allowable operation factor",
+        },
+        0x5A: {  # Range hood
+            0x80: "Operation status",
+            0xA0: "Ventilation air flow rate setting",
+            0xBF: "Range hood automatic setting",
+            0xC0: "Measured indoor temperature",
+            0xC1: "Measured outdoor temperature",
+            0xC2: "Measured supply air temperature",
+            0xC3: "Measured cooking temperature",
+            0xC4: "Measured indoor relative humidity",
+            0xC5: "Measured outdoor air humidity",
+            0xC6: "Human detection threshold level setting",
+            0xC7: "Human detection status",
+            0xC8: "Measured CO2 concentration",
+            0xC9: "Gas detection threshold level setting",
+            0xCA: "Gas detection status",
+            0xCB: "Error detection mode",
+            0xD0: "Lighting operation setting",
+            0xD1: "Light source color setting",
+            0xD2: "Brightness level setting",
+            0xD6: "Lighting mode setting",
+            0xE0: "RGB setting in colored lighting mode",
         },
     },
     0x02: {  # Housing/facility-related device class group
@@ -1088,13 +1135,74 @@ EPC_CODE = {
             0xCD: "Unit of measurement data of cumulative amount of reactive electric power consumption (lag)",
             0xCE: "Historical data of measurement data of cumulative amount of reactive electric power consumption(lag) for power factor measurement",
         },
+        0x8B: {  # Kerosene meter
+            0x80: "Operation status",
+            0xE0: "Measured cumulative kerosene consumption",
+            0xE2: "Historical data of cumulative kerosene consumption",
+        },
+        0x8C: {  # Smart kerosene meter
+            0x80: "Operation status",
+            0xD0: "Measured cumulative kerosene consumption with date and time",
+            0xD1: "Historical data of cumulative kerosene consumption with date and time",
+            0xE1: "Owner category setting",
+            0xE2: "Measured cumulative kerosene consumption",
+            0xE3: "Units for measured cumulative kerosene consumption",
+            0xE4: "Historical data of cumulative kerosene consumption",
+            0xE5: "Collection date setting for cumulative kerosene consumption history",
+            0xE6: "Meter reading data abnormality detection status",
+            0xE7: "Security data information",
+            0xE8: "Residual volume control warning level",
+            0xEA: "Residual volume control warning level 1",
+            0xEB: "Residual volume control warning level 2",
+            0xEC: "Residual volume control warning level 3",
+            0xED: "Slight leak timer value",
+            0xEE: "ID number setting",
+            0xEF: "Verification expiration setting",
+        },
         0x8E: {  # Distributed Generator Electric Energy Meter
             0x80: "Operation status",
             0x98: "Current date setting",
+            0xA0: "Measured cumulative electric energy (AC output, based on PV)",
+            0xA1: "Cumulative electric energy history (AC output, based on PV)",
+            0xA2: "Cumulative electric energy at fixed time (AC output, based on PV)",
+            0xA3: "Measured cumulative electric energy (independent output, based on PV)",
+            0xA4: "Cumulative electric energy history (independent output, based on PV)",
+            0xA5: "Cumulative electric energy at fixed time (independent output, based on PV)",
+            0xA6: "Measured cumulative electric energy (AC output, based on grid)",
+            0xA7: "Cumulative electric energy history (AC output, based on grid)",
+            0xA8: "Cumulative electric energy at fixed time (AC output, based on grid)",
+            0xA9: "Measured cumulative electric energy (independent output, based on grid)",
+            0xAA: "Cumulative electric energy history (independent output, based on grid)",
+            0xAB: "Cumulative electric energy at fixed time (independent output, based on grid)",
+            0xB0: "Measured cumulative DC electric energy (PV)",
+            0xB1: "Measured cumulative DC electric energy (storage battery charging)",
+            0xB2: "Measured cumulative DC electric energy (storage battery discharging)",
+            0xB3: "Measured cumulative DC electric energy (EV charging)",
+            0xB4: "Measured cumulative DC electric energy (EV discharging)",
+            0xB5: "Measured cumulative DC electric energy (EV charging, based on PV)",
+            0xB6: "Cumulative DC electric energy history (EV charging, based on PV)",
+            0xB7: "Cumulative DC electric energy at fixed time (EV charging, based on PV)",
+            0xD0: "Device type",
+            0xD1: "Device ID",
+            0xD2: "Tolerance class (AC)",
+            0xD3: "Number of days of cumulative electric energy history",
             0xD4: "Unit for cumulative amount of electric energy",
+            0xD5: "Day for which cumulative electric energy history is to be retrieved",
+            0xD6: "Identification number of device to be metered",
+            0xD7: "Tolerance class (DC, PV)",
+            0xD8: "Tolerance class (DC, storage battery)",
+            0xD9: "Tolerance class (DC, EV)",
+            0xDA: "Current hour, minute, and second setting",
+            0xDB: "Time synchronization status",
             0xE0: "Measured cumulative amount of electric energy (AC input)",
+            0xE1: "Cumulative electric energy history (AC input)",
             0xE2: "Measured cumulative amount of electric energy (AC output)",
+            0xE3: "Cumulative electric energy history (AC output)",
             0xE4: "Measured cumulative amount of electric energy (independent output)",
+            0xE5: "Cumulative electric energy history (independent output)",
+            0xE6: "Cumulative electric energy at fixed time (AC input)",
+            0xE7: "Cumulative electric energy at fixed time (AC output)",
+            0xE8: "Cumulative electric energy at fixed time (independent output)",
             0xE9: "Measured instantaneous electric power (AC input/output)",
             0xEA: "Measured instantaneous electric power (independent output)",
         },
@@ -1125,6 +1233,17 @@ EPC_CODE = {
         0x91: {  # Single function lighting class
             0x80: "Operation status",
             0xB0: "Illuminance level setting",
+        },
+        0x92: {  # Lighting for solid light-emitting sources
+            0x80: "Operation status",
+            0x90: "ON timer reservation setting",
+            0x91: "ON timer setting",
+            0x94: "OFF timer reservation setting",
+            0x95: "OFF timer setting",
+            0xB1: "Number of light sources",
+            0xB2: "Light source operation status list",
+            0xB3: "Light source optical output setting list",
+            0xB4: "Light source color temperature setting list",
         },
         0xA0: {  # Buzzer class
             0x80: "Operation status",
@@ -1174,6 +1293,51 @@ EPC_CODE = {
             0xC3: "Hot water supply status",
             0xE1: "Measured amount of hot water remaining in tank",
             0xE2: "Tank Capacity",
+        },
+        0xA7: {  # Frequency regulation
+            0x80: "Operation status",
+            0x8C: "Product code",
+            0x8D: "Production number",
+            0x98: "Current date setting",
+            0xC0: "Control point",
+            0xC1: "Frequency regulation parameter setting",
+            0xC2: "EM target power value",
+            0xC3: "Command control parameter setting",
+            0xC4: "Autonomous control parameter setting 1",
+            0xC5: "Autonomous control parameter setting 2",
+            0xC6: "Autonomous control parameter setting 3",
+            0xC7: "Correction value for reference frequency",
+            0xC8: "Frequency regulation priority setting",
+            0xC9: "Current hour, minute, and second setting",
+            0xCA: "Time synchronization status",
+            0xCB: "Instantaneous power measurement history information",
+            0xCC: "Instantaneous power measurement history storage setting",
+            0xCD: "Date and time for retrieving instantaneous power measurement history",
+            0xCE: "Instantaneous power measurement history",
+            0xD0: "Transmittable/receivable cycle",
+            0xD1: "Device type",
+            0xD2: "Values of AC maximum power",
+            0xD3: "Value of contract power",
+            0xD4: "Device control performance",
+            0xD5: "Information of frequency regulation",
+            0xD6: "Detailed information of whether the device can continue to control",
+            0xD7: "Information of EM",
+            0xD8: "Measured instantaneous values of PCS",
+            0xD9: "Response information",
+            0xDA: "Instantaneous input and output power capability value",
+            0xDB: "Instantaneous chargeable and dischargeable power values",
+            0xDC: "Battery status",
+            0xDE: "Cumulative electric energy measurement values",
+            0xDF: "Cumulative electric energy measurement by frequency regulation",
+            0xE0: "EM planned information",
+            0xE1: "EM planned value 1",
+            0xE2: "EM planned value 2",
+            0xE3: "Information of supply plan for regulation up",
+            0xE4: "Supply plan-1 for regulation up",
+            0xE5: "Supply plan-2 for regulation up",
+            0xE6: "Information of supply plan for regulation down",
+            0xE7: "Supply plan-1 for regulation down",
+            0xE8: "Supply plan-2 for regulation down",
         },
     },
     0x03: {  # Cooking/housework-related device class group
@@ -1348,6 +1512,47 @@ EPC_CODE = {
             0xE2: "Compressor operation status",
             0xCA: "Group information",
         },
+        0xD5: {  # Dishwasher and dryer
+            0x80: "Operation status",
+            0x90: "ON timer reservation setting",
+            0x91: "ON timer setting",
+            0x92: "Relative time-based ON timer setting",
+            0xB0: "Door/cover open/close setting",
+            0xB1: "Door/cover lock setting",
+            0xB2: "Operation status setting",
+            0xD0: "Dish-washing method setting",
+            0xD1: "Drying method setting",
+            0xD2: "Storing method setting",
+            0xD3: "Available dish-washing methods",
+            0xD4: "Available drying methods",
+            0xD5: "Available storing methods",
+            0xD6: "Prewashing time setting",
+            0xD7: "Maximum prewashing water temperature setting",
+            0xD8: "Washing time setting",
+            0xD9: "Maximum washing water temperature setting",
+            0xDA: "Number of rinses setting",
+            0xDB: "Rinsing method setting",
+            0xDC: "Maximum hot water rinsing temperature setting",
+            0xDD: "Dish-washing water volume setting",
+            0xDE: "Dish-washing water pressure setting",
+            0xDF: "Dish-washing level setting",
+            0xE0: "Drying time setting",
+            0xE1: "Maximum hot air drying temperature setting",
+            0xE2: "Drying air flow rate setting",
+            0xE3: "Drying level setting",
+            0xE4: "Storing time setting",
+            0xE5: "Operation setting information",
+            0xE6: "Operation transition status",
+            0xE7: "Remaining time on the ON timer",
+            0xE8: "Remaining prewashing time",
+            0xE9: "Remaining washing time",
+            0xEA: "Remaining rinsing time",
+            0xEB: "Remaining dish-washing time",
+            0xEC: "Remaining drying time",
+            0xED: "Remaining dish-washing and drying time",
+            0xEE: "Elapsed storing time",
+            0xEF: "Used water volume",
+        },
     },
     0x04: {  # Health-related device class group
         0x01: {  # Weighing machine class
@@ -1357,6 +1562,31 @@ EPC_CODE = {
         }
     },
     0x05: {  # Management/control-related device class group
+        0xFA: {  # Parallel processing combination-type power control
+            0x80: "Operation status",
+            0xC0: "Power deviation information",
+            0xC1: "Power reduction information",
+            0xC2: "Transmission interval",
+            0xC3: "Rated power consumption threshold",
+        },
+        0xFB: {  # DR event controller
+            0x80: "Operation status",
+            0xD0: "Business ID",
+            0xD1: "DR program type",
+            0xD2: "Program ID",
+            0xD3: "Current valid event information",
+            0xD4: "Next valid event information",
+            0xD5: "Future event notification ID list",
+            0xD6: "Past event notification ID list",
+            0xD7: "Newest received event notification ID",
+            0xD8: "Oldest received event notification ID",
+            0xD9: "Notification ID designation",
+            0xDA: "Event information ID designation",
+            0xDB: "Target device information list",
+            0xE0: "Event information",
+            0xE1: "Confirm/opt information",
+            0xE2: "Confirm/opt information status",
+        },
         0xFD: {  # Switch (supporting JEM-A/HA terminals) class
             0x80: "Operation status",
             0xE0: "Connected device",
@@ -1437,6 +1667,30 @@ EPC_CODE = {
         }
     },
 }
+
+
+def _add_mra_properties():
+    devices = files("pychonet").joinpath("mraData").joinpath("devices")
+    for source in devices.iterdir():
+        if not source.name.endswith(".json"):
+            continue
+        definition = json.loads(source.read_text(encoding="utf-8"))
+        eoj = int(definition["eoj"], 16)
+        # The MRA labels the illuminance sensor 00D0. Appendix R rev.4 uses 000D.
+        if eoj == 0x00D0:
+            eoj = 0x000D
+        properties = EPC_CODE.setdefault(eoj >> 8, {}).setdefault(eoj & 0xFF, {})
+        by_epc = {}
+        for item in definition["elProperties"]:
+            epc = int(item["epc"], 16)
+            if item["validRelease"]["to"] == "latest" or epc not in by_epc:
+                by_epc[epc] = item["propertyName"]["en"]
+        for epc, name in by_epc.items():
+            properties.setdefault(epc, name)
+
+
+_add_mra_properties()
+
 
 EPC_SUPER = {
     0x80: "Operation status",

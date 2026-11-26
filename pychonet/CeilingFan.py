@@ -2,7 +2,7 @@ from typing import Dict
 from deprecated import deprecated
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.GeneralLighting import ENL_BRIGHTNESS, ENL_COLOR_TEMP
-from pychonet.lib.const import EFFECT_OFF, ENL_OFF, ENL_ON, ENL_SETMAP, ENL_STATUS
+from pychonet.lib.const import EFFECT_OFF, ENL_OFF, ENL_ON, ENL_STATUS
 from pychonet.lib.epc_functions import DICT_30_ON_OFF, DICT_30_TRUE_FALSE
 from pychonet.lib.epc_functions import _int, _swap_dict
 
@@ -309,10 +309,8 @@ class CeilingFan(EchonetInstance):
         Returns:
             list|None: Effect list or None
         """
-        if (
-            ENL_FAN_LIGHT_MODE in self._epc_data[ENL_SETMAP]
-            and ENL_FAN_LIGHT_NIGHT_BRIGHTNESS in self._epc_data[ENL_SETMAP]
-        ):
+        writable = self.getSetProperties()
+        if ENL_FAN_LIGHT_MODE in writable and ENL_FAN_LIGHT_NIGHT_BRIGHTNESS in writable:
             return list(DICT_FAN_LIGHT_EFFECTS.values())
         return None
 

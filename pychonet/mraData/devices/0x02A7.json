@@ -27,7 +27,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "ASCIIコードで指定。",
+        "ja": "ASCIIコードで指定",
         "en": "Identifies the product using ASCII code."
       },
       "data": {
@@ -51,11 +51,43 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "ASCIIコードで指定。",
+        "ja": "ASCIIコードで指定",
         "en": "This property indicates the production number using ASCII code."
       },
       "data": {
         "$ref": "#/definitions/raw_12"
+      }
+    },
+    {
+      "epc": "0x98",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "現在年月日設定",
+        "en": "Current date setting"
+      },
+      "shortName": "currentDateAndTime",
+      "accessRule": {
+        "get": "required_c",
+        "set": "optional",
+        "inf": "optional"
+      },
+      "descriptions": {
+        "ja": "現在年月日YYYY:MM:DD",
+        "en": "Current date (YYYY:MM:DD)"
+      },
+      "data": {
+        "type": "date"
+      },
+      "remark": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      },
+      "note": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
       }
     },
     {
@@ -75,7 +107,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "周波数制御における電力の制御ポイントを示す。",
+        "ja": "周波数制御における電力の制御ポイントを示す",
         "en": "This property indicates the power control point for frequency regulation."
       },
       "data": {
@@ -118,7 +150,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "周波数制御モードと無通信監視タイマを設定する。",
+        "ja": "周波数制御モードと無通信監視タイマを設定する",
         "en": "This property indicates the frequency regulation mode and no-communication watchdog timer."
       },
       "data": {
@@ -127,7 +159,7 @@
           {
             "elementName": {
               "ja": "周波数制御モード",
-              "en": "frequency regulation mode"
+              "en": "Frequency regulation mode"
             },
             "shortName": "frequencyRegulationMode",
             "element": {
@@ -206,12 +238,12 @@
         ]
       },
       "remark": {
-        "ja": "周波数制御モードと周波数制御情報は指令制御、自端制御の何れかおよび、EM目標値制御の搭載を必須とする。",
-        "en": "Frequency regulation mode in \"Frequency regulation parameter setting\" property and \"Information of frequency regulation\" property are required to install \"EM target value control\" and either \"command control\" or \"autonomous control\"."
+        "ja": "周波数制御パラメータ設定の周波数制御モードと周波数制御情報の周波数制御状態は、指令制御、自端制御の何れかおよび、EM 目標値制御の搭載を必須とし、周波数制御情報の周波数調整サービスへの参加可否は、指令制御、自端制御、指令制御＋自端制御の何れかおよび、EM 目標値制御の搭載を必須とする",
+        "en": "Frequency regulation mode of 'frequency regulation parameter setting' and frequency regulation state of 'information of frequency regulation' are required to install either 'command control' or 'autonomous control', and 'EM target value control'. Also, frequency regulation service is possible or not possible of 'Information of frequency regulation' is required to install either 'command control' or 'autonomous control' or 'command control and autonomous control', and 'EM target value control'."
       },
       "note": {
-        "ja": "周波数制御モードと周波数制御情報は指令制御、自端制御の何れかおよび、EM目標値制御の搭載を必須とする。",
-        "en": "Frequency regulation mode in \"Frequency regulation parameter setting\" property and \"Information of frequency regulation\" property are required to install \"EM target value control\" and either \"command control\" or \"autonomous control\"."
+        "ja": "周波数制御パラメータ設定の周波数制御モードと周波数制御情報の周波数制御状態は、指令制御、自端制御の何れかおよび、EM 目標値制御の搭載を必須とし、周波数制御情報の周波数調整サービスへの参加可否は、指令制御、自端制御、指令制御＋自端制御の何れかおよび、EM 目標値制御の搭載を必須とする",
+        "en": "Frequency regulation mode of 'frequency regulation parameter setting' and frequency regulation state of 'information of frequency regulation' are required to install either 'command control' or 'autonomous control', and 'EM target value control'. Also, frequency regulation service is possible or not possible of 'Information of frequency regulation' is required to install either 'command control' or 'autonomous control' or 'command control and autonomous control', and 'EM target value control'."
       }
     },
     {
@@ -231,7 +263,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "EM目標値制御における制御ポイントの基準電力を設定する。",
+        "ja": "EM目標値制御における制御ポイントの基準電力を設定する",
         "en": "This property indicates the reference power of EM target value control at control point."
       },
       "data": {
@@ -255,7 +287,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける指令制御用のパラメータを設定する。",
+        "ja": "制御ポイントにおける指令制御用のパラメータを設定する",
         "en": "This property indicates the command control parameter at control point."
       },
       "data": {
@@ -284,11 +316,11 @@
         ]
       },
       "remark": {
-        "ja": "指令制御機能を有する機器は搭載を必須とする。",
+        "ja": "指令制御機能を有する機器は搭載を必須とする",
         "en": "Devices with command control functions are mandatory."
       },
       "note": {
-        "ja": "指令制御機能を有する機器は搭載を必須とする。",
+        "ja": "指令制御機能を有する機器は搭載を必須とする",
         "en": "Devices with command control functions are mandatory."
       }
     },
@@ -309,7 +341,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける自端制御のパラメータ1を設定する。",
+        "ja": "制御ポイントにおける自端制御のパラメータ1を設定する",
         "en": "This property indicates the autonomous control parameter 1 at control point."
       },
       "data": {
@@ -380,7 +412,7 @@
               "ja": "異常周波数偏差閾値(mHz)",
               "en": "Abnormal frequency deviation threshold (mHz)"
             },
-            "shortName": "abnormalFrequencyDeviationThreshold (mHz)",
+            "shortName": "abnormalFrequencyDeviationThreshold",
             "element": {
               "$ref": "#/definitions/number_unsigned_0-1000mHz"
             }
@@ -413,7 +445,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける自端制御パラメータ2を設定する。",
+        "ja": "制御ポイントにおける自端制御パラメータ2を設定する",
         "en": "This property indicates the autonomous control parameter 2 at control point."
       },
       "data": {
@@ -499,7 +531,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける自端制御のパラメータ3を設定する。",
+        "ja": "制御ポイントにおける自端制御のパラメータ3を設定する",
         "en": "This property indicates the autonomous control parameter 3 at control point."
       },
       "data": {
@@ -551,11 +583,359 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "基準周波数補正値を設定する。",
+        "ja": "基準周波数補正値を設定する",
         "en": "This property indicates the correction value for reference frequency."
       },
       "data": {
         "$ref": "#/definitions/number_signed_-100-100mHz"
+      }
+    },
+    {
+      "epc": "0xC8",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "周波数制御優先設定",
+        "en": "Frequency regulation priority setting"
+      },
+      "shortName": "frequencyRegulationPrioritized",
+      "accessRule": {
+        "get": "required",
+        "set": "optional",
+        "inf": "optional"
+      },
+      "descriptions": {
+        "ja": "周波数制御優先のON／OFFを示す",
+        "en": "This property indicates the frequency regulation priority ON/OFF status."
+      },
+      "data": {
+        "$ref": "#/definitions/state_ON-OFF_3031"
+      }
+    },
+    {
+      "epc": "0xC9",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "現在時分秒設定",
+        "en": "Current hour, minute and second setting"
+      },
+      "shortName": "currentTime",
+      "accessRule": {
+        "get": "required_c",
+        "set": "optional",
+        "inf": "optional"
+      },
+      "descriptions": {
+        "ja": "現在時刻HH:MM:SS",
+        "en": "Current time (hh:mm:ss)"
+      },
+      "data": {
+        "type": "time"
+      },
+      "remark": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      },
+      "note": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      }
+    },
+    {
+      "epc": "0xCA",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "時刻同期状態",
+        "en": "Time synchronization status"
+      },
+      "shortName": "timeSynchronizationStatus",
+      "accessRule": {
+        "get": "required",
+        "set": "notApplicable",
+        "inf": "optional"
+      },
+      "descriptions": {
+        "ja": "NTP サーバ等との時刻同期の状態を示す",
+        "en": "This property indicates the status of time synchronization with NTP servers, etc."
+      },
+      "data": {
+        "type": "state",
+        "size": 1,
+        "enum": [
+          {
+            "edt": "0x00",
+            "name": "noSynch",
+            "descriptions": {
+              "ja": "時刻同期なし",
+              "en": "No time synchronization"
+            }
+          },
+          {
+            "edt": "0x01",
+            "name": "success",
+            "descriptions": {
+              "ja": "時刻同期成功",
+              "en": "Time synchronization successful"
+            }
+          },
+          {
+            "edt": "0x02",
+            "name": "fail",
+            "descriptions": {
+              "ja": "時刻同期失敗",
+              "en": "Time synchronization failed"
+            }
+          },
+          {
+            "edt": "0xFF",
+            "name": "notImplemented",
+            "descriptions": {
+              "ja": "時刻同期機能未搭載",
+              "en": "Time synchronization function not implemented"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "epc": "0xCB",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "瞬時電力計測値履歴蓄積情報",
+        "en": "Instantaneous power measurement value history Information"
+      },
+      "shortName": "instantaneousPowerHistoryInfo",
+      "accessRule": {
+        "get": "required_c",
+        "set": "notApplicable",
+        "inf": "optional"
+      },
+      "descriptions": {
+        "ja": "現在の履歴蓄積件数と履歴蓄積可能件数、蓄積履歴の最古日時、最新日時を示す",
+        "en": "This property indicates the number of history entries stored and the oldest and latest dates and times of the stored history."
+      },
+      "data": {
+        "type": "object",
+        "properties": [
+          {
+            "elementName": {
+              "ja": "履歴蓄積件数",
+              "en": "The number of history entries stored"
+            },
+            "shortName": "numberOfStoredEntries",
+            "element": {
+              "$ref": "#/definitions/number_0-65535"
+            }
+          },
+          {
+            "elementName": {
+              "ja": "履歴蓄積可能件数",
+              "en": "The number of total history entries"
+            },
+            "shortName": "numberOfTotalEntries",
+            "element": {
+              "$ref": "#/definitions/number_0-65535"
+            }
+          },
+          {
+            "elementName": {
+              "ja": "履歴最古年月日時分",
+              "en": "The oldest history date and time"
+            },
+            "shortName": "oldestDateTime",
+            "element": {
+              "$ref": "#/definitions/date-time_6"
+            }
+          },
+          {
+            "elementName": {
+              "ja": "履歴最新年月日時分",
+              "en": "The latest history date and time"
+            },
+            "shortName": "latestDateTime",
+            "element": {
+              "$ref": "#/definitions/date-time_6"
+            }
+          }
+        ]
+      },
+      "remark": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      },
+      "note": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      }
+    },
+    {
+      "epc": "0xCC",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "瞬時電力計測値履歴蓄積設定",
+        "en": "Instantaneous power measurement value history storage setting"
+      },
+      "shortName": "instantaneousPowerHistoryEnabled",
+      "accessRule": {
+        "get": "required_c",
+        "set": "required_c",
+        "inf": "optional"
+      },
+      "descriptions": {
+        "ja": "瞬時電力計測値の履歴蓄積機能の有効／無効を設定し取得する",
+        "en": "This property indicates the enable or disable of the history storage function for instantaneous power measurement values."
+      },
+      "data": {
+        "$ref": "#/definitions/state_ON-OFF_3031"
+      },
+      "remark": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      },
+      "note": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      }
+    },
+    {
+      "epc": "0xCD",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "瞬時電力計測値履歴取得日時",
+        "en": "Date and time when the history of measured instantaneous power measurements is to be acquired"
+      },
+      "shortName": "dateTimeforInstantaneousPowerHistory",
+      "accessRule": {
+        "get": "required_c",
+        "set": "required_c",
+        "inf": "optional"
+      },
+      "descriptions": {
+        "ja": "瞬時電力計測値履歴を取得する日時をYYYYMMDDhhmm形式で示す",
+        "en": "This property indicates the date and time when the historical data of instantaneous power measurements is acquired in the YYYYMMDDhhmm format."
+      },
+      "data": {
+        "$ref": "#/definitions/date-time_6"
+      },
+      "remark": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      },
+      "note": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      }
+    },
+    {
+      "epc": "0xCE",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "瞬時電力計測値履歴",
+        "en": "Historical data of instantaneous power measurement"
+      },
+      "shortName": "instantaneousPowerLog",
+      "accessRule": {
+        "get": "required_c",
+        "set": "notApplicable",
+        "inf": "optional"
+      },
+      "atomic": "0xCD",
+      "descriptions": {
+        "ja": "計測年月日時分と計測年月日時分における0 秒から59 秒までの各秒の制御ポイントにおける瞬時電力計測値を時系列順に上位からプロパティ値として示す",
+        "en": "This property indicates the measurement date, time, and minute, and the instantaneous power measurement value at each control point from 0 seconds to 59 seconds in chronological order from the top byte."
+      },
+      "data": {
+        "type": "object",
+        "properties": [
+          {
+            "elementName": {
+              "ja": "計測年月日時分",
+              "en": "Date and time of measurement"
+            },
+            "shortName": "dateTime",
+            "element": {
+              "$ref": "#/definitions/date-time_6"
+            }
+          },
+          {
+            "elementName": {
+              "ja": "計測電力値",
+              "en": "Measured power"
+            },
+            "shortName": "measuredPower",
+            "element": {
+              "type": "array",
+              "itemSize": 4,
+              "minItems": 60,
+              "maxItems": 60,
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/number_-999999999-999999999W"
+                  },
+                  {
+                    "type": "state",
+                    "size": 4,
+                    "enum": [
+                      {
+                        "edt": "0x7FFFFFFE",
+                        "name": "noData",
+                        "descriptions": {
+                          "ja": "計測データなし",
+                          "en": "No measurement data"
+                        }
+                      },
+                      {
+                        "edt": "0x80000000",
+                        "name": "underflow",
+                        "descriptions": {
+                          "ja": "アンダーフロー",
+                          "en": "Underflow"
+                        }
+                      },
+                      {
+                        "edt": "0x7FFFFFFF",
+                        "name": "overflow",
+                        "descriptions": {
+                          "ja": "オーバフロー",
+                          "en": "Overflow"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "remark": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      },
+      "note": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする。クエリパラメータは履歴取得日時",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property. Query parameter is the date and time when the historical data of instantaneous power measurements is acquired."
       }
     },
     {
@@ -575,11 +955,11 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "送受信可能周期(10msec)を示す。",
-        "en": "This property indicates the transmittable/receivable cycle (10msec)"
+        "ja": "送受信可能周期(10msec)を示す",
+        "en": "This property indicates the transmittable/receivable cycle (10msec)."
       },
       "data": {
-        "$ref": "#/definitions/number_0-65535_10ms"
+        "$ref": "#/definitions/number_0-2000_10ms"
       }
     },
     {
@@ -599,7 +979,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "周波数制御対象の機器のクラスグループコード、クラスコードを示す。",
+        "ja": "周波数制御対象の機器のクラスグループコード、クラスコードを示す",
         "en": "This property indicates the class group code and the class code of device for frequency regulation."
       },
       "data": {
@@ -627,7 +1007,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "機器点における機器の最大入出力電力を示す。",
+        "ja": "機器点における機器の最大入出力電力を示す",
         "en": "This property indicates the values of device maximum power at device point."
       },
       "data": {
@@ -673,7 +1053,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "電力会社との受電点契約電力値を示す。",
+        "ja": "電力会社との受電点契約電力値を示す",
         "en": "This property indicates the value of contract power at power receiving point."
       },
       "data": {
@@ -697,7 +1077,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "機器点における機器の制御性能を示すパラメータを示す。",
+        "ja": "機器点における機器の制御性能を示すパラメータを示す",
         "en": "This property indicates the device control performance parameters at device point."
       },
       "data": {
@@ -766,11 +1146,11 @@
         ]
       },
       "remark": {
-        "ja": "自端制御機能を有する機器は搭載を必須とする。",
+        "ja": "自端制御機能を有する機器は搭載を必須とする",
         "en": "Devices with autonomous control functions are mandatory."
       },
       "note": {
-        "ja": "自端制御機能を有する機器は搭載を必須とする。",
+        "ja": "自端制御機能を有する機器は搭載を必須とする",
         "en": "Devices with autonomous control functions are mandatory."
       }
     },
@@ -791,7 +1171,7 @@
         "inf": "required"
       },
       "descriptions": {
-        "ja": "周波数調整サービスに関する機能の有無と現在の周波数制御状態を示す。",
+        "ja": "周波数調整サービスに関する機能の有無と現在の周波数制御状態を示す",
         "en": "This property indicates the presence or absence of frequency regulation service function and current frequency regulation status."
       },
       "data": {
@@ -800,7 +1180,7 @@
           {
             "elementName": {
               "ja": "周波数調整サービスへの参加可否",
-              "en": "Possibility to participate in the frequency regulation service."
+              "en": "Possibility to participate in the frequency regulation service"
             },
             "shortName": "possibilityToParticipate",
             "element": {
@@ -869,7 +1249,7 @@
           {
             "elementName": {
               "ja": "周波数制御状態",
-              "en": "frequency regulation status."
+              "en": "Frequency regulation status"
             },
             "shortName": "frequencyRegulationStatus",
             "element": {
@@ -952,12 +1332,12 @@
         ]
       },
       "remark": {
-        "ja": "周波数制御モードと周波数制御情報は指令制御、自端制御の何れかおよび、EM 目標値制御の搭載を必須とする。",
-        "en": "Frequency regulation mode and frequency regulation state must be either command control or autonomous control, and EM target value control must be installed."
+        "ja": "周波数制御パラメータ設定の周波数制御モードと周波数制御情報の周波数制御状態は、指令制御、自端制御の何れかおよび、EM 目標値制御の搭載を必須とし、周波数制御情報の周波数調整サービスへの参加可否は、指令制御、自端制御、指令制御＋自端制御の何れかおよび、EM 目標値制御の搭載を必須とする",
+        "en": "Frequency regulation mode of 'frequency regulation parameter setting' and frequency regulation state of 'information of frequency regulation' are required to install either 'command control' or 'autonomous control', and 'EM target value control'. Also, frequency regulation service is possible or not possible of 'Information of frequency regulation' is required to install either 'command control' or 'autonomous control' or 'command control and autonomous control', and 'EM target value control'."
       },
       "note": {
-        "ja": "周波数制御モードと周波数制御情報は指令制御、自端制御の何れかおよび、EM 目標値制御の搭載を必須とする。",
-        "en": "Frequency regulation mode and frequency regulation state must be either command control or autonomous control, and EM target value control must be installed."
+        "ja": "周波数制御パラメータ設定の周波数制御モードと周波数制御情報の周波数制御状態は、指令制御、自端制御の何れかおよび、EM 目標値制御の搭載を必須とし、周波数制御情報の周波数調整サービスへの参加可否は、指令制御、自端制御、指令制御＋自端制御の何れかおよび、EM 目標値制御の搭載を必須とする",
+        "en": "Frequency regulation mode of 'frequency regulation parameter setting' and frequency regulation state of 'information of frequency regulation' are required to install either 'command control' or 'autonomous control', and 'EM target value control'. Also, frequency regulation service is possible or not possible of 'Information of frequency regulation' is required to install either 'command control' or 'autonomous control' or 'command control and autonomous control', and 'EM target value control'."
       }
     },
     {
@@ -977,15 +1357,19 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "周波数制御続行可否の詳細情報を示す。",
+        "ja": "周波数制御続行可否の詳細情報を示す",
         "en": "This property indicates the detailed information of whether the device can continue to control."
       },
       "data": {
         "$ref": "#/definitions/raw_2"
       },
+      "remark": {
+        "ja": "上位バイトは制御続行の可否状態を示し、下位バイトは制御制限や継続不可の詳細情報を示す。APPENDIXの「制御続行可否詳細情報プロパティ」詳細説明参照",
+        "en": "The upper byte indicates whether control can be continued or not. The lower byte indicates detailed information on control restrictions and continuation impossibility. Refer to '(18) Detailed information of whether the device can continue to control' in APPENDIX."
+      },
       "note": {
         "ja": "上位バイトは制御続行の可否状態を示し、下位バイトは制御制限や継続不可の詳細情報を示す。APPENDIXの「制御続行可否詳細情報プロパティ」詳細説明参照",
-        "en": "The upper byte indicates whether control can be continued or not. The lower byte indicates detailed information on control restrictions and continuation impossibility. Refer to \"(18) Detailed information of whether the device can continue to control\" in APPENDIX."
+        "en": "The upper byte indicates whether control can be continued or not. The lower byte indicates detailed information on control restrictions and continuation impossibility. Refer to '(18) Detailed information of whether the device can continue to control' in APPENDIX."
       }
     },
     {
@@ -1005,7 +1389,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "EM状態とピークカット閾値を示す。",
+        "ja": "EM状態とピークカット閾値を示す",
         "en": "This property indicates the EM service status and peak cut threshold."
       },
       "data": {
@@ -1031,7 +1415,7 @@
           {
             "elementName": {
               "ja": "充電終了時刻 (HH:MM)",
-              "en": "Charge end time in the HH:MM format."
+              "en": "Charge end time in the HH:MM format"
             },
             "shortName": "chargeEndTime",
             "element": {
@@ -1048,7 +1432,7 @@
           {
             "elementName": {
               "ja": "放電開始時刻 (HH:MM)",
-              "en": "Discharge start time in the HH:MM format."
+              "en": "Discharge start time in the HH:MM format"
             },
             "shortName": "dischargeStartTime",
             "element": {
@@ -1065,7 +1449,7 @@
           {
             "elementName": {
               "ja": "放電終了時刻 (HH:MM)",
-              "en": "Discharge end time in the HH:MM format."
+              "en": "Discharge end time in the HH:MM format"
             },
             "shortName": "dischargeEndTime",
             "element": {
@@ -1119,7 +1503,7 @@
           {
             "elementName": {
               "ja": "ピークカット電力量閾値(Wh)",
-              "en": "Peak cut electric energy threshold. (Wh)"
+              "en": "Peak cut electric energy threshold (Wh)"
             },
             "shortName": "peakCutEnergyThreshold",
             "element": {
@@ -1136,7 +1520,7 @@
           {
             "elementName": {
               "ja": "PV余剰充電有無",
-              "en": "Existence of PV surplus charging."
+              "en": "Existence of PV surplus charging"
             },
             "shortName": "pvSurplusCharging",
             "element": {
@@ -1146,7 +1530,7 @@
           {
             "elementName": {
               "ja": "PV逆潮有無",
-              "en": "Existence of PV reverse power flow."
+              "en": "Existence of PV reverse power flow"
             },
             "shortName": "pvReversePowerFlow",
             "element": {
@@ -1156,7 +1540,7 @@
           {
             "elementName": {
               "ja": "押し上げ効果有無",
-              "en": "Existence of PCS push-up effect."
+              "en": "Existence of PCS push-up effect"
             },
             "shortName": "pcsPushUpEffect",
             "element": {
@@ -1178,12 +1562,12 @@
       },
       "shortName": "pcsMeasuredInstantaneousValue",
       "accessRule": {
-        "get": "required",
+        "get": "required_c",
         "set": "notApplicable",
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "PCSの瞬時計測値を示す。",
+        "ja": "PCSの瞬時計測値を示す",
         "en": "This property indicates the measured instantaneous values of PCS."
       },
       "data": {
@@ -1192,7 +1576,7 @@
           {
             "elementName": {
               "ja": "周波数計測値(mHz)",
-              "en": "Frequency measurement value. (mHz)"
+              "en": "Frequency measurement value (mHz)"
             },
             "shortName": "frequency",
             "element": {
@@ -1209,7 +1593,7 @@
           {
             "elementName": {
               "ja": "機器点瞬時電力計測値(W)",
-              "en": "Instantaneous power measurement value at device point. (W)"
+              "en": "Instantaneous power measurement value at device point (W)"
             },
             "shortName": "powerAtDevicePoint",
             "element": {
@@ -1219,7 +1603,7 @@
           {
             "elementName": {
               "ja": "受電点瞬時電力計測値(W)",
-              "en": "Instantaneous power measurement value at power receiving point. (W)"
+              "en": "Instantaneous power measurement value at power receiving point (W)"
             },
             "shortName": "powerAtReceivingPoint",
             "element": {
@@ -1236,11 +1620,11 @@
         ]
       },
       "remark": {
-        "ja": "受電点を制御ポイントとできる機器は、受電点瞬時電力計測値(W)の搭載を必須とし、無効値を許容しない。",
+        "ja": "受電点を制御ポイントとできる機器は、受電点瞬時電力計測値(W)の搭載を必須とし、無効値を許容しない",
         "en": "Devices that can use the power receiving point as a control point must implement the instantaneous power measurement value (W) at the power receiving point, and invalid are not allowed."
       },
       "note": {
-        "ja": "受電点を制御ポイントとできる機器は、受電点瞬時電力計測値(W)の搭載を必須とし、無効値を許容しない。",
+        "ja": "受電点を制御ポイントとできる機器は、受電点瞬時電力計測値(W)の搭載を必須とし、無効値を許容しない",
         "en": "Devices that can use the power receiving point as a control point must implement the instantaneous power measurement value (W) at the power receiving point, and invalid are not allowed."
       }
     },
@@ -1261,7 +1645,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントの瞬時電力値、各制御電力値、及び電力指令指示Noを示す。",
+        "ja": "制御ポイントの瞬時電力値、各制御電力値、及び電力指令指示Noを示す",
         "en": "This property indicates the instantaneous power measurement value, each control power value and command control instruction number at control point."
       },
       "data": {
@@ -1270,7 +1654,7 @@
           {
             "elementName": {
               "ja": "AC瞬時電力計測値(W)",
-              "en": "AC power measurement. (W)"
+              "en": "AC power measurement (W)"
             },
             "shortName": "acPower",
             "element": {
@@ -1280,7 +1664,7 @@
           {
             "elementName": {
               "ja": "EM制御電力値(W)",
-              "en": "Power value of EM control. (W)"
+              "en": "Power value of EM control (W)"
             },
             "shortName": "emControlPower",
             "element": {
@@ -1297,7 +1681,7 @@
           {
             "elementName": {
               "ja": "指令制御電力値(W)",
-              "en": "Power value of command control. (W)"
+              "en": "Power value of command control (W)"
             },
             "shortName": "commandControlPower",
             "element": {
@@ -1314,7 +1698,7 @@
           {
             "elementName": {
               "ja": "自端制御電力値(W)",
-              "en": "Power value of autonomous control. (W)"
+              "en": "Power value of autonomous control (W)"
             },
             "shortName": "autonomousControlPower",
             "element": {
@@ -1331,7 +1715,7 @@
           {
             "elementName": {
               "ja": "電力指令制御指示No.",
-              "en": "Command control instruction number."
+              "en": "Command control instruction number"
             },
             "shortName": "instructionNo",
             "element": {
@@ -1348,7 +1732,7 @@
           {
             "elementName": {
               "ja": "系統周波数偏差(mHz)",
-              "en": "Grid frequency deviation. (mHz)"
+              "en": "Grid frequency deviation (mHz)"
             },
             "shortName": "frequencyDeviation",
             "element": {
@@ -1358,11 +1742,11 @@
         ]
       },
       "remark": {
-        "ja": "当該する制御を行っていない場合は無効値とする。",
+        "ja": "当該する制御を行っていない場合は無効値とする",
         "en": "If the relevant control is not performed, the value is invalid."
       },
       "note": {
-        "ja": "当該する制御を行っていない場合は無効値とする。",
+        "ja": "当該する制御を行っていない場合は無効値とする",
         "en": "If the relevant control is not performed, the value is invalid."
       }
     },
@@ -1383,7 +1767,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "機器の入出力可能電力値（機器点）を示す。",
+        "ja": "機器の入出力可能電力値(機器点)を示す",
         "en": "This property indicates the input and output power capability values at device point."
       },
       "data": {
@@ -1392,7 +1776,7 @@
           {
             "elementName": {
               "ja": "瞬時入力可能電力値(W)",
-              "en": "Instantaneous input power capability value."
+              "en": "Instantaneous input power capability value"
             },
             "shortName": "input",
             "element": {
@@ -1402,7 +1786,7 @@
           {
             "elementName": {
               "ja": "瞬時出力可能電力値(W)",
-              "en": "Instantaneous output power capability value."
+              "en": "Instantaneous output power capability value"
             },
             "shortName": "output",
             "element": {
@@ -1429,8 +1813,8 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "充放電可能電力値(DC値)を示す。",
-        "en": "This property indicates the chargeable and dischargeable power value. (DC value)"
+        "ja": "充放電可能電力値(DC値)を示す",
+        "en": "This property indicates the chargeable and dischargeable power value (DC value)."
       },
       "data": {
         "type": "object",
@@ -1438,7 +1822,7 @@
           {
             "elementName": {
               "ja": "瞬時充電可能電力値(W)",
-              "en": "Instantaneous chargeable power value. (W)"
+              "en": "Instantaneous chargeable power value (W)"
             },
             "shortName": "chargeablePower",
             "element": {
@@ -1448,7 +1832,7 @@
           {
             "elementName": {
               "ja": "瞬時放電可能電力値(W)",
-              "en": "Instantaneous dischargeable power value. (W)"
+              "en": "Instantaneous dischargeable power value (W)"
             },
             "shortName": "dischargeablePower",
             "element": {
@@ -1475,7 +1859,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "現時点での蓄電池の状態を示す。",
+        "ja": "現時点での蓄電池の状態を示す",
         "en": "This property indicates the current battery status."
       },
       "data": {
@@ -1484,7 +1868,7 @@
           {
             "elementName": {
               "ja": "充電可能電力量(Wh)",
-              "en": "Chargeable electric energy value. (AC value) (Wh)"
+              "en": "Chargeable electric energy value (AC value) (Wh)"
             },
             "shortName": "chargeableEnergy",
             "element": {
@@ -1494,7 +1878,7 @@
           {
             "elementName": {
               "ja": "放電可能電力量(Wh)",
-              "en": "Dischargeable electric energy value. (AC value) (Wh)"
+              "en": "Dischargeable electric energy value (AC value) (Wh)"
             },
             "shortName": "dischargeableEnergy",
             "element": {
@@ -1504,7 +1888,7 @@
           {
             "elementName": {
               "ja": "蓄電残量(DC値)(Wh)",
-              "en": "Remaining stored electricity. (DC value) (Wh)"
+              "en": "Remaining stored electricity (DC value) (Wh)"
             },
             "shortName": "storedEnergy",
             "element": {
@@ -1521,7 +1905,7 @@
           {
             "elementName": {
               "ja": "蓄電残量(%)",
-              "en": "Remaining stored electricity. (State of charge) (%)"
+              "en": "Remaining stored electricity (State of charge) (%)"
             },
             "shortName": "storedEnergyPercent",
             "element": {
@@ -1538,7 +1922,7 @@
           {
             "elementName": {
               "ja": "劣化状態(健康状態)(%)",
-              "en": "State of Health. (%)"
+              "en": "State of Health (%)"
             },
             "shortName": "healthState",
             "element": {
@@ -1555,11 +1939,11 @@
         ]
       },
       "remark": {
-        "ja": "充電可能電力量(Wh) 、放電可能電力量(Wh) の搭載を必須とする。また、蓄電残量(DC Wh) と蓄電残量(%) の何れかの搭載を必須とする。なお、非搭載の値は無効値とする。",
+        "ja": "充電可能電力量(Wh) 、放電可能電力量(Wh) の搭載を必須とする。また、蓄電残量(DC Wh) と蓄電残量(%) の何れかの搭載を必須とする。なお、非搭載の値は無効値とする",
         "en": "It is mandatory to implement chargeable power (Wh) and dischargeable power (Wh). In addition, it is mandatory to implement either the remaining stored electricity (DC Wh) or the state of charge (%). And non-implemented values should be treated as invalid values."
       },
       "note": {
-        "ja": "充電可能電力量(Wh) 、放電可能電力量(Wh) の搭載を必須とする。また、蓄電残量(DC Wh) と蓄電残量(%) の何れかの搭載を必須とする。なお、非搭載の値は無効値とする。",
+        "ja": "充電可能電力量(Wh) 、放電可能電力量(Wh) の搭載を必須とする。また、蓄電残量(DC Wh) と蓄電残量(%) の何れかの搭載を必須とする。なお、非搭載の値は無効値とする",
         "en": "It is mandatory to implement chargeable power (Wh) and dischargeable power (Wh). In addition, it is mandatory to implement either the remaining stored electricity (DC Wh) or the state of charge (%). And non-implemented values should be treated as invalid values."
       }
     },
@@ -1580,8 +1964,8 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "各種積算電力量計測値を示す。",
-        "en": "This property indicates the various cumulative electric energy measurement values"
+        "ja": "各種積算電力量計測値を示す",
+        "en": "This property indicates the various cumulative electric energy measurement values."
       },
       "data": {
         "type": "object",
@@ -1589,7 +1973,7 @@
           {
             "elementName": {
               "ja": "積算入力電力量計測値(機器点順方向 Wh)",
-              "en": "Measured cumulative amount of input electric energy for PCS. (Normal direction at device point) (Wh)"
+              "en": "Measured cumulative amount of input electric energy for PCS (Normal direction at device point) (Wh)"
             },
             "shortName": "inputEnergyAtDevicePoint",
             "element": {
@@ -1599,7 +1983,7 @@
           {
             "elementName": {
               "ja": "積算出力電力量計測値(機器点逆方向 Wh)",
-              "en": "Measured cumulative amount of output electric energy by PCS. (Reverse direction at device point) (Wh)"
+              "en": "Measured cumulative amount of output electric energy by PCS (Reverse direction at device point) (Wh)"
             },
             "shortName": "outputEnergyAtDevicePoint",
             "element": {
@@ -1609,7 +1993,7 @@
           {
             "elementName": {
               "ja": "積算系統買電電力量計測値(Wh)",
-              "en": "Measured cumulative amount of electric energy bought from grid. (Wh)"
+              "en": "Measured cumulative amount of electric energy bought from grid (Wh)"
             },
             "shortName": "boughtEnergy",
             "element": {
@@ -1626,7 +2010,7 @@
           {
             "elementName": {
               "ja": "積算系統売電電力量計測値(Wh)",
-              "en": "Measured cumulative amount of electric energy sold for grid. (Wh)"
+              "en": "Measured cumulative amount of electric energy sold for grid (Wh)"
             },
             "shortName": "soldEnergy",
             "element": {
@@ -1643,7 +2027,7 @@
           {
             "elementName": {
               "ja": "積算負荷電力量計測(Wh)",
-              "en": "Measured cumulative amount of load electric energy. (Wh)"
+              "en": "Measured cumulative amount of load electric energy (Wh)"
             },
             "shortName": "loadEnergy",
             "element": {
@@ -1660,7 +2044,7 @@
           {
             "elementName": {
               "ja": "積算太陽光発電電力量計測値(DC Wh)",
-              "en": "Measured cumulative amount of electric energy by PV. (DC value) (Wh)"
+              "en": "Measured cumulative amount of electric energy by PV (DC value) (Wh)"
             },
             "shortName": "pvEnergy",
             "element": {
@@ -1677,7 +2061,7 @@
           {
             "elementName": {
               "ja": "積算充電電力量計測値(DC Wh)",
-              "en": "Measured cumulative amount of charge electric energy to battery. (DC value) (Wh)"
+              "en": "Measured cumulative amount of charge electric energy to battery (DC value) (Wh)"
             },
             "shortName": "chargeEnergy",
             "element": {
@@ -1694,7 +2078,7 @@
           {
             "elementName": {
               "ja": "積算放電電力量計測値(DC Wh)",
-              "en": "Measured cumulative amount of discharge electric energy from battery. (DC value) (Wh)"
+              "en": "Measured cumulative amount of discharge electric energy from battery (DC value) (Wh)"
             },
             "shortName": "dischargeEnergy",
             "element": {
@@ -1711,11 +2095,11 @@
         ]
       },
       "remark": {
-        "ja": "積算入力電力量計測値（機器点順方向 Wh）、積算出力電力量計測値（機器点逆方向 Wh）の搭載を必須とし、非搭載の値は無効値とする。また、受電点を制御ポイントとできる機器は積算系統買電電力量計測値(Wh)、積算系統売電電力量計測値(Wh)の搭載を推奨する。",
+        "ja": "積算入力電力量計測値(機器点順方向 Wh)、積算出力電力量計測値(機器点逆方向 Wh)の搭載を必須とし、非搭載の値は無効値とする。また、受電点を制御ポイントとできる機器は積算系統買電電力量計測値(Wh)、積算系統売電電力量計測値(Wh)の搭載を推奨する",
         "en": "It is mandatory to install the measured cumulative amount of input electric energy (normal direction at device point) (Wh) and the measured cumulative amount of output electric energy (reverse direction at device point) (Wh).In addition, it is recommended that devices that can use the power receiving point as a control point should be equipped with the measured cumulative amount of electric energy bought from grid (Wh) and the measured cumulative amount of electric energy sold to grid (Wh)."
       },
       "note": {
-        "ja": "積算入力電力量計測値（機器点順方向 Wh）、積算出力電力量計測値（機器点逆方向 Wh）の搭載を必須とし、非搭載の値は無効値とする。また、受電点を制御ポイントとできる機器は積算系統買電電力量計測値(Wh)、積算系統売電電力量計測値(Wh)の搭載を推奨する。",
+        "ja": "積算入力電力量計測値(機器点順方向 Wh)、積算出力電力量計測値(機器点逆方向 Wh)の搭載を必須とし、非搭載の値は無効値とする。また、受電点を制御ポイントとできる機器は積算系統買電電力量計測値(Wh)、積算系統売電電力量計測値(Wh)の搭載を推奨する",
         "en": "It is mandatory to install the measured cumulative amount of input electric energy (normal direction at device point) (Wh) and the measured cumulative amount of output electric energy (reverse direction at device point) (Wh).In addition, it is recommended that devices that can use the power receiving point as a control point should be equipped with the measured cumulative amount of electric energy bought from grid (Wh) and the measured cumulative amount of electric energy sold to grid (Wh)."
       }
     },
@@ -1736,7 +2120,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける周波数制御に係る各種積算電力量計測値を示す。",
+        "ja": "制御ポイントにおける周波数制御に係る各種積算電力量計測値を示す",
         "en": "This property indicates the various cumulative electric energy measurement values by frequency regulation at control point."
       },
       "data": {
@@ -1824,7 +2208,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおけるEM計画のデータ数、開始日時を示す。",
+        "ja": "制御ポイントにおけるEM計画のデータ数、開始日時を示す",
         "en": "This property indicates the number of EM planned data and the start date and time at control point."
       },
       "data": {
@@ -1853,7 +2237,7 @@
           {
             "elementName": {
               "ja": "先頭データ月日 (MMDD)",
-              "en": "First data in the MMDD format."
+              "en": "First data in the MMDD format"
             },
             "shortName": "firstDataMmDd",
             "element": {
@@ -1885,7 +2269,7 @@
           {
             "elementName": {
               "ja": "先頭データ時分 (HHMM)",
-              "en": "Hour and minute of first data in the HHMM format."
+              "en": "Hour and minute of first data in the HHMM format"
             },
             "shortName": "firstDataHhMm",
             "element": {
@@ -1912,7 +2296,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "EMの計画電力値を示す。",
+        "ja": "EMの計画電力値を示す",
         "en": "This property indicates the planned power values of EM control."
       },
       "data": {
@@ -1942,7 +2326,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "EMの計画電力値を示す。",
+        "ja": "EMの計画電力値を示す",
         "en": "This property indicates the planned power values of EM control."
       },
       "data": {
@@ -1972,7 +2356,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける上げ調整力供出計画のデータ数と開始日時を示す。",
+        "ja": "制御ポイントにおける上げ調整力供出計画のデータ数と開始日時を示す",
         "en": "This property indicates the number of regulation up plan data and the start date and time."
       },
       "data": {
@@ -2001,7 +2385,7 @@
           {
             "elementName": {
               "ja": "先頭データ月日 (MMDD)",
-              "en": "First data in the MMDD format."
+              "en": "First data in the MMDD format"
             },
             "shortName": "firstDataMmDd",
             "element": {
@@ -2033,7 +2417,7 @@
           {
             "elementName": {
               "ja": "先頭データ時分 (HHMM)",
-              "en": "Hour and minute of first data in the HHMM format."
+              "en": "Hour and minute of first data in the HHMM format"
             },
             "shortName": "firstDataHhMm",
             "element": {
@@ -2060,7 +2444,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける上げ調整力供出の計画電力値を示す。",
+        "ja": "制御ポイントにおける上げ調整力供出の計画電力値を示す",
         "en": "This property indicates the regulation up of supply plan at control point."
       },
       "data": {
@@ -2090,7 +2474,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける上げ調整力供出の計画電力値を示す。",
+        "ja": "制御ポイントにおける上げ調整力供出の計画電力値を示す",
         "en": "This property indicates the regulation up of supply plan at control point."
       },
       "data": {
@@ -2120,7 +2504,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける下げ調整力供出計画のデータ数と開始日時を示す。",
+        "ja": "制御ポイントにおける下げ調整力供出計画のデータ数と開始日時を示す",
         "en": "This property indicates the regulation down of supply plan at control point."
       },
       "data": {
@@ -2149,7 +2533,7 @@
           {
             "elementName": {
               "ja": "先頭データ月日 (MMDD)",
-              "en": "First data in the MMDD format."
+              "en": "First data in the MMDD format"
             },
             "shortName": "firstDataMmDd",
             "element": {
@@ -2181,7 +2565,7 @@
           {
             "elementName": {
               "ja": "先頭データ時分 (HHMM)",
-              "en": "Hour and minute of first data in the HHMM format."
+              "en": "Hour and minute of first data in the HHMM format"
             },
             "shortName": "firstDataHhMm",
             "element": {
@@ -2208,7 +2592,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける下げ調整力供出の計画電力値を示す。",
+        "ja": "制御ポイントにおける下げ調整力供出の計画電力値を示す",
         "en": "This property indicates the regulation down of supply plan at control point."
       },
       "data": {
@@ -2238,7 +2622,7 @@
         "inf": "optional"
       },
       "descriptions": {
-        "ja": "制御ポイントにおける下げ調整力供出の計画電力値を示す。",
+        "ja": "制御ポイントにおける下げ調整力供出の計画電力値を示す",
         "en": "This property indicates the regulation down of supply plan at control point."
       },
       "data": {

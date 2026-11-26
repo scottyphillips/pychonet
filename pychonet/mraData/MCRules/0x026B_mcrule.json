@@ -1,0 +1,52 @@
+{
+  "eoj": "0x026B",
+  "properties": [
+    {
+      "epc": "0xFF",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "propertyName": {
+        "ja": "風呂沸き上がり完了状態",
+        "en": "Bath heating completion status"
+      },
+      "shortName": "bathHeatingCompletion",
+      "accessRule": {
+        "get": "optional",
+        "set": "notApplicable",
+        "inf": "required"
+      },
+      "descriptions": {
+        "ja": "風呂の沸き上がりが完了したか否かを示す。",
+        "en": "Indicates whether bath heating has been completed."
+      },
+      "data": {
+        "type": "state",
+        "size": 1,
+        "enum": [
+          {
+            "edt": "0x41",
+            "name": "true",
+            "descriptions": {
+              "ja": "完了",
+              "en": "Completed"
+            }
+          },
+          {
+            "edt": "0x42",
+            "name": "false",
+            "descriptions": {
+              "ja": "非完了",
+              "en": "Not completed"
+            }
+          }
+        ]
+      },
+      "note": {
+        "ja": "このプロパティの実装は任意である。風呂沸き上がりセンサのdetectionと同じ機能",
+        "en": "This property is optional to implement. This property provides the same functionality as the detection property of the bathHeatingStatusSensor."
+      }
+    }
+  ]
+}

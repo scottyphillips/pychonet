@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, ByteString
 from pychonet.lib.const import MANUFACTURERS
 
@@ -28,6 +29,12 @@ DICT_41_EMPTY_OR_NOT = {0x41: "not empty", 0x42: "empty"}
 DICT_30_TRUE_FALSE = {0x30: True, 0x31: False}
 DICT_30_ON_OFF = {0x30: DATA_STATE_ON, 0x31: DATA_STATE_OFF}
 DICT_30_OPEN_CLOSED = {0x30: DATA_STATE_OPEN, 0x31: DATA_STATE_CLOSE}
+TIME_SYNCHRONIZATION_STATUS = {
+    0x00: "no time synchronization",
+    0x01: "time synchronization successful",
+    0x02: "time synchronization failed",
+    0xFF: "time synchronization not implemented",
+}
 
 # Lighting type enums (used by CommercialShowcase, etc.)
 # EPC values with release I and later specifications
@@ -151,11 +158,30 @@ def _hh_mm(edt):  # basic time unit
     return f"{hh}:{mm}"
 
 
-def _yyyy_mm_dd(edt):  # basic year unit
-    yyyy = str(int.from_bytes(edt[0:4], "big")).zfill(4)
-    mm = str(int.from_bytes(edt[4:6], "big")).zfill(2)
-    dd = str(int.from_bytes(edt[6:8], "big")).zfill(2)
-    return f"{yyyy}:{mm}:{dd}"
+def _hh_mm_ss(edt):
+    if len(edt) != 3:
+        return None
+    hour, minute, second = edt
+    return f"{hour:02d}:{minute:02d}:{second:02d}"
+
+
+def _yyyy_mm_dd(edt):
+    if len(edt) != 4:
+        return None
+    year = _int(edt[:2])
+    month, day = edt[2:]
+    return f"{year:04d}:{month:02d}:{day:02d}"
+
+
+def _date_time(edt):
+    """Decode a four-byte date and a time in hours, minutes and optional seconds."""
+    if len(edt) not in (6, 7):
+        return None
+    try:
+        timestamp = datetime(_int(edt[:2]), *edt[2:])
+    except ValueError:
+        return None
+    return timestamp.isoformat(timespec="minutes" if len(edt) == 6 else "seconds")
 
 
 def _to_string(edt):
@@ -220,10 +246,14 @@ def _0089(edt):
             0x08: "Unknown (reserved for future use)",
             0x09: "User-definable domain",
         }
-        errcode = int.from_bytes(edt[0:1], "big")
-        err = err_dict.get(
-            int.from_bytes(edt[1:2], "big"), "Faults that require repair"
-        )
+        errcode, general_code = edt
+        fault_code = _int(edt)
+        if fault_code == 0x03E9:
+            err = "Repair location unknown"
+        elif fault_code == 0x03FF:
+            err = "Recovery method or fault location unknown"
+        else:
+            err = err_dict.get(general_code, "Faults that require repair")
     else:
         err = None
         errcode = None
@@ -264,6 +294,7 @@ EPC_SUPER_FUNCTIONS = {
     0x8C: _null_padded_optional_string,
     0x8F: [_int, DICT_41_ON_OFF],
     0x97: _hh_mm,
+    0x98: _yyyy_mm_dd,
     0x9A: _009A,
     0x9D: _009X,
     0x9E: _009X,

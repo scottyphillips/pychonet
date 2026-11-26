@@ -8,7 +8,7 @@ class MockECHONETAPIClient:
         # Raw byte values that simulate device responses
         # _hh_mm() format: hh = int(edt[0]), mm = str(int(edt[1])).zfill(2)
         # So b'\x00\x00' -> "0:00", b'\x05\x00' -> "5:00"
-        # DICT_30_OPEN_CLOSED: 0x30 = "open", 0x31 = "closed"
+        # Cover status uses 0x41 for open and 0x42 for closed.
         self._state = {
             "192.168.1.100": {
                 "instances": {
@@ -16,12 +16,12 @@ class MockECHONETAPIClient:
                         0xBB: {  # Class code for Rice Cooker
                             0x01: {
                                 0x80: b'\x31',  # Operation status: OFF (DICT_30_ON_OFF[0x31] = "off")
-                                0xB0: b'\x30',  # Cover status: Open (DICT_30_OPEN_CLOSED[0x30] = "open")
-                                0xB1: b'\x42',  # Rice cooking status: Cooking in progress
+                                0xB0: b'\x41',  # Cover open
+                                0xB1: b'\x43',  # Rice cooking in progress
                                 0xB2: b'\x41',  # Control setting: Start/Restart
                                 0xE1: b'\x42',  # Warmer setting: Off (DICT_41_ON_OFF[0x42] = "off")
-                                0xE5: b'\x41',  # Inner pot removal: Installed
-                                0xE6: b'\x41',  # Cover removal: Installed
+                                0xE5: b'\x41',  # Inner pot removed
+                                0xE6: b'\x42',  # Cover installed
                                 0x90: b'\x42',  # Reservation setting: Off (DICT_41_ON_OFF[0x42] = "off")
                                 0x91: b'\x00\x00',  # Reservation time: 0:00 (hh:mm format)
                                 0x92: b'\x00\x00',  # Reservation relative time: 0:00 (hh:mm format)
@@ -63,9 +63,9 @@ class TestRiceCooker(unittest.IsolatedAsyncioTestCase):
         rc = RiceCooker("192.168.1.100", api_connector)
 
         cover_status = await rc.getCoverStatus()
-        self.assertEqual(cover_status, b'\x30')  # Open (DICT_30_OPEN_CLOSED[0x30] = "open")
+        self.assertEqual(cover_status, b'\x41')
         status = await rc.update(0xB0)
-        expected = 'open'  # DICT_30_OPEN_CLOSED[0x30] = "open"
+        expected = 'open'
         self.assertEqual(status, expected)
 
     async def test_getRiceCookingStatus(self):
@@ -73,9 +73,9 @@ class TestRiceCooker(unittest.IsolatedAsyncioTestCase):
         rc = RiceCooker("192.168.1.100", api_connector)
 
         cooking_status = await rc.getRiceCookingStatus()
-        self.assertEqual(cooking_status, b'\x42')  # Cooking in progress
+        self.assertEqual(cooking_status, b'\x43')
         status = await rc.update(0xB1)
-        expected = 'Rice cooking in progress'  # DICT_30_ON_OFF[0x42] = 'Rice cooking in progress'
+        expected = 'Rice cooking in progress'
         self.assertEqual(status, expected)
 
     async def test_getRiceCookingControlSetting(self):
@@ -117,9 +117,9 @@ class TestRiceCooker(unittest.IsolatedAsyncioTestCase):
         rc = RiceCooker("192.168.1.100", api_connector)
 
         inner_pot_status = await rc.getInnerPotRemovalStatus()
-        self.assertEqual(inner_pot_status, b'\x41')  # Installed
+        self.assertEqual(inner_pot_status, b'\x41')
         status = await rc.update(0xE5)
-        expected = 'Installed'  # {0x41: "Installed", 0x42: "Removed"}
+        expected = 'Removed'
         self.assertEqual(status, expected)
 
     async def test_getCoverRemovalStatus(self):
@@ -127,9 +127,9 @@ class TestRiceCooker(unittest.IsolatedAsyncioTestCase):
         rc = RiceCooker("192.168.1.100", api_connector)
 
         cover_removal_status = await rc.getCoverRemovalStatus()
-        self.assertEqual(cover_removal_status, b'\x41')  # Installed
+        self.assertEqual(cover_removal_status, b'\x42')
         status = await rc.update(0xE6)
-        expected = 'Installed'  # {0x41: "Installed", 0x42: "Removed"}
+        expected = 'Installed'
         self.assertEqual(status, expected)
 
     async def test_getRiceCookingReservationSetting(self):

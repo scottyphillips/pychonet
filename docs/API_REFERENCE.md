@@ -81,18 +81,18 @@ async def getMessage(self, epc: int, pdc: int = 0x00) -> bytes
 
 **Returns:** Raw bytes (EDT payload) or False on failure
 
-#### `setMessage(epc, edt, pdc=0x01)`
-Fire a single ECHONET SET request. Requires byte values.
+#### `setMessage(epc, edt, pdc=None)`
+Fire a single ECHONET SET request.
 
 ```python
-async def setMessage(self, epc: int, edt: int, pdc: int = 0x01) -> bool
+async def setMessage(self, epc: int, edt: int | bytes, pdc: int | None = None) -> bool
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `epc` | int | EPC (Property) byte code to set |
-| `edt` | int | EDT (Expected Data Type) byte value |
-| `pdc` | int | PDC value, default 0x01 |
+| `edt` | int, bytes, or bytearray | EDT (property value data) to send |
+| `pdc` | int or None | Byte count. The default uses the payload length for bytes and one byte for integers. |
 
 **Returns:** True if successful, False otherwise
 
@@ -105,9 +105,12 @@ async def setMessages(self, opc: list) -> bool
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `opc` | list | List of dicts with 'EPC', 'PDC', 'EDT' keys |
+| `opc` | list | List of dictionaries with `EPC` and `EDT` keys and an optional `PDC` byte count |
 
-**Returns:** True if successful, False otherwise
+The client checks the entire batch against the device's available Set property
+map before sending. The operation returns `True` when the device confirms
+every requested property. A partial response updates the confirmed values
+in the cache and returns `False`.
 
 #### `update(attributes=None, no_request=False)`
 Request multiple properties and invoke EPC_FUNCTIONS for processing.
@@ -124,7 +127,7 @@ async def update(self, attributes: list = None, no_request: bool = False) -> dic
 **Returns:** 
 - Single value if one attribute requested and processed
 - Dict mapping EPC codes to values: `{epc: processed_value_or_hex}`
-- Raw hex bytes for EPCs without defined functions
+- A hexadecimal string for each raw EPC value
 
 #### `getSetProperties()`
 Get the settable properties map (EPC 0x9E).

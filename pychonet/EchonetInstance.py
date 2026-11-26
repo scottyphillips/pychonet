@@ -14,7 +14,7 @@ from pychonet.lib.const import (
     GET,
     SETC,
 )
-from pychonet.lib.epc import EPC_CODE, EPC_SUPER
+from pychonet.lib.epc import EPC_SUPER
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
 
 
@@ -31,18 +31,10 @@ def call_epc_function(
     Returns:
         The result of calling the function
     """
-    if type(epc_function) == list:
-        if list(epc_function) == 3:
-            data = epc_function[0](
-                edt,
-                epc_function[1],
-                epc_function[2],
-            )
-        else:
-            data = epc_function[0](edt, epc_function[1])
-    else:
-        data = epc_function(edt)
-    return data
+    if isinstance(epc_function, list):
+        function, *arguments = epc_function
+        return function(edt, *arguments)
+    return epc_function(edt)
 
 
 """
@@ -119,17 +111,19 @@ class EchonetInstance:
     :return: True if sucessful, false if request message failed
     """
 
-    async def setMessage(self, epc: int, edt: Any, pdc: int = 1) -> bool:
+    async def setMessage(self, epc: int, edt: Any, pdc: Optional[int] = None) -> bool:
         """Set a property value on the device.
 
         Args:
             epc: EPC byte code for the request
             edt: EDT data relevant to the request
-            pdc: Property Data Count (default: 1)
+            pdc: Property Data Count (defaults to the byte-string length or 1 for integers)
 
         Returns:
             True if successful, False if request failed
         """
+        if pdc is None:
+            pdc = len(edt) if isinstance(edt, (bytes, bytearray)) else 1
         opc = [{"EPC": epc, "PDC": pdc, "EDT": edt}]
         response = await self._api.echonetMessage(
             self._host, self._eojgc, self._eojcc, self._eojci, SETC, opc
@@ -195,102 +189,43 @@ class EchonetInstance:
         Returns:
             Dictionary with property values, or None if no attributes specified
         """
-        opc: List[Dict[str, Any]] = []
         if attributes is None:
             attributes = self.getGetProperties()
         if isinstance(attributes, int):
-            list_attributes = [attributes]
-            attributes = list_attributes
-        returned_json_data: Dict[int, Any] = {}
-        if no_request:
-            response = True
-        else:
-            for value in attributes:
-                if value in self.getGetProperties():
-                    opc.append({"EPC": value})
-            self._api._logger(f"Updating instance {self._eojgc}/{self._eojcc}/{self._eojci} with attributes {opc}")
-            response = await self._api.echonetMessage(
-                self._host, self._eojgc, self._eojcc, self._eojci, GET, opc
-            )
-        if response is not False:
-            for epc in attributes:
-                if epc not in list(
-                    self._api._state[self._host]["instances"][self._eojgc][self._eojcc][
-                        self._eojci
-                    ].keys()
-                ):
-                    returned_json_data.update({epc: None})
-                    continue
-                elif epc in list(
-                    EPC_SUPER_FUNCTIONS.keys()
-                ):  # check if function is defined in the superset
-                    returned_json_data.update(
-                        {
-                            epc: call_epc_function(
-                                EPC_SUPER_FUNCTIONS[epc],
-                                self._api._state[self._host]["instances"][self._eojgc][
-                                    self._eojcc
-                                ][self._eojci][epc],
-                            )
-                        }
-                    )
-                    continue
-                elif epc in list(
-                    EPC_SUPER.keys()
-                ):  # return hex value if code exists in superset but no function found
-                    returned_json_data.update(
-                        {
-                            epc: self._api._state[self._host]["instances"][self._eojgc][
-                                self._eojcc
-                            ][self._eojci][epc].hex()
-                        }
-                    )
-                    continue
-                elif epc in list(
-                    self.EPC_FUNCTIONS.keys()
-                ):  # check the class-specific EPC function table.
-                    returned_json_data.update(
-                        {
-                            epc: call_epc_function(
-                                self.EPC_FUNCTIONS[epc],
-                                self._api._state[self._host]["instances"][self._eojgc][
-                                    self._eojcc
-                                ][self._eojci][epc],
-                            )
-                        }
-                    )
-                    # returned_json_data.update(
-                    #     {
-                    #         epc: self.EPC_FUNCTIONS[epc](
-                    #             self._api._state[self._host]["instances"][self._eojgc][
-                    #                 self._eojcc
-                    #             ][self._eojci][epc]
-                    #         )
-                    #     }
-                    # )
-                    continue
-                elif epc in list(
-                    EPC_CODE[self._eojgc][self._eojcc].keys()
-                ):  # return hex value if EPC code exists in class but no function found
-                    returned_json_data.update(
-                        {
-                            epc: self._api._state[self._host]["instances"][self._eojgc][
-                                self._eojcc
-                            ][self._eojci][epc].hex()
-                        }
-                    )
-        else:
-            # Timeout Error
-            raise TimeoutError("Pychonet UDP request timeout.")
-
-        for epc in attributes:
-            if epc not in list(returned_json_data.keys()):
-                returned_json_data.update({epc: None})
-        if (len(returned_json_data)) == 1 and len(attributes) == 1:
-            return returned_json_data[attributes[0]]
-        elif (len(returned_json_data)) == 0:
+            attributes = [attributes]
+        if not attributes:
             return None
-        return returned_json_data
+
+        if not no_request:
+            readable = self.getGetProperties()
+            opc = [{"EPC": epc} for epc in attributes if epc in readable]
+            if opc:
+                logger = getattr(self._api, "_logger", None)
+                if logger is not None:
+                    logger(
+                        f"Updating instance {self._eojgc}/{self._eojcc}/{self._eojci} with attributes {opc}"
+                    )
+                response = await self._api.echonetMessage(
+                    self._host, self._eojgc, self._eojcc, self._eojci, GET, opc
+                )
+                if response is False:
+                    raise TimeoutError("Pychonet UDP request timeout.")
+
+        data = self._api._state[self._host]["instances"][self._eojgc][self._eojcc][
+            self._eojci
+        ]
+        values = {}
+        for epc in attributes:
+            value = data.get(epc)
+            if isinstance(value, (bytes, bytearray)):
+                decoder = EPC_SUPER_FUNCTIONS.get(epc)
+                if decoder is None and epc not in EPC_SUPER:
+                    decoder = self.EPC_FUNCTIONS.get(epc)
+                value = call_epc_function(decoder, value) if decoder else value.hex()
+            values[epc] = value
+        if len(attributes) == 1:
+            return values[attributes[0]]
+        return values
 
     """
     getIdentificationNumber returns a number used to identify an object uniquely
@@ -413,7 +348,7 @@ class EchonetInstance:
         """
         return self._api._state[self._host]["instances"][self._eojgc][self._eojcc][
             self._eojci
-        ][ENL_SETMAP]
+        ].get(ENL_SETMAP, [])
 
     def getGetProperties(self) -> Any:  # EPC 0x9F
         """Get list of readable properties.
@@ -423,7 +358,7 @@ class EchonetInstance:
         """
         return self._api._state[self._host]["instances"][self._eojgc][self._eojcc][
             self._eojci
-        ][ENL_GETMAP]
+        ].get(ENL_GETMAP, [])
 
     def register_epc_function(
         self, epc: int, func: Any, op_code: Optional[Dict[str, Any]] = None
