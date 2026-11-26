@@ -98,6 +98,34 @@
           "ja": "ECHONET Lite の プロパティ EPC: 0x97 と 0x98 を組み合わせて利用",
           "en": "This property utilizes both EPC: 0x97 and 0x98."
       }
+    },
+    {
+      "epc": "0xFF",
+      "propertyName": {
+        "ja": "ニックネーム",
+        "en": "Nickname"
+      },
+      "shortName": "nickname",
+      "validRelease": {
+        "from": "R",
+        "to": "latest"
+      },
+      "accessRule": {
+        "get": "optional",
+        "set": "optional",
+        "inf": "optional"
+      },
+      "descriptions": {
+        "ja": "ニックネーム",
+        "en": "Nickname"
+      },
+      "data": {
+        "type": "raw"
+      },
+      "note": {
+          "ja": "ECHONET Lite では規定されていない機能。サーバーで実装する。",
+          "en": "This property is not defined in the specification of ECHONET Lite. It should be implemented in the server."
+      }
     }
   ]
 }

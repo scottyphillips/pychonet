@@ -26,16 +26,14 @@ class MicromotionSensor(EchonetInstance):
         0x80: [_int, DICT_30_ON_OFF],            # Operation status (ON/OFF)
         0xB0: [_int, DICT_31_8_LEVELS],          # Detection threshold level (8 steps)
         0xB1: [_int, DICT_41_MICROMOTION_STATUS],  # Micromotion detection status
-        0xB2: [_int],                            # Detection counter (unsigned short)
-        0xBC: [_int],                            # Sampling count (unsigned short)
-        0xBD: [_int],                            # Sampling cycle (unsigned short, msec)
+        0xB2: _int,                              # Detection counter (unsigned short)
+        0xBC: _int,                              # Sampling count (unsigned short)
+        0xBD: _int,                              # Sampling cycle (unsigned short, msec)
     }
 
     def __init__(self, host, api_connector=None, instance=0x1):
-        # The class/group codes for a micromotion sensor. These values are
-        # placeholders; replace with the correct codes if they differ.
         self._eojgc = 0x00
-        self._eojcc = 0x1E
+        self._eojcc = 0x26
         EchonetInstance.__init__(self, host, self._eojgc, self._eojcc, instance, api_connector)
 
     # ---- Operation status -------------------------------------------------
@@ -68,7 +66,7 @@ class MicromotionSensor(EchonetInstance):
 
     async def setDetectionCounter(self, count):
         """Set the micromotion detection count."""
-        return await self.setMessage(0xB2, count)
+        return await self.setMessage(0xB2, count, pdc=2)
 
     # ---- Sampling count ---------------------------------------------------
     async def getSamplingCount(self):
@@ -77,7 +75,7 @@ class MicromotionSensor(EchonetInstance):
 
     async def setSamplingCount(self, count):
         """Set the micromotion detection sampling count."""
-        return await self.setMessage(0xBC, count)
+        return await self.setMessage(0xBC, count, pdc=2)
 
     # ---- Sampling cycle ---------------------------------------------------
     async def getSamplingCycle(self):
@@ -86,4 +84,4 @@ class MicromotionSensor(EchonetInstance):
 
     async def setSamplingCycle(self, cycle):
         """Set the micromotion detection sampling cycle (msec)."""
-        return await self.setMessage(0xBD, cycle)
+        return await self.setMessage(0xBD, cycle, pdc=2)

@@ -32,7 +32,7 @@ class CigaretteSensor(EchonetInstance):
 
     def __init__(self, host, api_connector=None, instance=0x1):
         self._eojgc = 0x00
-        self._eojcc = 0x05
+        self._eojcc = 0x1A
         EchonetInstance.__init__(
             self, host, self._eojgc, self._eojcc, instance, api_connector
         )

@@ -1,8 +1,8 @@
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
     DICT_30_ON_OFF,
-    DICT_30_OPEN_CLOSED,
     DICT_41_ON_OFF,
+    DICT_41_OPEN_CLOSED,
     _hh_mm,
     _int,
 )
@@ -13,20 +13,21 @@ class RiceCooker(EchonetInstance):
 
     EPC_FUNCTIONS = {
         0x80: [_int, DICT_30_ON_OFF],
-        0xB0: [_int, DICT_30_OPEN_CLOSED],
+        0xB0: [_int, DICT_41_OPEN_CLOSED],
         0xB1: [
             _int,
             {
-                0x41: "Rice cooking completed",
-                0x42: "Rice cooking in progress",
-                0x43: "Rice cooking paused",
-                0x44: "Rice cooking aborted",
+                0x41: "Rice cooking stopped",
+                0x42: "Preheating",
+                0x43: "Rice cooking in progress",
+                0x44: "Steaming",
+                0x45: "Rice cooking completed",
             },
         ],
         0xB2: [_int, {0x41: "Start/Restart", 0x42: "Pause"}],
         0xE1: [_int, DICT_41_ON_OFF],
-        0xE5: [_int, {0x41: "Installed", 0x42: "Removed"}],
-        0xE6: [_int, {0x41: "Installed", 0x42: "Removed"}],
+        0xE5: [_int, {0x41: "Removed", 0x42: "Installed"}],
+        0xE6: [_int, {0x41: "Removed", 0x42: "Installed"}],
         0x90: [_int, DICT_41_ON_OFF],
         0x91: _hh_mm,
         0x92: _hh_mm,
@@ -77,10 +78,10 @@ class RiceCooker(EchonetInstance):
         return await self.getMessage(0x91)
 
     async def setRiceCookingReservationSettingTime(self, time):
-        return await self.setMessage(0x91, time)
+        return await self.setMessage(0x91, time, pdc=2)
 
     async def getRiceCookingReservationSettingRelativeTime(self):
         return await self.getMessage(0x92)
 
     async def setRiceCookingReservationSettingRelativeTime(self, time):
-        return await self.setMessage(0x92, time)
+        return await self.setMessage(0x92, time, pdc=2)

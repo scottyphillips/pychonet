@@ -760,7 +760,7 @@
             "name": "false",
             "descriptions": {
               "ja": "熱交換機OFF",
-              "en": "Heat exchanger ON"
+              "en": "Heat exchanger OFF"
             }
           }
         ]

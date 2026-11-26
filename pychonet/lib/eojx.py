@@ -164,7 +164,7 @@ EOJX_CLASS = {
         0xA4: "Extended lighting system",
         0xA5: "Multiple input PCS",
         0xA6: "Hybrid water heater",
-        0xA7: "Frequency control",
+        0xA7: "Frequency regulation",
     },
     0x03: {  # Cooking/housework-related device group
         0xB0: "Coffee machine",

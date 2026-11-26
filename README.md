@@ -57,6 +57,9 @@ server.configure(
 # Discover instances on a host
 await server.discover('192.168.1.6')
 
+# Discover nodes on the local IPv4 network using multicast and broadcast
+await server.discover(broadcast=True)
+
 # Register multicast for the interface used to reach a host
 server.register_multicast('192.168.1.6')
 ```
@@ -183,8 +186,19 @@ from pychonet import Factory
 device = Factory(host, server, eojgc, eojcc, eojci)
 ```
 
-For device types not yet supported, `EchonetInstance` provides raw connectivity
-and the generic `update()`/`setMessage()` API works for any EPC.
+The distributed generator electric energy meter (`0x028E`) decodes Release R rev.4
+AC and DC energy totals, half-hour histories, fixed-time readings, and tolerance
+classes. Multiply energy counts by the factor from EPC `0xD4` to get kWh.
+`FrequencyRegulation` (`0x02A7`) decodes the clock, priority and history
+settings, and per-second power history. Its properties without a dedicated
+decoder are available as hexadecimal values via `update()`.
+
+The property catalog includes the official MRA labels and tables from the
+device appendix. `Factory()` uses a generic `EchonetInstance` for classes that
+have no dedicated Python class. Call `getAllPropertyMaps()` to discover the
+device's readable and writable EPCs. `update()` returns raw EDT as hexadecimal
+for properties without a decoder, including manufacturer-specific EPCs
+advertised by the device.
 
 ## Using with Home Assistant
 
@@ -216,9 +230,13 @@ Extra Special thanks to 'sayurin' for offering up so many constructive ideas on 
 
 ## References
 
-- [ECHONET Lite Specification, Version 1.13](https://echonet.jp/spec_v113_lite_en/)
-- [APPENDIX, Detailed Requirements for ECHONET Device objects, Release Q](https://echonet.jp/wp/wp-content/uploads/pdf/General/Standard/Release/Release_Q/Appendix_Release_Q_E.pdf)
-- [Machine Readable Appendix (MRA)](https://echonet.jp/spec_mra_rq/)
+- [ECHONET Lite Specification, Version 1.14](https://echonet.jp/spec_v114_lite_en/)
+- [Device Object Appendix, Release R rev.4](https://echonet.jp/spec_object_rr4_en/)
+- [Machine Readable Appendix 1.4.0, Release R rev.3](https://echonet.jp/spec_mra_rr3/)
+
+The packaged `mraData` files come from the official MRA 1.4.0 archive. The
+archive's `metaData.json` reports `dataVersion` as `1.3.2`. This field retains
+the value supplied by the Consortium.
 
 ## License
 

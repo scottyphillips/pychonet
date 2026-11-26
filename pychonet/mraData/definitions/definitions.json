@@ -2352,7 +2352,7 @@
           "name": "invalid",
           "descriptions": {
             "ja": "無効値",
-            "en": "invalid value"
+            "en": "Invalid value"
           },
           "readOnly": true
         }
@@ -3027,6 +3027,14 @@
       "multiple": 10,
       "unit": "ms"
     },
+    "number_0-2000_10ms": {
+      "type": "number",
+      "format": "uint16",
+      "minimum": 0,
+      "maximum": 2000,
+      "multiple": 10,
+      "unit": "ms"
+    },
     "state_Invalid_7FFFFFFF": {
       "type": "state",
       "size": 4,
@@ -3137,7 +3145,7 @@
         },
         {
           "edt": "0x0007",
-          "name": "recoverOperationNoReuired",
+          "name": "recoverOperationNoRequired",
           "descriptions": {
             "ja": "復帰操作不要",
             "en": "Recover operation no required"
@@ -3145,10 +3153,10 @@
         },
         {
           "edt": "0x0009",
-          "name": "userDefinable",
+          "name": "userDefinable1",
           "descriptions": {
-            "ja": "ユーザ定義領域",
-            "en": "User-definable domain"
+            "ja": "ユーザ定義領域1",
+            "en": "User-definable domain 1"
           }
         },
         {
@@ -3193,10 +3201,10 @@
         },
         {
           "edt": "0x006F...0x03E8",
-          "name": "userDefinable",
+          "name": "userDefinable2",
           "descriptions": {
-            "ja": "ユーザ定義領域",
-            "en": "User-definable domain"
+            "ja": "ユーザ定義領域2",
+            "en": "User-definable domain 2"
           }
         },
         {

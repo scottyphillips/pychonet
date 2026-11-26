@@ -83,6 +83,29 @@ def decodeEchonetMsg(byte: bytes) -> Dict[str, Any]:
     return data
 
 
+def encode_property_data(prop: Dict[str, Any]) -> bytes:
+    """Encode one property's EDT and check its declared data count."""
+    value = prop.get("EDT")
+    size = prop.get("PDC")
+    if value is None:
+        data = b""
+    elif isinstance(value, (bytes, bytearray)):
+        data = bytes(value)
+    elif isinstance(value, int):
+        if size is None:
+            size = 1
+        if not 0 <= size <= 255:
+            raise ValueError("PDC must fit in one byte")
+        data = value.to_bytes(size, "big")
+    else:
+        raise TypeError("EDT must be an integer or bytes")
+    if len(data) > 255:
+        raise ValueError("EDT must fit in a single property")
+    if size is not None and size != len(data):
+        raise ValueError("PDC must match the EDT length")
+    return data
+
+
 def buildEchonetMsg(data: Dict[str, Any]) -> bytearray:
     """Build an ECHONET message from a dictionary.
     
@@ -138,15 +161,10 @@ def buildEchonetMsg(data: Dict[str, Any]) -> bytearray:
 
     # You can have multiple OPC per transaction.
     for values in data["OPC"]:
-        # validate EPC
+        edt = encode_property_data(values)
         message = (message << 8) + values["EPC"]
-        if "PDC" in values:
-            message = (message << 8) + values["PDC"]
-            # if PDC has a value then concat EDT to message
-            if values["PDC"] > 0:
-                message = (message << 8 * values["PDC"]) + values["EDT"]
-        else:
-            message = (message << 8) + 0x00
+        message = (message << 8) + len(edt)
+        message = (message << (8 * len(edt))) + int.from_bytes(edt, "big")
     # print(message)
     return bytearray.fromhex(format(int(message), "x"))
 

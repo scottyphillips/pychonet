@@ -1,15 +1,44 @@
 from deprecated import deprecated
 
-# TODO fix this ChatGPT created code.
 from pychonet.EchonetInstance import EchonetInstance
 from pychonet.lib.epc_functions import (
     DICT_30_ON_OFF,
-    DICT_41_AVAILABLE_NOT_AVAILABLE,
-    DICT_41_ENABLED_DISABLED,
-    DICT_41_ON_OFF,
     _hh_mm,
     _int,
+    _signed_int,
 )
+
+
+FAN_OPERATION = {0x31: "off", 0x32: "weak", 0x33: "strong"}
+HEAT_STORAGE_ABILITY = {0x30: "available", 0x31: "not available"}
+RADIATION_METHOD = {0x30: "With fan", 0x31: "Without fan"}
+CHILD_LOCK = {0x30: "enabled", 0x31: "disabled"}
+
+
+def _air_temperature(edt):
+    if len(edt) != 1:
+        return None
+    value = _signed_int(edt)
+    return value if -127 <= value <= 125 else None
+
+
+def _stored_heat_temperature(edt):
+    if len(edt) != 2:
+        return None
+    value = _signed_int(edt)
+    return value if -200 <= value <= 1000 else None
+
+
+def _rated_power(edt):
+    if len(edt) != 8:
+        return None
+    powers = [_int(edt[index : index + 2]) for index in range(0, 8, 2)]
+    return {
+        name: value if value <= 0xFFFD else None
+        for name, value in zip(
+            ("heat_storage", "control", "weak_airflow", "strong_airflow"), powers
+        )
+    }
 
 
 # Static methods for ElectricStorageHeater
@@ -25,12 +54,12 @@ def _0155B8(payload):
 
 @deprecated(reason="Scheduled for removal.")
 def _0155BB(payload):
-    return _int(payload)
+    return _air_temperature(payload)
 
 
 @deprecated(reason="Scheduled for removal.")
 def _0155BE(payload):
-    return _int(payload)
+    return _air_temperature(payload)
 
 
 def _0155A0(payload):
@@ -39,12 +68,12 @@ def _0155A0(payload):
 
 @deprecated(reason="Scheduled for removal.")
 def _0155A1(payload):
-    return _int(payload, DICT_30_ON_OFF)
+    return _int(payload, FAN_OPERATION)
 
 
 @deprecated(reason="Scheduled for removal.")
 def _0155C0(payload):
-    return _int(payload, DICT_41_ON_OFF)
+    return _int(payload, DICT_30_ON_OFF)
 
 
 @deprecated(reason="Scheduled for removal.")
@@ -54,17 +83,17 @@ def _0155C1(payload):
 
 @deprecated(reason="Scheduled for removal.")
 def _0155C2(payload):
-    return _int(payload)
+    return _stored_heat_temperature(payload)
 
 
 @deprecated(reason="Scheduled for removal.")
 def _0155C3(payload):
-    return _int(payload, DICT_41_ENABLED_DISABLED)
+    return _int(payload, DICT_30_ON_OFF)
 
 
 @deprecated(reason="Scheduled for removal.")
 def _0155C4(payload):
-    return _int(payload, DICT_41_AVAILABLE_NOT_AVAILABLE)
+    return _int(payload, HEAT_STORAGE_ABILITY)
 
 
 @deprecated(reason="Scheduled for removal.")
@@ -79,19 +108,12 @@ def _0155C6(payload):
 
 @deprecated(reason="Scheduled for removal.")
 def _0155C7(payload):
-    return _int(
-        payload,
-        {
-            0x41: "Radiant heat method",
-            0x42: "Air heat method",
-            0x43: "Radiant and air heat method",
-        },
-    )
+    return _int(payload, RADIATION_METHOD)
 
 
 @deprecated(reason="Scheduled for removal.")
 def _0155C8(payload):
-    return _int(payload, DICT_41_ENABLED_DISABLED)
+    return _int(payload, CHILD_LOCK)
 
 
 @deprecated(reason="Scheduled for removal.")
@@ -119,27 +141,20 @@ class ElectricStorageHeater(EchonetInstance):
 
     EPC_FUNCTIONS = {
         0xB3: _int,
-        0xB8: _int,
-        0xBB: _int,
-        0xBE: _int,
+        0xB8: _rated_power,
+        0xBB: _air_temperature,
+        0xBE: _air_temperature,
         0xA0: _int,
-        0xA1: [_int, DICT_30_ON_OFF],
-        0xC0: [_int, DICT_41_ON_OFF],
+        0xA1: [_int, FAN_OPERATION],
+        0xC0: [_int, DICT_30_ON_OFF],
         0xC1: _int,
-        0xC2: _int,
-        0xC3: [_int, DICT_41_ENABLED_DISABLED],
-        0xC4: [_int, DICT_41_AVAILABLE_NOT_AVAILABLE],
+        0xC2: _stored_heat_temperature,
+        0xC3: [_int, DICT_30_ON_OFF],
+        0xC4: [_int, HEAT_STORAGE_ABILITY],
         0xC5: _int,
-        0xC6: _hh_mm,
-        0xC7: [
-            _int,
-            {
-                0x41: "Radiant heat method",
-                0x42: "Air heat method",
-                0x43: "Radiant and air heat method",
-            },
-        ],
-        0xC8: [_int, DICT_41_ENABLED_DISABLED],
+        0xC6: _int,
+        0xC7: [_int, RADIATION_METHOD],
+        0xC8: [_int, CHILD_LOCK],
         0xD0: _int,
         0xD1: _hh_mm,
         0xD2: _hh_mm,
@@ -187,7 +202,7 @@ class ElectricStorageHeater(EchonetInstance):
         return await self.getMessage(0xC1)
 
     async def setHeatStorageTemperatureSetting(self, temperature):
-        await self.setMessage(0xC1, temperature)
+        await self.setMessage(0xC1, temperature, pdc=2)
 
     async def getMeasuredStoredHeatTemperature(self):
         return await self.getMessage(0xC2)
@@ -235,13 +250,13 @@ class ElectricStorageHeater(EchonetInstance):
         return await self.getMessage(0xD1)
 
     async def setFanTimer1ONTimeSetting(self, time):
-        await self.setMessage(0xD1, time)
+        await self.setMessage(0xD1, time, pdc=2)
 
     async def getFanTimer1OFFTimeSetting(self):
         return await self.getMessage(0xD2)
 
     async def setFanTimer1OFFTimeSetting(self, time):
-        await self.setMessage(0xD2, time)
+        await self.setMessage(0xD2, time, pdc=2)
 
     async def getFanTimer2Setting(self):
         return await self.getMessage(0xD3)
@@ -253,10 +268,10 @@ class ElectricStorageHeater(EchonetInstance):
         return await self.getMessage(0xD4)
 
     async def setFanTimer2ONTimeSetting(self, time):
-        await self.setMessage(0xD4, time)
+        await self.setMessage(0xD4, time, pdc=2)
 
     async def getFanTimer2OFFTimeSetting(self):
         return await self.getMessage(0xD5)
 
     async def setFanTimer2OFFTimeSetting(self, time):
-        await self.setMessage(0xD5, time)
+        await self.setMessage(0xD5, time, pdc=2)

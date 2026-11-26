@@ -12,7 +12,7 @@
     {
       "epc": "0xE0",
       "data": {
-        "$ref": "#/definitions/number_0-99999999kWh",
+        "$ref": "#/definitions/number_0-999999999kWh",
           "coefficient": [
               "0xD4"
            ]
@@ -58,7 +58,7 @@
               "items": {
                 "oneOf": [
                   {
-                    "$ref": "#/definitions/number_0-99999999kWh",
+                    "$ref": "#/definitions/number_0-999999999kWh",
                     "coefficient": [
                       "0xD4"
                     ]
@@ -94,7 +94,7 @@
     {
       "epc": "0xE2",
       "data": {
-          "$ref": "#/definitions/number_0-99999999kWh",
+          "$ref": "#/definitions/number_0-999999999kWh",
           "coefficient": [
               "0xD4"
            ]
@@ -140,7 +140,7 @@
               "items": {
                 "oneOf": [
                   {
-                    "$ref": "#/definitions/number_0-99999999kWh",
+                    "$ref": "#/definitions/number_0-999999999kWh",
                     "coefficient": [
                       "0xD4"
                     ]
@@ -178,7 +178,7 @@
       "data": {
             "oneOf": [
               {
-                "$ref": "#/definitions/number_0-99999999kWh",
+                "$ref": "#/definitions/number_0-999999999kWh",
                 "coefficient": [
                   "0xD4"
                 ]
@@ -229,7 +229,7 @@
               "items": {
                 "oneOf": [
                   {
-                    "$ref": "#/definitions/number_0-99999999kWh",
+                    "$ref": "#/definitions/number_0-999999999kWh",
                     "coefficient": [
                       "0xD4"
                     ]
@@ -286,7 +286,7 @@
             "element": {
               "oneOf": [
                   {
-                    "$ref": "#/definitions/number_0-99999999kWh",
+                    "$ref": "#/definitions/number_0-999999999kWh",
                     "coefficient": [
                       "0xD4"
                     ]
@@ -328,7 +328,7 @@
             "element": {
               "oneOf": [
                   {
-                    "$ref": "#/definitions/number_0-99999999kWh",
+                    "$ref": "#/definitions/number_0-999999999kWh",
                     "coefficient": [
                       "0xD4"
                     ]
@@ -370,7 +370,7 @@
             "element": {
               "oneOf": [
                   {
-                    "$ref": "#/definitions/number_0-99999999kWh",
+                    "$ref": "#/definitions/number_0-999999999kWh",
                     "coefficient": [
                       "0xD4"
                     ]

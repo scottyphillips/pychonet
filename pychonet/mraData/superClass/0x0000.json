@@ -342,6 +342,10 @@
       },
       "data": {
         "$ref": "#/definitions/state_for_epc89"
+      },
+      "remark": {
+        "ja": "MRA定義を簡潔にするため、下位1バイトが0x0Aから0x6Eの場合に上位1バイトが0x04から0xFFの意味はユーザ定義であることを、現在のMRA定義は表現していない。",
+        "en": "To make the definition in MRA simple, the current MRA definition does not denote that the meaning of the upper one byte value between 0x04 and 0xFF is defined by a user when the lower one bye value is between 0x0A and 0x6E."
       }
     },
     {

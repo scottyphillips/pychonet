@@ -12,7 +12,7 @@ class MockECHONETAPIClient:
             "192.168.1.60": {
                 "instances": {
                     0x00: {  # Class group code for activity amount sensor
-                        0x1D: {  # Class code for activity amount sensor
+                        0x2A: {  # Class code for activity amount sensor
                             0x01: {
                                 0x80: b'\x31',  # Operation status: OFF
                                 0xB0: b'\x35',  # Activity threshold level: level-5
@@ -87,8 +87,7 @@ class TestActivityAmountSensor(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(amount, b'\x14')  # 20
 
         amount = await sensor.update(0xE0)
-        expected = 20  # _int() returns integer value
-        self.assertEqual(amount, expected)
+        self.assertEqual(amount, '14')  # Preserve the raw EDT for this vendor GET.
 
 
 if __name__ == '__main__':

@@ -36,7 +36,7 @@
         "enum": [
           {
             "edt": "0x0000",
-            "name": "NoFault",
+            "name": "noFault",
             "descriptions": {
               "ja": "異常なし",
               "en": "No fault"
@@ -60,7 +60,7 @@
           },
           {
             "edt": "0x0003",
-            "name": "SetIncorrectly",
+            "name": "setIncorrectly",
             "descriptions": {
               "ja": "セット不良",
               "en": "Device set incorrectly"
@@ -92,10 +92,10 @@
           },
           {
             "edt": "0x0009",
-            "name": "userDefinable",
+            "name": "userDefinable1",
             "descriptions": {
-              "ja": "ユーザ定義領域",
-              "en": "User-definable domain"
+              "ja": "ユーザ定義領域1",
+              "en": "User-definable domain 1"
             }
           },
           {
@@ -116,7 +116,7 @@
           },
           {
             "edt": "0x001E...0x003B",
-            "name": "SensorSystem",
+            "name": "sensorSystem",
             "descriptions": {
               "ja": "センサ異常",
               "en": "Fault in the sensor system"
@@ -140,15 +140,15 @@
           },
           {
             "edt": "0x006F...0x03E8",
-            "name": "userDefinable",
+            "name": "userDefinable2",
             "descriptions": {
-              "ja": "ユーザ定義領域",
-              "en": "User-definable domain"
+              "ja": "ユーザ定義領域2",
+              "en": "User-definable domain 2"
             }
           },
           {
             "edt": "0x03FF",
-            "name": "Fault",
+            "name": "fault",
             "descriptions": {
               "ja": "異常あり",
               "en": "Fault"

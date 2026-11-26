@@ -4,6 +4,8 @@ import socket
 import struct
 from collections import deque
 
+from .const import ENL_BROADCAST_ADDRESS
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -166,7 +168,14 @@ class UDPServer:
             return fut
 
         try:
-            bytes_sent = self._sock.sendto(data, addr)
+            if addr[0] == ENL_BROADCAST_ADDRESS:
+                self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                try:
+                    bytes_sent = self._sock.sendto(data, addr)
+                finally:
+                    self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 0)
+            else:
+                bytes_sent = self._sock.sendto(data, addr)
         except (BlockingIOError, InterruptedError):
             self.loop.add_writer(fd, self._sock_send, data, addr, fut, True)
         except Exception as e:

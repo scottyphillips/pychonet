@@ -1,14 +1,14 @@
 {
-    "eoj": "0x02A7",
-    "properties": [
-      {
-        "epc": "0x8C",
-        "action": "DEL"
-      },
-      {
-        "epc": "0x8D",
-        "action": "DEL"
-      },
+  "eoj": "0x02A7",
+  "properties": [
+    {
+      "epc": "0x8C",
+      "action": "DEL"
+    },
+    {
+      "epc": "0x8D",
+      "action": "DEL"
+    },
     {
       "epc": "0xE0",
       "data": {
@@ -37,7 +37,7 @@
           {
             "elementName": {
               "ja": "先頭データ月日 (MMDD)",
-              "en": "First data in the MMDD format."
+              "en": "First data in the MMDD format"
             },
             "shortName": "firstDataMmDd",
             "element": {
@@ -51,7 +51,7 @@
           {
             "elementName": {
               "ja": "先頭データ時分 (HHMM)",
-              "en": "Hour and minute of first data in the HHMM format."
+              "en": "Hour and minute of first data in the HHMM format"
             },
             "shortName": "firstDataHhMm",
             "element": {
@@ -93,7 +93,7 @@
           {
             "elementName": {
               "ja": "先頭データ月日 (MMDD)",
-              "en": "First data in the MMDD format."
+              "en": "First data in the MMDD format"
             },
             "shortName": "firstDataMmDd",
             "element": {
@@ -107,7 +107,7 @@
           {
             "elementName": {
               "ja": "先頭データ時分 (HHMM)",
-              "en": "Hour and minute of first data in the HHMM format."
+              "en": "Hour and minute of first data in the HHMM format"
             },
             "shortName": "firstDataHhMm",
             "element": {
@@ -149,7 +149,7 @@
           {
             "elementName": {
               "ja": "先頭データ月日 (MMDD)",
-              "en": "First data in the MMDD format."
+              "en": "First data in the MMDD format"
             },
             "shortName": "firstDataMmDd",
             "element": {
@@ -163,7 +163,7 @@
           {
             "elementName": {
               "ja": "先頭データ時分 (HHMM)",
-              "en": "Hour and minute of first data in the HHMM format."
+              "en": "Hour and minute of first data in the HHMM format"
             },
             "shortName": "firstDataHhMm",
             "element": {
@@ -176,6 +176,162 @@
         "ja": "firstDataMmDdはdate形式だが、YYYY部分は意味のない情報",
         "en": "YYYY part of firstDataMmDd is meaningless even though its format is date."
       }
+    },
+    {
+      "epc": "0x98",
+      "action": "DEL"
+    },
+    {
+      "epc": "0xCD",
+      "action": "DEL"
+    },
+    {
+      "epc": "0xCE",
+      "data": {
+        "type": "object",
+        "properties": [
+          {
+            "elementName": {
+              "ja": "計測年月日時分",
+              "en": "Date and time of measurement"
+            },
+            "shortName": "dateTime",
+            "element": {
+              "type":"date-time",
+              "descriptions": {
+                  "ja": "瞬時電力計測値履歴の最初の日時をISO 8601形式で示す。秒の値は意味を持たない",
+                  "en": "This property indicates the date and time of the first historical data of instantaneous power measurements in ISO 8601 format. The value of 'second' is meaningless."
+              }
+            }
+          },
+          {
+            "elementName": {
+              "ja": "計測電力値",
+              "en": "Measured power"
+            },
+            "shortName": "measuredPower",
+            "element": {
+              "type": "array",
+              "itemSize": 4,
+              "minItems": 60,
+              "maxItems": 60,
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/number_-999999999-999999999W"
+                  },
+                  {
+                    "type": "state",
+                    "size": 4,
+                    "enum": [
+                      {
+                        "edt": "0x7FFFFFFE",
+                        "name": "noData",
+                        "descriptions": {
+                          "ja": "計測データなし",
+                          "en": "No measurement data"
+                        }
+                      },
+                      {
+                        "edt": "0x80000000",
+                        "name": "underflow",
+                        "descriptions": {
+                          "ja": "アンダーフロー",
+                          "en": "Underflow"
+                        }
+                      },
+                      {
+                        "edt": "0x7FFFFFFF",
+                        "name": "overflow",
+                        "descriptions": {
+                          "ja": "オーバフロー",
+                          "en": "Overflow"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "urlParameters": {
+        "dateTime": {
+          "descriptions": {
+            "ja": "瞬時電力計測値履歴を取得する日時をISO 8601形式で示す。秒の値は意味を持たない",
+            "en": "This property indicates the date and time when the historical data of instantaneous power measurements is acquired in ISO 8601 format. The value of 'second' is meaningless."
+          },
+          "data": {
+            "type":"date-time"
+          },
+          "required": true
+        }
+      }
+    },
+    {
+      "epc": "0xCB",
+      "data": {
+        "type": "object",
+        "properties": [
+          {
+            "elementName": {
+              "ja": "履歴蓄積件数",
+              "en": "The number of history entries stored"
+            },
+            "shortName": "numberOfStoredEntries",
+            "element": {
+              "$ref": "#/definitions/number_0-65535"
+            }
+          },
+          {
+            "elementName": {
+              "ja": "履歴蓄積可能件数",
+              "en": "The number of total history entries"
+            },
+            "shortName": "numberOfTotalEntries",
+            "element": {
+              "$ref": "#/definitions/number_0-65535"
+            }
+          },
+          {
+            "elementName": {
+              "ja": "履歴最古年月日時分",
+              "en": "The oldest history date and time"
+            },
+            "shortName": "oldestDateTime",
+            "element": {
+              "type": "date-time",
+              "descriptions": {
+                  "ja": "履歴最古データの日時をISO 8601形式で示す。秒の値は意味を持たない",
+                  "en": "This property indicates the date and time of the oldest historical data of instantaneous power measurements in ISO 8601 format. The value of 'second' is meaningless."
+              }
+            }
+          },
+          {
+            "elementName": {
+              "ja": "履歴最新年月日時分",
+              "en": "The latest history date and time"
+            },
+            "shortName": "latestDateTime",
+            "element": {
+              "type": "date-time",
+               "descriptions": {
+                  "ja": "履歴最新データの日時をISO 8601形式で示す。秒の値は意味を持たない",
+                  "en": "This property indicates the date and time of the latest historical data of instantaneous power measurements in ISO 8601 format. The value of 'second' is meaningless."
+              }
+            }
+          }
+        ]
+      },
+      "remark": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      },
+      "note": {
+        "ja": "瞬時電力計測値履歴蓄積を保持する周波数制御PCSは搭載を必須とする",
+        "en": "Frequency control PCSs that maintain a history of instantaneous power measurements must support this property."
+      }
     }
-    ]
+  ]
 }

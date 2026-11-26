@@ -84,4 +84,8 @@ exclude_lines = [
 
 [tool.setuptools]
 packages = ["pychonet", "pychonet.lib"]
+include-package-data = false
 zip-safe = false
+
+[tool.setuptools.package-data]
+pychonet = ["mraData/*.json", "mraData/*/*.json", "mraData/COPYRIGHT.txt"]
