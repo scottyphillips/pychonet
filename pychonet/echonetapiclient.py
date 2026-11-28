@@ -16,16 +16,21 @@ from pychonet.lib.const import (
     SETRES,
     GETRES,
     INF,
+    INFREQ,
     INFC,
+    INFC_RES,
     SETC_SND,
     GET_SNA,
     INF_SNA,
     SETI,
     SETC,
+    SETGET,
+    SETGET_RES,
+    SETGET_SNA,
     ENL_MULTICAST_ADDRESS,
 )
 from pychonet.lib.epc_functions import EPC_SUPER_FUNCTIONS
-from pychonet.lib.functions import TIDError, buildEchonetMsg, decodeEchonetMsg
+from pychonet.lib.functions import MAX_TID_VALUE, buildEchonetMsg, decodeEchonetMsg
 
 class ECHONETAPIClient:
     """ECHONET API client for handling ECHONETLite communication."""
@@ -90,11 +95,17 @@ class ECHONETAPIClient:
                 f"ECHONETLite Message Received from {host} - tid_data is {tid_data}"
             )
 
-        isPush = tid_data is None
         seojgc = processed_data["SEOJGC"]
         seojcc = processed_data["SEOJCC"]
         seojci = processed_data["SEOJCI"]
         esv = processed_data["ESV"]
+        if tid_data is not None and (
+            tid_data["host"] not in (host, ENL_MULTICAST_ADDRESS)
+            or tid_data["eoj"] != (seojgc, seojcc, seojci)
+            or esv not in tid_data["response_esvs"]
+        ):
+            tid_data = None
+        isPush = tid_data is None
 
         if self._state.get(host) is None:  # echonet packet arrived we dont know about
             self._logger(f"Unknown ECHONETLite node has been identified - {host}")
@@ -107,9 +118,7 @@ class ECHONETAPIClient:
         key = f"{host}-{seojgc}-{seojcc}-{seojci}"
         esv_set = esv in [SETRES, SETC_SND]
         esv_get = esv in [GETRES, GET_SNA, INF, INF_SNA, INFC]
-        if not isPush:
-            self._failure_list[tid] = 0
-            self._opc_counts[tid] = len(processed_data["OPC"])
+        failure_count = 0
         # handle discovery message response
         for opc in processed_data["OPC"]:
             epc = opc["EPC"]
@@ -166,10 +175,10 @@ class ECHONETAPIClient:
                     if esv_set:
                         if opc["PDC"] > 0 or isPush:
                             if not isPush:
-                                self._failure_list[tid] += 1
+                                failure_count += 1
                             continue
                         if tid_data.get(epc) is None:
-                            self._failure_list[tid] += 1
+                            failure_count += 1
                             if self._debug_flag:
                                 self._logger(
                                     f"EDT is not set in send data for EPC '{epc}' - process each EPC"
@@ -181,7 +190,7 @@ class ECHONETAPIClient:
                     elif esv_get:
                         if opc["PDC"] == 0:
                             if not isPush:
-                                self._failure_list[tid] += 1
+                                failure_count += 1
                             continue
                     else:
                         # @todo more esv support
@@ -242,7 +251,11 @@ class ECHONETAPIClient:
 
         # if we get duplicate packets that have already been processed then dont worry about the message list.
         # but still process them regardless.
-        if tid_data is not None:
+        # Callbacks/discovery can yield while the request times out or another
+        # receiver completes it. Publish results only to the same live request.
+        if tid_data is not None and self._message_list.get(tid) is tid_data:
+            self._failure_list[tid] = failure_count
+            self._opc_counts[tid] = len(processed_data["OPC"])
             del self._message_list[tid]
 
     async def discover(
@@ -346,26 +359,42 @@ class ECHONETAPIClient:
                 # genuine device timeout (False). Callers can treat None as
                 # "queue busy, serve cached data" rather than "device offline".
                 return None
+        # A reply's results still belong to its sender until its finally block.
+        # Skip both pending requests and unconsumed results when wrapping TIDs.
+        for _ in range(MAX_TID_VALUE):
+            self._next_tx_tid = self._next_tx_tid % MAX_TID_VALUE + 1
+            if (
+                self._next_tx_tid not in self._message_list
+                and self._next_tx_tid not in self._opc_counts
+                and self._next_tx_tid not in self._failure_list
+            ):
+                break
+        else:
+            return None
         self._waiting[host] += 1
-
-        self._next_tx_tid += 1
         tx_tid = self._next_tx_tid
         message_array["TID"] = tx_tid
+        tid_data = None
         try:
-            try:
-                payload = buildEchonetMsg(message_array)
-            except TIDError:  # Quashing the rollover bug hopefully once and for all...
-                self._next_tx_tid = 1
-                tx_tid = self._next_tx_tid
-                message_array["TID"] = tx_tid
-                payload = buildEchonetMsg(message_array)
+            payload = buildEchonetMsg(message_array)
 
             opc_count = len(opc)
             if no_res:
                 is_success = True
             else:
                 is_success = False
-                tid_data = {}
+                tid_data = {
+                    "host": host,
+                    "eoj": (deojgc, deojcc, deojci),
+                    # Correlation only; service parsing retains its limitations.
+                    "response_esvs": {
+                        GET: (GETRES, GET_SNA),
+                        SETC: (SETRES, SETC_SND),
+                        INFREQ: (INF, INF_SNA),
+                        INFC: (INFC_RES,),
+                        SETGET: (SETGET_RES, SETGET_SNA),
+                    }.get(esv, ()),
+                }
                 for opc_data in opc:
                     if opc_data.get("EDT") is not None:
                         if isinstance(opc_data["EDT"], int):
@@ -386,7 +415,6 @@ class ECHONETAPIClient:
                         # Check OPC count in results
                         if not is_discover and tx_tid in self._opc_counts:
                             res_opc_count = self._opc_counts[tx_tid]
-                            del self._opc_counts[tx_tid]
                             if self._debug_flag:
                                 self._logger(
                                     f"OPC count in results is {res_opc_count}/{opc_count} from IP {host}."
@@ -397,13 +425,10 @@ class ECHONETAPIClient:
                         # transaction sucessful remove from list
                         if self._failure_list.get(tx_tid, opc_count) < opc_count:
                             is_success = True
-                        if tx_tid in self._failure_list:
-                            del self._failure_list[tx_tid]
                         not_timeout = True
                         break
-                if not is_success:
-                    if self._message_list.get(tx_tid) is not None:
-                        del self._message_list[tx_tid]
+                # Keep timed-out TIDs reserved during availability callbacks.
+                # The finally block releases their request and result data.
                 if not is_discover and self._state[host]["available"] != not_timeout:
                     self._state[host]["available"] = not_timeout
                     # Call update callback functions
@@ -413,6 +438,13 @@ class ECHONETAPIClient:
                             for update_func in self._update_callbacks[key]:
                                 await update_func(False)
         finally:
+            if tid_data is not None and (
+                self._message_list.get(tx_tid) is tid_data
+                or tx_tid not in self._message_list
+            ):
+                self._message_list.pop(tx_tid, None)
+                self._opc_counts.pop(tx_tid, None)
+                self._failure_list.pop(tx_tid, None)
             self._waiting[host] -= 1
         return is_success
 
